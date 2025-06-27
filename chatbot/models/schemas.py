@@ -19,11 +19,20 @@ class Product(Base):
     price = Column(Float, nullable=False)
     stock = Column(Integer, nullable=False)
 
+class User(Base):
+    __tablename__ = "users"
+    id = Column(String, primary_key=True)  # Assuming user_id is a string
+    name = Column(String, nullable=False)
+    email = Column(String, unique=True, nullable=False)
+    address = Column(String, nullable=True)
+    number = Column(String, nullable=False) 
+    created_at = Column(DateTime, default=datetime.utcnow)
+
 class Order(Base):
     __tablename__ = "orders"
     id = Column(Integer, primary_key=True)
     seller_id = Column(Integer, ForeignKey("sellers.id"), nullable=False)
-    user_id = Column(String, nullable=False)
+    user_id = Column(String,ForeignKey("users.id"), nullable=False)
     status = Column(String, nullable=False)
     total_amount = Column(Float, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -40,6 +49,7 @@ class ChatLog(Base):
     __tablename__ = "chat_logs"
     id = Column(Integer, primary_key=True)
     seller_id = Column(Integer, ForeignKey("sellers.id"), nullable=False)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False)
     user_query = Column(String, nullable=False)
     intent = Column(String)
     entities = Column(String)

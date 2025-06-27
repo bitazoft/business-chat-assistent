@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List, Dict
-from agent.agent import agent_executor, log_query
+from agent.agent import create_agent_executor, log_query, check_user_exists
 
 router = APIRouter()
 
@@ -21,18 +21,26 @@ async def chat(request: ChatRequest):
         if not request.seller_id.isdigit():
             raise HTTPException(status_code=400, detail="Invalid seller_id: must be a numeric ID")
 
+        # Validate user_id
+        if not request.user_id:
+            raise HTTPException(status_code=400, detail="Invalid user_id: cannot be empty")
+        
+        # Check if user exists
+        if not check_user_exists(request.user_id):
+            raise HTTPException(status_code=404, detail="User not found")
         # Format chat history for LangChain
         formatted_history = [
             {"role": msg["role"], "content": msg["content"]}
             for msg in request.chat_history
         ]
 
+        # Create agent executor with seller_id and user_id bound to tools
+        agent_executor = create_agent_executor(request.seller_id, request.user_id)
+        
         # Pass seller_id to agent for seller-specific queries
         response = agent_executor.invoke({
             "input": request.message,
-            "chat_history": formatted_history,
-            "seller_id": request.seller_id,  
-            "user_id": request.user_id      
+            "chat_history": formatted_history
         })
 
         return {"response": response["output"]}
