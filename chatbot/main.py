@@ -17,4 +17,4 @@ app.include_router(chat_router)
 async def health():
     return {"status": "healthy"}
 
-# uvicorn backend.main:app --reload
+# uvicorn main:app --reload

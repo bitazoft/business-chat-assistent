@@ -39,7 +39,7 @@ while True:
         response.raise_for_status()
         assistant_reply = response.json().get("response", "[No response returned]")
     except Exception as e:
-        assistant_reply = f"[Error contacting server: {e}]"
+        assistant_reply = f"[Error contacting server: {e}] \n {response.json()}"
 
     # Print and store assistant reply
     print(f"Assistant: {assistant_reply}\n")

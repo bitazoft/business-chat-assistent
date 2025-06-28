@@ -1,4 +1,3 @@
-
 from langchain_openai import ChatOpenAI
 from langchain_deepseek.chat_models import ChatDeepSeek
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
@@ -19,7 +18,7 @@ DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
 DEEPSEEK_API_BASE = os.getenv("DEEPSEEK_API_BASE", "https://api.deepseek.com/v1")
 
 # Make functions available for import
-__all__ = ['create_agent_executor', 'log_query', 'get_product_info', 'track_order', 'place_order']
+__all__ = ['create_agent_executor', 'log_query', 'get_product_info', 'track_order', 'place_order', 'get_user_info', 'update_user_info', 'check_user_exists', 'save_user', 'create_tmp_user_id']
 
 # LangChain Tools
 def get_product_info(product_name: str, seller_id: str) -> str:
@@ -50,17 +49,33 @@ def place_order(seller_id: str, user_id: str, items: List[dict]) -> str:
         db.add(order)
         db.flush()  # Get order.id before committing
         for item in items:
-            product = db.query(Product).filter(Product.id == int(item["product_id"]), Product.seller_id == int(seller_id)).first()
-            if not product or product.stock < item["quantity"]:
+            product = None
+            
+            # Check if product_id is numeric (ID) or string (name)
+            product_identifier = item["product_id"]
+            
+            if str(product_identifier).isdigit():
+                # Look up by product ID
+                product = db.query(Product).filter(Product.id == int(product_identifier), Product.seller_id == int(seller_id)).first()
+            else:
+                # Look up by product name
+                product = db.query(Product).filter(Product.name.ilike(f"%{product_identifier}%"), Product.seller_id == int(seller_id)).first()
+            
+            if not product:
                 db.rollback()
-                return f"Product {item['product_id']} unavailable or insufficient stock"
+                return f"Product '{product_identifier}' not found"
+            
+            if product.stock < item["quantity"]:
+                db.rollback()
+                return f"Product '{product.name}' has insufficient stock. Available: {product.stock}, Requested: {item['quantity']}"
+            
             total_amount += product.price * item["quantity"]
             order_item = OrderItem(order_id=order.id, product_id=product.id, price=product.price, quantity=item["quantity"])
             db.add(order_item)
             product.stock -= item["quantity"]
         order.total_amount = total_amount
         db.commit()
-        return f"Order placed successfully. Order ID: {order.id}"
+        return f"Order placed successfully. Order ID: {order.id}, Total Amount: ${total_amount:.2f}"
     except Exception as e:
         db.rollback()
         return f"Error placing order: {str(e)}"
@@ -74,6 +89,43 @@ def check_user_exists(user_id: str) -> bool:
         return user is not None
     finally:
         db.close()       
+
+def get_user_info(user_id: str) -> str:
+    """Get user information from database"""
+    db = SessionLocal()
+    try:
+        user = db.query(User).filter(User.id == user_id).first()
+        if user:
+            return f"User ID: {user.id}, Name: {user.name}, Email: {user.email}, Address: {user.address}, Phone: {user.number}"
+        return "User not found"
+    finally:
+        db.close()
+
+def update_user_info(user_id: str, name: str = None, email: str = None, address: str = None, number: str = None) -> str:
+    """Update user information in database"""
+    db = SessionLocal()
+    try:
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            return "User not found"
+        
+        # Update only provided fields
+        if name is not None:
+            user.name = name
+        if email is not None:
+            user.email = email
+        if address is not None:
+            user.address = address
+        if number is not None:
+            user.number = number
+            
+        db.commit()
+        return f"User information updated successfully. Updated details: Name: {user.name}, Email: {user.email}, Address: {user.address}, Phone: {user.number}"
+    except Exception as e:
+        db.rollback()
+        return f"Error updating user information: {str(e)}"
+    finally:
+        db.close()
 
 def create_tmp_user_id() -> str:
     """Create a temporary user ID based on current timestamp and random number"""
@@ -143,7 +195,7 @@ def create_agent_executor(seller_id: str, user_id: str):
         Tool(
             name="place_order", 
             func=partial(place_order, seller_id=seller_id, user_id=user_id), 
-            description="Place an order for multiple products. Required parameters: items (list of dictionaries with product_id and quantity keys)"
+            description="Place an order for multiple products. Required parameters: items (list of dictionaries with product_id and quantity keys). product_id can be either numeric ID or product name string."
         ),
         Tool(
             name="log_query", 
@@ -164,12 +216,33 @@ def create_agent_executor(seller_id: str, user_id: str):
             name="check_user_exists",
             func=partial(check_user_exists, user_id=user_id),
             description="Check if user exists in database. No additional parameters required - user_id is automatically provided."
+        ),
+        Tool(
+            name="update_user_info",
+            func=partial(update_user_info, user_id=user_id),
+            description="Update user information in database. Parameters: name (string, optional), email (string, optional), address (string, optional), number (string, optional). Only provided parameters will be updated."
         )
         # Tool(name="query_context", func=partial(query_context, seller_id=seller_id), description="Search product/FAQ documents using RAG. Required parameters: query (string)")
     ]
 
     prompt = ChatPromptTemplate.from_messages([
-        ("system", f"You are a business assistant for seller ID: {seller_id}. Use tools to fetch product info, track orders, or place orders. The seller_id and user_id are automatically provided to tools that need them. Log all queries. For general questions, use RAG context if relevant."),
+        ("system", f"""You are a business assistant for seller ID: {seller_id}. Use tools to fetch product info, track orders, or place orders. The seller_id and user_id are automatically provided to tools that need them. 
+
+        USER MANAGEMENT WORKFLOW:
+        - For general inquiries (product info, order tracking, questions): No need to collect user details
+        - ONLY when user wants to PLACE AN ORDER:
+          1. Check if user exists using check_user_exists
+          2. If user doesn't exist, ask for their details (name, email, address, phone number) and create them using save_user
+          3. If user exists, get their info using get_user_info and show it to confirm details are correct
+          4. If user wants to update any information, use update_user_info with only the fields they want to change
+          5. Only proceed with placing order after confirming user details
+
+        GENERAL INSTRUCTIONS:
+        - Log all queries using log_query
+        - For product questions, use get_product_info (no user details needed)
+        - For order tracking, use track_order (no user details needed)
+        - For placing orders, use place_order (user details required first)
+        - Always be helpful and only ask for information when necessary"""),
         MessagesPlaceholder(variable_name="chat_history"),
         ("human", "{input}"),
         MessagesPlaceholder(variable_name="agent_scratchpad")
