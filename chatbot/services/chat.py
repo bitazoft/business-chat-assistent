@@ -39,7 +39,7 @@ async def chat(request: ChatRequest):
 
         # Create agent executor with seller_id and user_id bound to tools
         agent_executor = create_agent_executor(request.seller_id,user_id)
-        
+        print(f"Agent executor created for seller_id: {request.seller_id}, user_id: {user_id}")
         # Pass seller_id to agent for seller-specific queries
         response = agent_executor.invoke({
             "input": request.message,
