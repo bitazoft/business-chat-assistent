@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List, Dict
 from agent.agent import create_agent_executor, log_query, check_user_exists, create_tmp_user_id
+from agent.multi_agent import create_multi_agent_system
 
 router = APIRouter()
 
@@ -38,7 +39,11 @@ async def chat(request: ChatRequest):
         ]
 
         # Create agent executor with seller_id and user_id bound to tools
-        agent_executor = create_agent_executor(request.seller_id,user_id)
+        # agent_executor = create_agent_executor(request.seller_id,user_id)
+        system = create_multi_agent_system(seller_id="seller_123", user_id="user_123")
+        agent_executor = system["executor"]
+        # chat_history = system["chat_history"]
+        # response = agent_executor({"input": "Book a meeting for tomorrow at 10 AM with Alice"}, chat_history)
         print(f"Agent executor created for seller_id: {request.seller_id}, user_id: {user_id}")
         # Pass seller_id to agent for seller-specific queries
         response = agent_executor.invoke({

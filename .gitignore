@@ -2,4 +2,5 @@
 Keys/Keys.txt
 Admin-Portal/backend/node_modules
 Admin-Portal/frontend/node_modules
+chatbot/venv310
 .env

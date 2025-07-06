@@ -34,5 +34,5 @@ requests
 python-dotenv
 
 # Optional: FAISS or Chroma for vector database (only if used)
-# faiss-cpu
+faiss-cpu
 # chromadb

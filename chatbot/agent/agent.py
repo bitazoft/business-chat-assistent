@@ -212,11 +212,11 @@ def create_agent_executor(seller_id: str, user_id: str):
             func=partial(get_user_info, user_id=user_id),
             description="Retrieve user information from database. No additional parameters required - user_id is automatically provided."
         ),
-        Tool(
-            name="check_user_exists",
-            func=partial(check_user_exists, user_id=user_id),
-            description="Check if user exists in database. No additional parameters required - user_id is automatically provided."
-        ),
+        # Tool(
+        #     name="check_user_exists",
+        #     func=partial(check_user_exists, user_id=user_id),
+        #     description="Check if user exists in database."
+        # ),
         Tool(
             name="update_user_info",
             func=partial(update_user_info, user_id=user_id),
