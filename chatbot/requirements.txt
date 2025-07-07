@@ -33,6 +33,10 @@ requests
 # .env management
 python-dotenv
 
+langchain-community
+
+pandas
+
 # Optional: FAISS or Chroma for vector database (only if used)
 # faiss-cpu
 # chromadb
