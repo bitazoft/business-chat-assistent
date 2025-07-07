@@ -3075,3 +3075,94 @@ DETAIL:  Key (id)=(user3) already exists.
 2025-07-07 20:33:31,568 - agent.agent - INFO - [agent.py:573] - [Response Agent] Response generation completed
 2025-07-07 20:33:31,570 - agent.agent - INFO - [agent.py:681] - [Multi-Agent System] Processing completed successfully
 2025-07-07 20:33:31,570 - services.chat - INFO - [chat.py:82] - [Chat API] Successfully processed user input
+2025-07-07 20:36:21,663 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-07 20:36:21,677 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-07 20:36:21,759 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-07 20:36:21,763 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-07 20:36:52,844 - services.chat - INFO - [chat.py:23] - [Chat API] Received chat request - seller_id: 1, user_id: user4, session_id: session_12345
+2025-07-07 20:36:52,845 - services.chat - INFO - [chat.py:29] - [Chat API] Validating seller_id
+2025-07-07 20:36:52,845 - services.chat - INFO - [chat.py:36] - [Chat API] Validating user_id
+2025-07-07 20:36:52,845 - services.chat - INFO - [chat.py:43] - [Chat API] Checking if user exists
+2025-07-07 20:36:52,845 - services.chat - INFO - [chat.py:58] - [Chat API] Formatting chat history
+2025-07-07 20:36:52,846 - services.chat - INFO - [chat.py:66] - [Chat API] Creating multi-agent system
+2025-07-07 20:36:52,846 - agent.agent - INFO - [agent.py:607] - [Multi-Agent System] Creating multi-agent system for seller_id: 1, user_id: user4
+2025-07-07 20:36:52,846 - agent.agent - INFO - [agent.py:153] - [Intent Agent] Creating intent agent for seller_id: 1
+2025-07-07 20:36:52,846 - agent.agent - INFO - [agent.py:223] - [Function Agent] Creating unified function agent for seller_id: 1, user_id: user4
+2025-07-07 20:36:52,876 - agent.agent - INFO - [agent.py:465] - [Function Agent] Unified function agent created successfully
+2025-07-07 20:36:52,876 - agent.agent - INFO - [agent.py:469] - [Response Agent] Creating response agent for seller_id: 1
+2025-07-07 20:36:52,877 - agent.agent - INFO - [agent.py:600] - [Response Agent] Response agent created successfully
+2025-07-07 20:36:52,877 - agent.agent - INFO - [agent.py:617] - [Multi-Agent System] All agents created successfully
+2025-07-07 20:36:52,878 - services.chat - INFO - [chat.py:68] - [Chat API] Agent system created successfully for seller_id: 1, user_id: user4
+2025-07-07 20:36:52,878 - services.chat - INFO - [chat.py:71] - [Chat API] Getting process_input function from agent system
+2025-07-07 20:36:52,878 - services.chat - INFO - [chat.py:75] - [Chat API] Processing user input through multi-agent system
+2025-07-07 20:36:52,878 - agent.agent - INFO - [agent.py:629] - [Multi-Agent System] Starting processing for seller_id: 1, user_id: user4
+2025-07-07 20:36:52,878 - agent.agent - INFO - [agent.py:635] - [Multi-Agent System] Processing user input: I need to buy mechanical keyboard
+2025-07-07 20:36:52,878 - agent.agent - INFO - [agent.py:641] - [Multi-Agent System] Step 1: Detecting intent
+2025-07-07 20:36:52,878 - agent.agent - INFO - [agent.py:188] - [Intent Agent] Processing input for seller_id: 1
+2025-07-07 20:36:52,880 - agent.agent - INFO - [agent.py:193] - [Intent Agent] Step 1: Extracting entities
+2025-07-07 20:36:58,451 - agent.agent - INFO - [agent.py:202] - [Intent Agent] Step 2: Classifying intent
+2025-07-07 20:37:03,594 - agent.agent - INFO - [agent.py:213] - [Intent Agent] Intent classification completed: ```json
+{
+  "intent": "place_order",
+  "confidence": 0.9,
+  "reasoning": "The user explicitly mentions the need to buy a mechanical keyboard, which directly indicates an intention to place an order for a product."
+}
+```
+2025-07-07 20:37:03,595 - agent.agent - INFO - [agent.py:652] - [Multi-Agent System] Detected intent: place_order
+2025-07-07 20:37:03,595 - agent.agent - INFO - [agent.py:655] - [Multi-Agent System] Step 2: Executing function via LLM agent
+2025-07-07 20:37:03,595 - agent.agent - INFO - [agent.py:406] - [Function Agent] Invoking unified function agent with input: {'input': 'I need to buy mechanical keyboard', 'intent': 'place_order'}
+2025-07-07 20:37:17,467 - agent.agent - INFO - [agent.py:430] - [Function Agent] Agent execution completed
+2025-07-07 20:37:17,476 - agent.agent - ERROR - [agent.py:448] - [Function Agent] Error logging query: (psycopg2.errors.ForeignKeyViolation) insert or update on table "chat_logs" violates foreign key constraint "chat_logs_user_id_fkey"
+DETAIL:  Key (user_id)=(user4) is not present in table "users".
+
+[SQL: INSERT INTO chat_logs (seller_id, user_id, user_query, intent, entities, response, timestamp) VALUES (%(seller_id)s, %(user_id)s, %(user_query)s, %(intent)s, %(entities)s, %(response)s, %(timestamp)s) RETURNING chat_logs.id]
+[parameters: {'seller_id': 1, 'user_id': 'user4', 'user_query': 'I need to buy mechanical keyboard', 'intent': 'place_order', 'entities': 'LLM-extracted', 'response': "Here's the product you're interested in:\n\n- **Product Name**: Mechanical Keyboard  \n- **Description**: Backlit mechanical keyboard  \n- **Price**: $49.99  \n- **Stock Available**: 50  \n\nWould you like to proceed with placing an order for this keyboard? If yes, let me know the quantity.", 'timestamp': datetime.datetime(2025, 7, 7, 15, 7, 17, 468639)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-07-07 20:37:17,477 - agent.agent - INFO - [agent.py:664] - [Multi-Agent System] Function executed successfully via LLM agent
+2025-07-07 20:37:17,477 - agent.agent - INFO - [agent.py:667] - [Multi-Agent System] Step 3: Generating response
+2025-07-07 20:37:17,477 - agent.agent - INFO - [agent.py:534] - [Response Agent] Processing response for seller_id: 1
+2025-07-07 20:37:17,478 - agent.agent - INFO - [agent.py:539] - [Response Agent] Step 1: Determining response strategy
+2025-07-07 20:37:22,556 - agent.agent - INFO - [agent.py:553] - [Response Agent] Step 2: Generating response
+2025-07-07 20:37:28,992 - agent.agent - INFO - [agent.py:573] - [Response Agent] Response generation completed
+2025-07-07 20:37:28,992 - agent.agent - INFO - [agent.py:681] - [Multi-Agent System] Processing completed successfully
+2025-07-07 20:37:28,992 - services.chat - INFO - [chat.py:82] - [Chat API] Successfully processed user input
+2025-07-07 20:38:16,899 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-07 20:38:16,926 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-07 20:38:17,010 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-07 20:38:17,014 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-07 20:39:43,490 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-07 20:39:43,514 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-07 20:39:43,594 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-07 20:39:43,599 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-07 20:39:57,682 - services.chat - INFO - [chat.py:23] - [Chat API] Received chat request - seller_id: 1, user_id: user4, session_id: session_12345
+2025-07-07 20:39:57,682 - services.chat - INFO - [chat.py:29] - [Chat API] Validating seller_id
+2025-07-07 20:39:57,683 - services.chat - INFO - [chat.py:36] - [Chat API] Validating user_id
+2025-07-07 20:39:57,683 - services.chat - INFO - [chat.py:43] - [Chat API] Checking if user exists
+2025-07-07 20:39:57,683 - services.chat - INFO - [chat.py:58] - [Chat API] Formatting chat history
+2025-07-07 20:39:57,683 - services.chat - INFO - [chat.py:66] - [Chat API] Creating multi-agent system
+2025-07-07 20:39:57,683 - agent.agent - INFO - [agent.py:617] - [Multi-Agent System] Creating multi-agent system for seller_id: 1, user_id: user4
+2025-07-07 20:39:57,684 - agent.agent - INFO - [agent.py:154] - [Intent Agent] Creating intent agent for seller_id: 1
+2025-07-07 20:39:57,684 - agent.agent - INFO - [agent.py:224] - [Function Agent] Creating unified function agent for seller_id: 1, user_id: user4
+2025-07-07 20:39:57,724 - agent.agent - INFO - [agent.py:475] - [Function Agent] Unified function agent created successfully
+2025-07-07 20:39:57,724 - agent.agent - INFO - [agent.py:479] - [Response Agent] Creating response agent for seller_id: 1
+2025-07-07 20:39:57,724 - agent.agent - INFO - [agent.py:610] - [Response Agent] Response agent created successfully
+2025-07-07 20:39:57,725 - agent.agent - INFO - [agent.py:627] - [Multi-Agent System] All agents created successfully
+2025-07-07 20:39:57,725 - services.chat - INFO - [chat.py:68] - [Chat API] Agent system created successfully for seller_id: 1, user_id: user4
+2025-07-07 20:39:57,725 - services.chat - INFO - [chat.py:71] - [Chat API] Getting process_input function from agent system
+2025-07-07 20:39:57,725 - services.chat - INFO - [chat.py:75] - [Chat API] Processing user input through multi-agent system
+2025-07-07 20:39:57,726 - agent.agent - INFO - [agent.py:639] - [Multi-Agent System] Starting processing for seller_id: 1, user_id: user4
+2025-07-07 20:39:57,726 - agent.agent - INFO - [agent.py:645] - [Multi-Agent System] Processing user input: give me 1
+2025-07-07 20:39:57,726 - agent.agent - INFO - [agent.py:651] - [Multi-Agent System] Step 1: Detecting intent
+2025-07-07 20:39:57,726 - agent.agent - INFO - [agent.py:189] - [Intent Agent] Processing input for seller_id: 1
+2025-07-07 20:39:57,726 - agent.agent - INFO - [agent.py:194] - [Intent Agent] Step 1: Extracting entities
+2025-07-07 20:40:06,117 - agent.agent - INFO - [agent.py:203] - [Intent Agent] Step 2: Classifying intent
+2025-07-07 20:40:13,336 - agent.agent - INFO - [agent.py:214] - [Intent Agent] Intent classification completed: ```json
+{
+  "intent": "general_inquiry",
+  "confidence": 0.5,
+  "reasoning": "The user's request is vague, mentioning only a quantity ('1') without specifying a product or context. This lack of specificity makes it difficult to classify the intent more precisely, but it aligns most closely with a general inquiry due to the absence of clear indicators for other intents like product_info, order_tracking, place_order, or user_management."
+}
+```
+2025-07-07 20:40:13,336 - agent.agent - INFO - [agent.py:662] - [Multi-Agent System] Detected intent: general_inquiry
+2025-07-07 20:40:13,336 - agent.agent - INFO - [agent.py:665] - [Multi-Agent System] Step 2: Executing function via LLM agent
+2025-07-07 20:40:13,337 - agent.agent - INFO - [agent.py:416] - [Function Agent] Invoking unified function agent with input: {'input': 'give me 1', 'intent': 'general_inquiry'}

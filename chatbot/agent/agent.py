@@ -27,7 +27,8 @@ from repositories.tools import (
     update_user_info,
     check_user_exists,
     save_user,
-    create_tmp_user_id
+    create_tmp_user_id,
+    get_all_products
 )
 from vector_store.vector_store import vector_store
 import os
@@ -274,6 +275,9 @@ def create_function_agent(seller_id: str, user_id: str):
         # Ignore any passed arguments since this function doesn't need them
         return check_user_exists(user_id=user_id)
 
+    def get_all_products_wrapper(*args, **kwargs) -> List[str]:
+        return get_all_products(seller_id=seller_id)
+
     def update_user_info_wrapper(name: str = "", email: str = "", address: str = "", number: str = "") -> dict:
         # Convert empty strings to None for compatibility
         name = None if not name else name
@@ -325,6 +329,12 @@ def create_function_agent(seller_id: str, user_id: str):
             func=update_user_info_wrapper,
             description="Updates information for the current user. All parameters are optional: name (string), email (string), address (string), phone number (string). Provide empty strings for unchanged fields.",
             args_schema=UpdateUserInfoInput
+        ),
+        StructuredTool(
+            name="get_all_products",
+            func=get_all_products_wrapper,
+            description="Retrieves all products for the current seller. Returns a list of product details as strings.",
+            args_schema=EmptyInput
         )
     ]
 

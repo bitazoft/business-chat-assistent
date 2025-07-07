@@ -18,6 +18,16 @@ def get_product_info(product_name: str, seller_id: str) -> str:
     finally:
         db.close()
 
+def get_all_products(seller_id: str) -> List[str]:
+    db = SessionLocal()
+    try:
+        products = db.query(Product).filter(Product.seller_id == int(seller_id)).all()
+        if products:
+            return [f"Product: {p.name}, Price: ${p.price}, Stock: {p.stock}" for p in products]
+        return ["No products found for this seller"]
+    finally:
+        db.close()
+
 def track_order(order_id: str) -> str:
     db = SessionLocal()
     try:
