@@ -27,7 +27,8 @@ from repositories.tools import (
     update_user_info,
     check_user_exists,
     save_user,
-    create_tmp_user_id
+    create_tmp_user_id,
+    get_all_products
 )
 from vector_store.vector_store import vector_store
 import os
@@ -274,6 +275,9 @@ def create_function_agent(seller_id: str, user_id: str):
         # Ignore any passed arguments since this function doesn't need them
         return check_user_exists(user_id=user_id)
 
+    def get_all_products_wrapper(*args, **kwargs) -> List[str]:
+        return get_all_products(seller_id=seller_id)
+
     def update_user_info_wrapper(name: str = "", email: str = "", address: str = "", number: str = "") -> dict:
         # Convert empty strings to None for compatibility
         name = None if not name else name
@@ -325,6 +329,12 @@ def create_function_agent(seller_id: str, user_id: str):
             func=update_user_info_wrapper,
             description="Updates information for the current user. All parameters are optional: name (string), email (string), address (string), phone number (string). Provide empty strings for unchanged fields.",
             args_schema=UpdateUserInfoInput
+        ),
+        StructuredTool(
+            name="get_all_products",
+            func=get_all_products_wrapper,
+            description="Retrieves all products for the current seller. Returns a list of product details as strings.",
+            args_schema=EmptyInput
         )
     ]
 
@@ -365,14 +375,29 @@ def create_function_agent(seller_id: str, user_id: str):
             - get_user_info: Retrieves user information (no parameters)
             - check_user_exists: Checks if user exists (no parameters)
             - update_user_info: Updates user information (optional: name, email, address, number as strings; use empty strings for unchanged fields)
+            - get_all_products: Retrieves all available products for the seller
             
             For intent: {{intent}}, select and execute the appropriate tool(s).
             
-            IMPORTANT:
-            - Execute tools directly; do not describe actions without executing.
-            - For place_order, verify user existence with check_user_exists, then get_user_info or save_user as needed.
-            - Extract parameters accurately from user input and chat history.
-            - Provide clear responses based on tool outputs.
+            CRITICAL USER DATA WORKFLOW FOR ORDERS:
+            When user wants to place an order, follow this EXACT sequence:
+            1. FIRST: Always use check_user_exists to verify if user exists
+            2. IF user does NOT exist:
+               - NEVER create fake or assumed user data
+               - NEVER use save_user without explicit user-provided information
+               - Ask the user: "To place your order, I need your details. Please provide your full name, email address, physical address, and phone number."
+               - WAIT for user response with their actual details
+               - ONLY then use save_user with the information they provided
+            3. IF user exists: Use get_user_info to show their details and confirm they're correct
+            4. ONLY after user confirmation, proceed with place_order
+            
+            IMPORTANT RULES:
+            - NEVER generate, assume, or create fake user information
+            - NEVER use save_user without explicit user input containing name, email, address, phone
+            - For product info and order tracking: No user details needed
+            - For placing orders: User details are MANDATORY and must be explicitly provided by the user
+            - Extract parameters accurately from user input and chat history
+            - Execute tools directly; do not describe actions without executing
         """),
         MessagesPlaceholder(variable_name="chat_history"),
         ("human", "{input}"),
