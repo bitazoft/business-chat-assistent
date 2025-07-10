@@ -5,3 +5,4 @@ Admin-Portal/frontend/node_modules
 venv
 chatbot/cache
 chatbot/__pycache__
+chatbot/data/bitext_embeddings.pkl
