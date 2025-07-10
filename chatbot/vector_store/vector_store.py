@@ -100,56 +100,65 @@ class FastVectorStore:
                 self._loaded = True
     
     @lru_cache(maxsize=100)
-    def similarity_search(self, query: str, k: int = 3) -> List:
-        """Fast similarity search using FAISS with caching, converting query string to embedding"""
-        cache_key = f"{query}_{k}"
-        
+    def similarity_search(self, query: str, k: int = 3, threshold: float = 3) -> List:
+        """Fast similarity search using FAISS with caching, converting query string to embedding
+        Args:
+            query (str): Query string.
+            k (int): Number of top matches to return.
+            threshold (float): Minimum similarity score (percentage) to include a match.
+        Returns:
+            List: List of matching documents.
+        """
+        cache_key = f"{query}_{k}_{threshold}"
+
         # Check cache first
         if cache_key in self._cache:
             return self._cache[cache_key]
-        
+
         # Lazy load embeddings, FAISS index, and embedding model
         self._lazy_load()
-        
+
         if len(self._documents) == 0 or self._index is None or self._embedding_model is None:
             return []
-        
+
         try:
             # Convert query string to embedding
             start_time = time.time()
             query_embedding = self._embedding_model.encode([query], convert_to_numpy=True, normalize_embeddings=True)
             embed_time = time.time() - start_time
             logger.debug(f"[FastVectorStore] Query embedding generated in {embed_time:.2f}s")
-            
+
             # Ensure query_embedding is float32 and 2D
             if not isinstance(query_embedding, np.ndarray) or query_embedding.dtype != np.float32:
                 query_embedding = np.array(query_embedding, dtype=np.float32)
             if query_embedding.ndim == 1:
                 query_embedding = query_embedding.reshape(1, -1)
-            
+
             # Perform FAISS search
             distances, indices = self._index.search(query_embedding, k)
-            
+
             matches = []
-            for idx in indices[0]:
-                if idx < len(self._documents):  # Ensure index is valid
+            for dist, idx in zip(distances[0], indices[0]):
+                logger.info(f"[FastVectorStore] Found match at index {idx} with distance {dist:.4f}")
+                if idx < len(self._documents) and dist <= threshold:  # Apply threshold filter
                     metadata = self._metadata[idx] if idx < len(self._metadata) else {}
                     matches.append(type('Document', (), {
                         'page_content': str(self._documents[idx]),
-                        'metadata': metadata
+                        'metadata': metadata,
+                        'similarity_score': dist
                     })())
-            
+
             # Cache the result
             self._cache[cache_key] = matches
-            
+
             # Limit cache size
             if len(self._cache) > 100:
                 # Remove oldest entries (simple FIFO)
                 oldest_key = next(iter(self._cache))
                 del self._cache[oldest_key]
-            
+
             return matches
-            
+
         except Exception as e:
             logger.error(f"[FastVectorStore] Search error: {str(e)}")
             return []

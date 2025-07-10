@@ -19,7 +19,6 @@ from functools import lru_cache
 import threading
 
 # Get logger for this module
-GlobalLogger()  # Initialize global logger configuration
 logger = get_logger(__name__)
 
 # Import existing tools
@@ -56,18 +55,18 @@ llm = ChatDeepSeek(
 
 # Caching for frequently accessed data
 @lru_cache(maxsize=100)
-def get_cached_rag_examples(user_input: str, seller_id: str, k: int = 2):
+def get_cached_rag_examples(user_input: str, seller_id: str, k: int = 2,threshold: float = 3):
     """Cached RAG examples with reduced k for speed"""
     try:
         # Simplified RAG - only get essential examples
-        results = vector_store.similarity_search(user_input, k=k)
+        results = vector_store.similarity_search(user_input, k=k, threshold=threshold)
         examples = []
         
         for result in results:
             if hasattr(result, 'metadata'):
                 result_seller = result.metadata.get('seller_id') or result.metadata.get('category')
-                if result_seller is None or str(result_seller) == str(seller_id):
-                    examples.append(f"{result.page_content[:200]}...")  # Truncate for speed
+                result_intent = result.metadata.get('intent')  # Extract intent from metadata
+                examples.append(f"{result.page_content[:200]}... (Intent: {result_intent})")  # Include intent in the examples
                     
         return "\n".join(examples[:k]) if examples else ""
     except Exception as e:
@@ -296,8 +295,8 @@ class OptimizedChatbot:
             logger.info(f"[Optimized] Detected intent: {intent} for message: '{message}' in {time.time() - start_time:.2f}s")
             
             # Get minimal RAG examples
-            examples = get_cached_rag_examples(message, self.seller_id, k=3)
-            # logger.info(f"[Optimized] Retrieved RAG examples: {examples[:100]}... for intent: {intent}")
+            examples = get_cached_rag_examples(message, self.seller_id, k=1)
+            logger.info(f"[Optimized] Retrieved RAG examples: {examples}... for intent: {intent}")
             # Format chat history for agent
             formatted_history = []
             for msg in self.chat_history[-6:]:  # Only last 3 exchanges for speed

@@ -1247,3 +1247,774 @@
 2025-07-10 10:08:56,354 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
 2025-07-10 10:08:56,355 - main - INFO - [main.py:22] - ✅ Chat routes registered
 2025-07-10 10:08:56,357 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 10:19:52,341 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 10:19:52,341 - agent.agent - INFO - [<string>:21] - INFO: This is an info message
+2025-07-10 10:19:52,341 - agent.agent - WARNING - [<string>:22] - WARNING: This is a warning message
+2025-07-10 10:19:52,341 - agent.agent - ERROR - [<string>:23] - ERROR: This is an error message
+2025-07-10 10:20:08,305 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 10:20:08,401 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 10:20:08,421 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 10:20:08,425 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 10:20:14,903 - vector_store.vector_store - INFO - [vector_store.py:38] - [FastVectorStore] Loading embeddings...
+2025-07-10 10:20:15,007 - vector_store.vector_store - INFO - [vector_store.py:48] - [FastVectorStore] Loaded 53744 Bitext documents
+2025-07-10 10:20:15,039 - vector_store.vector_store - INFO - [vector_store.py:79] - [FastVectorStore] Built FAISS index with 53744 vectors
+2025-07-10 10:20:15,040 - vector_store.vector_store - INFO - [vector_store.py:82] - [FastVectorStore] Loading embedding model all-MiniLM-L6-v2...
+2025-07-10 10:20:15,042 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:219] - Use pytorch device_name: cpu
+2025-07-10 10:20:15,042 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:227] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-10 10:20:22,832 - vector_store.vector_store - INFO - [vector_store.py:85] - [FastVectorStore] Embedding model all-MiniLM-L6-v2 loaded
+2025-07-10 10:20:22,832 - vector_store.vector_store - INFO - [vector_store.py:92] - [FastVectorStore] Embeddings and model loaded in 7.93s
+2025-07-10 10:20:23,119 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 10:20:25,693 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 10:20:25,778 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 10:20:25,783 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 10:20:33,139 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 10:20:33,140 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 10:20:33,141 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 10:20:38,117 - services.chat - INFO - [chat.py:25] - [Chat API] Received chat request - seller_id: 1, user_id: user5, session_id: session_12345
+2025-07-10 10:20:38,117 - services.chat - INFO - [chat.py:31] - [Chat API] Validating seller_id
+2025-07-10 10:20:38,117 - services.chat - INFO - [chat.py:38] - [Chat API] Validating user_id
+2025-07-10 10:20:38,117 - services.chat - INFO - [chat.py:45] - [Chat API] Checking if user exists
+2025-07-10 10:20:38,117 - services.chat - INFO - [chat.py:60] - [Chat API] Formatting chat history
+2025-07-10 10:20:38,117 - services.chat - INFO - [chat.py:68] - [Chat API] Creating optimized chatbot
+2025-07-10 10:20:38,146 - services.chat - INFO - [chat.py:72] - [Chat API] Chatbot created in 0.03s
+2025-07-10 10:20:38,146 - services.chat - INFO - [chat.py:75] - [Chat API] Processing user input through optimized chatbot
+2025-07-10 10:20:38,146 - agent.agent - INFO - [agent.py:275] - [Optimized] Detected intent: general_inquiry for message: 'hi' in 0.00s
+2025-07-10 10:20:38,147 - agent.agent - INFO - [agent.py:279] - [Optimized] Retrieved RAG examples: ... for intent: general_inquiry
+2025-07-10 10:20:44,021 - agent.agent - INFO - [agent.py:308] - [Optimized] Total processing time: 5.87s
+2025-07-10 10:20:44,022 - services.chat - INFO - [chat.py:81] - [Chat API] Message processed in 5.88s
+2025-07-10 10:20:59,536 - services.chat - INFO - [chat.py:25] - [Chat API] Received chat request - seller_id: 1, user_id: user5, session_id: session_12345
+2025-07-10 10:20:59,536 - services.chat - INFO - [chat.py:31] - [Chat API] Validating seller_id
+2025-07-10 10:20:59,536 - services.chat - INFO - [chat.py:38] - [Chat API] Validating user_id
+2025-07-10 10:20:59,536 - services.chat - INFO - [chat.py:45] - [Chat API] Checking if user exists
+2025-07-10 10:20:59,536 - services.chat - INFO - [chat.py:60] - [Chat API] Formatting chat history
+2025-07-10 10:20:59,538 - services.chat - INFO - [chat.py:68] - [Chat API] Creating optimized chatbot
+2025-07-10 10:20:59,564 - services.chat - INFO - [chat.py:72] - [Chat API] Chatbot created in 0.03s
+2025-07-10 10:20:59,564 - services.chat - INFO - [chat.py:75] - [Chat API] Processing user input through optimized chatbot
+2025-07-10 10:20:59,565 - agent.agent - INFO - [agent.py:275] - [Optimized] Detected intent: general_inquiry for message: 'hi' in 0.00s
+2025-07-10 10:20:59,565 - agent.agent - INFO - [agent.py:279] - [Optimized] Retrieved RAG examples: ... for intent: general_inquiry
+2025-07-10 10:21:04,704 - agent.agent - INFO - [agent.py:308] - [Optimized] Total processing time: 5.14s
+2025-07-10 10:21:04,705 - services.chat - INFO - [chat.py:81] - [Chat API] Message processed in 5.14s
+2025-07-10 12:55:39,397 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 12:55:45,137 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 12:55:46,288 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 12:55:46,357 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 12:57:52,359 - vector_store.vector_store - INFO - [vector_store.py:38] - [FastVectorStore] Loading embeddings...
+2025-07-10 12:57:53,594 - vector_store.vector_store - INFO - [vector_store.py:48] - [FastVectorStore] Loaded 53744 Bitext documents
+2025-07-10 12:57:53,677 - vector_store.vector_store - INFO - [vector_store.py:79] - [FastVectorStore] Built FAISS index with 53744 vectors
+2025-07-10 12:57:53,678 - vector_store.vector_store - INFO - [vector_store.py:82] - [FastVectorStore] Loading embedding model all-MiniLM-L6-v2...
+2025-07-10 12:57:53,679 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:219] - Use pytorch device_name: cpu
+2025-07-10 12:57:53,679 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:227] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-10 12:58:18,198 - vector_store.vector_store - INFO - [vector_store.py:85] - [FastVectorStore] Embedding model all-MiniLM-L6-v2 loaded
+2025-07-10 12:58:18,199 - vector_store.vector_store - INFO - [vector_store.py:92] - [FastVectorStore] Embeddings and model loaded in 25.84s
+2025-07-10 12:58:18,485 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 12:58:47,362 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 12:58:47,443 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 12:58:47,448 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 12:58:58,271 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 12:58:58,272 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 12:58:58,274 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 12:59:04,173 - services.chat - INFO - [chat.py:25] - [Chat API] Received chat request - seller_id: 1, user_id: user5, session_id: session_12345
+2025-07-10 12:59:04,173 - services.chat - INFO - [chat.py:31] - [Chat API] Validating seller_id
+2025-07-10 12:59:04,174 - services.chat - INFO - [chat.py:38] - [Chat API] Validating user_id
+2025-07-10 12:59:04,174 - services.chat - INFO - [chat.py:45] - [Chat API] Checking if user exists
+2025-07-10 12:59:04,174 - services.chat - INFO - [chat.py:60] - [Chat API] Formatting chat history
+2025-07-10 12:59:04,174 - services.chat - INFO - [chat.py:68] - [Chat API] Creating optimized chatbot
+2025-07-10 12:59:04,220 - services.chat - INFO - [chat.py:72] - [Chat API] Chatbot created in 0.05s
+2025-07-10 12:59:04,220 - services.chat - INFO - [chat.py:75] - [Chat API] Processing user input through optimized chatbot
+2025-07-10 12:59:04,220 - agent.agent - INFO - [agent.py:296] - [Optimized] Detected intent: general_inquiry for message: 'hi' in 0.00s
+2025-07-10 12:59:04,220 - vector_store.vector_store - INFO - [vector_store.py:38] - [FastVectorStore] Loading embeddings...
+2025-07-10 12:59:04,320 - vector_store.vector_store - INFO - [vector_store.py:48] - [FastVectorStore] Loaded 53744 Bitext documents
+2025-07-10 12:59:04,352 - vector_store.vector_store - INFO - [vector_store.py:79] - [FastVectorStore] Built FAISS index with 53744 vectors
+2025-07-10 12:59:04,353 - vector_store.vector_store - INFO - [vector_store.py:82] - [FastVectorStore] Loading embedding model all-MiniLM-L6-v2...
+2025-07-10 12:59:04,354 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:219] - Use pytorch device_name: cpu
+2025-07-10 12:59:04,355 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:227] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-10 12:59:10,542 - vector_store.vector_store - INFO - [vector_store.py:85] - [FastVectorStore] Embedding model all-MiniLM-L6-v2 loaded
+2025-07-10 12:59:10,543 - vector_store.vector_store - INFO - [vector_store.py:92] - [FastVectorStore] Embeddings and model loaded in 6.32s
+2025-07-10 12:59:18,227 - agent.agent - INFO - [agent.py:330] - [Optimized] Total processing time: 14.01s
+2025-07-10 12:59:18,228 - services.chat - INFO - [chat.py:81] - [Chat API] Message processed in 14.01s
+2025-07-10 12:59:53,412 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 12:59:55,943 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 12:59:58,648 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 12:59:58,736 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 12:59:58,742 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 13:00:05,832 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 13:00:05,833 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 13:00:05,834 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 13:00:05,836 - services.chat - INFO - [chat.py:25] - [Chat API] Received chat request - seller_id: 1, user_id: user5, session_id: session_12345
+2025-07-10 13:00:05,836 - services.chat - INFO - [chat.py:31] - [Chat API] Validating seller_id
+2025-07-10 13:00:05,836 - services.chat - INFO - [chat.py:38] - [Chat API] Validating user_id
+2025-07-10 13:00:05,837 - services.chat - INFO - [chat.py:45] - [Chat API] Checking if user exists
+2025-07-10 13:00:05,837 - services.chat - INFO - [chat.py:60] - [Chat API] Formatting chat history
+2025-07-10 13:00:05,837 - services.chat - INFO - [chat.py:68] - [Chat API] Creating optimized chatbot
+2025-07-10 13:00:05,866 - services.chat - INFO - [chat.py:72] - [Chat API] Chatbot created in 0.03s
+2025-07-10 13:00:05,867 - services.chat - INFO - [chat.py:75] - [Chat API] Processing user input through optimized chatbot
+2025-07-10 13:00:05,867 - agent.agent - INFO - [agent.py:296] - [Optimized] Detected intent: general_inquiry for message: 'hi' in 0.00s
+2025-07-10 13:00:05,867 - vector_store.vector_store - INFO - [vector_store.py:38] - [FastVectorStore] Loading embeddings...
+2025-07-10 13:00:05,961 - vector_store.vector_store - INFO - [vector_store.py:48] - [FastVectorStore] Loaded 53744 Bitext documents
+2025-07-10 13:00:05,987 - vector_store.vector_store - INFO - [vector_store.py:79] - [FastVectorStore] Built FAISS index with 53744 vectors
+2025-07-10 13:00:05,987 - vector_store.vector_store - INFO - [vector_store.py:82] - [FastVectorStore] Loading embedding model all-MiniLM-L6-v2...
+2025-07-10 13:00:05,989 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:219] - Use pytorch device_name: cpu
+2025-07-10 13:00:05,990 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:227] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-10 13:00:12,672 - vector_store.vector_store - INFO - [vector_store.py:85] - [FastVectorStore] Embedding model all-MiniLM-L6-v2 loaded
+2025-07-10 13:00:12,672 - vector_store.vector_store - INFO - [vector_store.py:92] - [FastVectorStore] Embeddings and model loaded in 6.81s
+2025-07-10 13:00:12,709 - agent.agent - INFO - [agent.py:300] - [Optimized] Retrieved RAG examples: ... for intent: general_inquiry
+2025-07-10 13:00:18,300 - agent.agent - INFO - [agent.py:330] - [Optimized] Total processing time: 12.43s
+2025-07-10 13:00:18,301 - services.chat - INFO - [chat.py:81] - [Chat API] Message processed in 12.43s
+2025-07-10 13:00:29,665 - services.chat - INFO - [chat.py:25] - [Chat API] Received chat request - seller_id: 1, user_id: user5, session_id: session_12345
+2025-07-10 13:00:29,665 - services.chat - INFO - [chat.py:31] - [Chat API] Validating seller_id
+2025-07-10 13:00:29,665 - services.chat - INFO - [chat.py:38] - [Chat API] Validating user_id
+2025-07-10 13:00:29,665 - services.chat - INFO - [chat.py:45] - [Chat API] Checking if user exists
+2025-07-10 13:00:29,666 - services.chat - INFO - [chat.py:60] - [Chat API] Formatting chat history
+2025-07-10 13:00:29,666 - services.chat - INFO - [chat.py:68] - [Chat API] Creating optimized chatbot
+2025-07-10 13:00:29,693 - services.chat - INFO - [chat.py:72] - [Chat API] Chatbot created in 0.03s
+2025-07-10 13:00:29,693 - services.chat - INFO - [chat.py:75] - [Chat API] Processing user input through optimized chatbot
+2025-07-10 13:00:29,693 - agent.agent - INFO - [agent.py:296] - [Optimized] Detected intent: general_inquiry for message: 'what can you do?' in 0.00s
+2025-07-10 13:00:29,805 - agent.agent - INFO - [agent.py:300] - [Optimized] Retrieved RAG examples: ... for intent: general_inquiry
+2025-07-10 13:00:42,950 - agent.agent - INFO - [agent.py:330] - [Optimized] Total processing time: 13.26s
+2025-07-10 13:00:42,950 - services.chat - INFO - [chat.py:81] - [Chat API] Message processed in 13.26s
+2025-07-10 13:01:54,391 - services.chat - INFO - [chat.py:25] - [Chat API] Received chat request - seller_id: 1, user_id: user5, session_id: session_12345
+2025-07-10 13:01:54,392 - services.chat - INFO - [chat.py:31] - [Chat API] Validating seller_id
+2025-07-10 13:01:54,392 - services.chat - INFO - [chat.py:38] - [Chat API] Validating user_id
+2025-07-10 13:01:54,392 - services.chat - INFO - [chat.py:45] - [Chat API] Checking if user exists
+2025-07-10 13:01:54,392 - services.chat - INFO - [chat.py:60] - [Chat API] Formatting chat history
+2025-07-10 13:01:54,393 - services.chat - INFO - [chat.py:68] - [Chat API] Creating optimized chatbot
+2025-07-10 13:01:54,421 - services.chat - INFO - [chat.py:72] - [Chat API] Chatbot created in 0.03s
+2025-07-10 13:01:54,421 - services.chat - INFO - [chat.py:75] - [Chat API] Processing user input through optimized chatbot
+2025-07-10 13:01:54,422 - agent.agent - INFO - [agent.py:296] - [Optimized] Detected intent: order_tracking for message: 'can I place order' in 0.00s
+2025-07-10 13:01:54,520 - agent.agent - INFO - [agent.py:300] - [Optimized] Retrieved RAG examples: ... for intent: order_tracking
+2025-07-10 13:02:00,861 - agent.agent - INFO - [agent.py:330] - [Optimized] Total processing time: 6.44s
+2025-07-10 13:02:00,862 - services.chat - INFO - [chat.py:81] - [Chat API] Message processed in 6.44s
+2025-07-10 13:02:43,811 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 13:02:45,527 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 13:02:48,433 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 13:02:48,541 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 13:02:48,547 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 13:02:55,657 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 13:02:55,658 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 13:02:55,659 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 13:02:55,660 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 13:02:57,272 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 13:03:00,082 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 13:03:00,170 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 13:03:00,176 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 13:03:06,785 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 13:03:06,786 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 13:03:06,787 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 13:03:06,788 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 13:03:08,161 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 13:03:11,030 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 13:03:11,119 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 13:03:11,123 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 13:03:17,568 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 13:03:17,569 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 13:03:17,570 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 13:06:57,959 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 13:06:59,673 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 13:07:02,858 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 13:07:02,940 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 13:07:02,944 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 13:07:09,536 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 13:07:09,537 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 13:07:09,538 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 13:07:09,539 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 13:07:10,847 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 13:07:13,446 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 13:07:13,528 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 13:07:13,533 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 13:07:19,826 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 13:07:19,827 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 13:07:19,828 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 13:07:19,828 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 13:07:21,086 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 13:07:23,656 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 13:07:23,736 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 13:07:23,740 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 13:07:30,308 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 13:07:30,309 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 13:07:30,310 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 13:07:54,949 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 13:07:56,494 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 13:07:59,341 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 13:07:59,424 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 13:07:59,430 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 13:08:06,329 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 13:08:06,330 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 13:08:06,332 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 13:08:44,995 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 13:08:46,325 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 13:08:49,041 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 13:08:49,134 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 13:08:49,139 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 13:08:55,901 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 13:08:55,902 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 13:08:55,903 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 13:08:55,904 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 13:08:57,278 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 13:09:00,142 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 13:09:00,232 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 13:09:00,238 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 13:09:07,468 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 13:09:07,470 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 13:09:07,471 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 13:09:07,471 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 13:09:09,023 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 13:09:11,860 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 13:09:11,945 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 13:09:11,950 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 13:09:19,126 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 13:09:19,127 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 13:09:19,128 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 13:09:19,129 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 13:09:20,477 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 13:09:23,213 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 13:09:23,314 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 13:09:23,320 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 13:09:29,674 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 13:09:29,676 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 13:09:29,677 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 13:13:18,463 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 13:13:18,467 - vector_store.vector_store - INFO - [vector_store.py:38] - [FastVectorStore] Loading embeddings...
+2025-07-10 13:13:18,562 - vector_store.vector_store - INFO - [vector_store.py:48] - [FastVectorStore] Loaded 53744 Bitext documents
+2025-07-10 13:13:18,590 - vector_store.vector_store - INFO - [vector_store.py:79] - [FastVectorStore] Built FAISS index with 53744 vectors
+2025-07-10 13:13:18,590 - vector_store.vector_store - INFO - [vector_store.py:82] - [FastVectorStore] Loading embedding model all-MiniLM-L6-v2...
+2025-07-10 13:13:18,591 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:219] - Use pytorch device_name: cpu
+2025-07-10 13:13:18,593 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:227] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-10 13:13:25,953 - vector_store.vector_store - INFO - [vector_store.py:85] - [FastVectorStore] Embedding model all-MiniLM-L6-v2 loaded
+2025-07-10 13:13:25,953 - vector_store.vector_store - INFO - [vector_store.py:92] - [FastVectorStore] Embeddings and model loaded in 7.49s
+2025-07-10 13:13:26,212 - vector_store.vector_store - INFO - [vector_store.py:38] - [FastVectorStore] Loading embeddings...
+2025-07-10 13:13:26,313 - vector_store.vector_store - INFO - [vector_store.py:48] - [FastVectorStore] Loaded 53744 Bitext documents
+2025-07-10 13:13:26,341 - vector_store.vector_store - INFO - [vector_store.py:79] - [FastVectorStore] Built FAISS index with 53744 vectors
+2025-07-10 13:13:26,341 - vector_store.vector_store - INFO - [vector_store.py:82] - [FastVectorStore] Loading embedding model all-MiniLM-L6-v2...
+2025-07-10 13:13:26,344 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:219] - Use pytorch device_name: cpu
+2025-07-10 13:13:26,345 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:227] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-10 13:13:31,632 - vector_store.vector_store - INFO - [vector_store.py:85] - [FastVectorStore] Embedding model all-MiniLM-L6-v2 loaded
+2025-07-10 13:13:31,633 - vector_store.vector_store - INFO - [vector_store.py:92] - [FastVectorStore] Embeddings and model loaded in 5.42s
+2025-07-10 13:15:04,296 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 13:15:04,301 - vector_store.vector_store - INFO - [vector_store.py:38] - [FastVectorStore] Loading embeddings...
+2025-07-10 13:15:04,402 - vector_store.vector_store - INFO - [vector_store.py:48] - [FastVectorStore] Loaded 53744 Bitext documents
+2025-07-10 13:15:04,431 - vector_store.vector_store - INFO - [vector_store.py:79] - [FastVectorStore] Built FAISS index with 53744 vectors
+2025-07-10 13:15:04,431 - vector_store.vector_store - INFO - [vector_store.py:82] - [FastVectorStore] Loading embedding model all-MiniLM-L6-v2...
+2025-07-10 13:15:04,433 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:219] - Use pytorch device_name: cpu
+2025-07-10 13:15:04,434 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:227] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-10 13:15:10,091 - vector_store.vector_store - INFO - [vector_store.py:85] - [FastVectorStore] Embedding model all-MiniLM-L6-v2 loaded
+2025-07-10 13:15:10,092 - vector_store.vector_store - INFO - [vector_store.py:92] - [FastVectorStore] Embeddings and model loaded in 5.79s
+2025-07-10 13:15:10,124 - vector_store.vector_store - INFO - [vector_store.py:38] - [FastVectorStore] Loading embeddings...
+2025-07-10 13:15:10,225 - vector_store.vector_store - INFO - [vector_store.py:48] - [FastVectorStore] Loaded 53744 Bitext documents
+2025-07-10 13:15:10,282 - vector_store.vector_store - INFO - [vector_store.py:79] - [FastVectorStore] Built FAISS index with 53744 vectors
+2025-07-10 13:15:10,283 - vector_store.vector_store - INFO - [vector_store.py:82] - [FastVectorStore] Loading embedding model all-MiniLM-L6-v2...
+2025-07-10 13:15:10,285 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:219] - Use pytorch device_name: cpu
+2025-07-10 13:15:10,285 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:227] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-10 13:15:15,516 - vector_store.vector_store - INFO - [vector_store.py:85] - [FastVectorStore] Embedding model all-MiniLM-L6-v2 loaded
+2025-07-10 13:15:15,516 - vector_store.vector_store - INFO - [vector_store.py:92] - [FastVectorStore] Embeddings and model loaded in 5.39s
+2025-07-10 13:17:31,152 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 13:17:31,156 - vector_store.vector_store - INFO - [vector_store.py:38] - [FastVectorStore] Loading embeddings...
+2025-07-10 13:17:31,250 - vector_store.vector_store - INFO - [vector_store.py:48] - [FastVectorStore] Loaded 53744 Bitext documents
+2025-07-10 13:17:31,285 - vector_store.vector_store - INFO - [vector_store.py:79] - [FastVectorStore] Built FAISS index with 53744 vectors
+2025-07-10 13:17:31,286 - vector_store.vector_store - INFO - [vector_store.py:82] - [FastVectorStore] Loading embedding model all-MiniLM-L6-v2...
+2025-07-10 13:17:31,288 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:219] - Use pytorch device_name: cpu
+2025-07-10 13:17:31,289 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:227] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-10 13:17:39,109 - vector_store.vector_store - INFO - [vector_store.py:85] - [FastVectorStore] Embedding model all-MiniLM-L6-v2 loaded
+2025-07-10 13:17:39,110 - vector_store.vector_store - INFO - [vector_store.py:92] - [FastVectorStore] Embeddings and model loaded in 7.95s
+2025-07-10 13:17:39,143 - vector_store.vector_store - INFO - [vector_store.py:38] - [FastVectorStore] Loading embeddings...
+2025-07-10 13:17:39,336 - vector_store.vector_store - INFO - [vector_store.py:48] - [FastVectorStore] Loaded 53744 Bitext documents
+2025-07-10 13:17:39,438 - vector_store.vector_store - INFO - [vector_store.py:79] - [FastVectorStore] Built FAISS index with 53744 vectors
+2025-07-10 13:17:39,438 - vector_store.vector_store - INFO - [vector_store.py:82] - [FastVectorStore] Loading embedding model all-MiniLM-L6-v2...
+2025-07-10 13:17:39,440 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:219] - Use pytorch device_name: cpu
+2025-07-10 13:17:39,440 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:227] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-10 13:17:45,738 - vector_store.vector_store - INFO - [vector_store.py:85] - [FastVectorStore] Embedding model all-MiniLM-L6-v2 loaded
+2025-07-10 13:17:45,738 - vector_store.vector_store - INFO - [vector_store.py:92] - [FastVectorStore] Embeddings and model loaded in 6.60s
+2025-07-10 13:17:45,763 - vector_store.vector_store - INFO - [vector_store.py:38] - [FastVectorStore] Loading embeddings...
+2025-07-10 13:17:45,965 - vector_store.vector_store - INFO - [vector_store.py:48] - [FastVectorStore] Loaded 53744 Bitext documents
+2025-07-10 13:17:46,016 - vector_store.vector_store - INFO - [vector_store.py:79] - [FastVectorStore] Built FAISS index with 53744 vectors
+2025-07-10 13:17:46,017 - vector_store.vector_store - INFO - [vector_store.py:82] - [FastVectorStore] Loading embedding model all-MiniLM-L6-v2...
+2025-07-10 13:17:46,018 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:219] - Use pytorch device_name: cpu
+2025-07-10 13:17:46,018 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:227] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-10 13:17:51,785 - vector_store.vector_store - INFO - [vector_store.py:85] - [FastVectorStore] Embedding model all-MiniLM-L6-v2 loaded
+2025-07-10 13:17:51,785 - vector_store.vector_store - INFO - [vector_store.py:92] - [FastVectorStore] Embeddings and model loaded in 6.02s
+2025-07-10 13:21:16,263 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 13:21:16,264 - vector_store.vector_store - INFO - [vector_store.py:38] - [FastVectorStore] Loading embeddings...
+2025-07-10 13:21:16,362 - vector_store.vector_store - INFO - [vector_store.py:48] - [FastVectorStore] Loaded 53744 Bitext documents
+2025-07-10 13:21:16,390 - vector_store.vector_store - INFO - [vector_store.py:79] - [FastVectorStore] Built FAISS index with 53744 vectors
+2025-07-10 13:21:16,390 - vector_store.vector_store - INFO - [vector_store.py:82] - [FastVectorStore] Loading embedding model all-MiniLM-L6-v2...
+2025-07-10 13:21:16,393 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:219] - Use pytorch device_name: cpu
+2025-07-10 13:21:16,394 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:227] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-10 13:21:36,479 - vector_store.vector_store - INFO - [vector_store.py:85] - [FastVectorStore] Embedding model all-MiniLM-L6-v2 loaded
+2025-07-10 13:21:36,480 - vector_store.vector_store - INFO - [vector_store.py:92] - [FastVectorStore] Embeddings and model loaded in 20.22s
+2025-07-10 13:23:01,836 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 13:23:01,836 - vector_store.vector_store - INFO - [vector_store.py:38] - [FastVectorStore] Loading embeddings...
+2025-07-10 13:23:01,932 - vector_store.vector_store - INFO - [vector_store.py:48] - [FastVectorStore] Loaded 53744 Bitext documents
+2025-07-10 13:23:01,959 - vector_store.vector_store - INFO - [vector_store.py:79] - [FastVectorStore] Built FAISS index with 53744 vectors
+2025-07-10 13:23:01,960 - vector_store.vector_store - INFO - [vector_store.py:82] - [FastVectorStore] Loading embedding model all-MiniLM-L6-v2...
+2025-07-10 13:23:01,962 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:219] - Use pytorch device_name: cpu
+2025-07-10 13:23:01,962 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:227] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-10 13:23:10,733 - vector_store.vector_store - INFO - [vector_store.py:85] - [FastVectorStore] Embedding model all-MiniLM-L6-v2 loaded
+2025-07-10 13:23:10,733 - vector_store.vector_store - INFO - [vector_store.py:92] - [FastVectorStore] Embeddings and model loaded in 8.90s
+2025-07-10 13:25:18,663 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 13:25:18,664 - vector_store.vector_store - INFO - [vector_store.py:38] - [FastVectorStore] Loading embeddings...
+2025-07-10 13:25:18,779 - vector_store.vector_store - INFO - [vector_store.py:48] - [FastVectorStore] Loaded 53744 Bitext documents
+2025-07-10 13:25:18,811 - vector_store.vector_store - INFO - [vector_store.py:79] - [FastVectorStore] Built FAISS index with 53744 vectors
+2025-07-10 13:25:18,812 - vector_store.vector_store - INFO - [vector_store.py:82] - [FastVectorStore] Loading embedding model all-MiniLM-L6-v2...
+2025-07-10 13:25:18,814 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:219] - Use pytorch device_name: cpu
+2025-07-10 13:25:18,814 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:227] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-10 13:25:24,866 - vector_store.vector_store - INFO - [vector_store.py:85] - [FastVectorStore] Embedding model all-MiniLM-L6-v2 loaded
+2025-07-10 13:25:24,866 - vector_store.vector_store - INFO - [vector_store.py:92] - [FastVectorStore] Embeddings and model loaded in 6.20s
+2025-07-10 13:29:41,510 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 13:29:41,594 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 13:29:41,612 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 13:29:41,617 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 13:29:47,519 - vector_store.vector_store - INFO - [vector_store.py:38] - [FastVectorStore] Loading embeddings...
+2025-07-10 13:29:47,628 - vector_store.vector_store - INFO - [vector_store.py:48] - [FastVectorStore] Loaded 53744 Bitext documents
+2025-07-10 13:29:47,661 - vector_store.vector_store - INFO - [vector_store.py:79] - [FastVectorStore] Built FAISS index with 53744 vectors
+2025-07-10 13:29:47,661 - vector_store.vector_store - INFO - [vector_store.py:82] - [FastVectorStore] Loading embedding model all-MiniLM-L6-v2...
+2025-07-10 13:29:47,666 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:219] - Use pytorch device_name: cpu
+2025-07-10 13:29:47,667 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:227] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-10 13:29:53,984 - vector_store.vector_store - INFO - [vector_store.py:85] - [FastVectorStore] Embedding model all-MiniLM-L6-v2 loaded
+2025-07-10 13:29:53,985 - vector_store.vector_store - INFO - [vector_store.py:92] - [FastVectorStore] Embeddings and model loaded in 6.47s
+2025-07-10 13:29:54,273 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 13:29:56,891 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 13:29:56,971 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 13:29:56,976 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 13:30:03,211 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 13:30:03,213 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 13:30:03,214 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 13:30:51,579 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 13:31:32,313 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 13:31:32,393 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 13:31:32,410 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 13:31:32,414 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 13:31:38,241 - vector_store.vector_store - INFO - [vector_store.py:38] - [FastVectorStore] Loading embeddings...
+2025-07-10 13:31:38,334 - vector_store.vector_store - INFO - [vector_store.py:48] - [FastVectorStore] Loaded 53744 Bitext documents
+2025-07-10 13:31:38,359 - vector_store.vector_store - INFO - [vector_store.py:79] - [FastVectorStore] Built FAISS index with 53744 vectors
+2025-07-10 13:31:38,360 - vector_store.vector_store - INFO - [vector_store.py:82] - [FastVectorStore] Loading embedding model all-MiniLM-L6-v2...
+2025-07-10 13:31:38,362 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:219] - Use pytorch device_name: cpu
+2025-07-10 13:31:38,363 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:227] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-10 13:31:59,239 - vector_store.vector_store - INFO - [vector_store.py:85] - [FastVectorStore] Embedding model all-MiniLM-L6-v2 loaded
+2025-07-10 13:31:59,240 - vector_store.vector_store - INFO - [vector_store.py:92] - [FastVectorStore] Embeddings and model loaded in 21.00s
+2025-07-10 13:31:59,500 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 13:32:02,079 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 13:32:02,166 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 13:32:02,171 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 13:32:08,569 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 13:32:08,570 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 13:32:08,571 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 13:32:13,291 - services.chat - INFO - [chat.py:25] - [Chat API] Received chat request - seller_id: 1, user_id: user5, session_id: session_12345
+2025-07-10 13:32:13,292 - services.chat - INFO - [chat.py:31] - [Chat API] Validating seller_id
+2025-07-10 13:32:13,292 - services.chat - INFO - [chat.py:38] - [Chat API] Validating user_id
+2025-07-10 13:32:13,292 - services.chat - INFO - [chat.py:45] - [Chat API] Checking if user exists
+2025-07-10 13:32:13,293 - services.chat - INFO - [chat.py:60] - [Chat API] Formatting chat history
+2025-07-10 13:32:13,293 - services.chat - INFO - [chat.py:68] - [Chat API] Creating optimized chatbot
+2025-07-10 13:32:13,325 - services.chat - INFO - [chat.py:72] - [Chat API] Chatbot created in 0.03s
+2025-07-10 13:32:13,326 - services.chat - INFO - [chat.py:75] - [Chat API] Processing user input through optimized chatbot
+2025-07-10 13:32:13,326 - agent.agent - INFO - [agent.py:295] - [Optimized] Detected intent: general_inquiry for message: 'hi' in 0.00s
+2025-07-10 13:32:13,326 - vector_store.vector_store - INFO - [vector_store.py:38] - [FastVectorStore] Loading embeddings...
+2025-07-10 13:32:13,419 - vector_store.vector_store - INFO - [vector_store.py:48] - [FastVectorStore] Loaded 53744 Bitext documents
+2025-07-10 13:32:13,445 - vector_store.vector_store - INFO - [vector_store.py:79] - [FastVectorStore] Built FAISS index with 53744 vectors
+2025-07-10 13:32:13,445 - vector_store.vector_store - INFO - [vector_store.py:82] - [FastVectorStore] Loading embedding model all-MiniLM-L6-v2...
+2025-07-10 13:32:13,447 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:219] - Use pytorch device_name: cpu
+2025-07-10 13:32:13,448 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:227] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-10 13:32:29,458 - vector_store.vector_store - INFO - [vector_store.py:85] - [FastVectorStore] Embedding model all-MiniLM-L6-v2 loaded
+2025-07-10 13:32:29,459 - vector_store.vector_store - INFO - [vector_store.py:92] - [FastVectorStore] Embeddings and model loaded in 16.13s
+2025-07-10 13:32:29,494 - agent.agent - ERROR - [agent.py:334] - [Optimized] Error: string index out of range
+2025-07-10 13:32:29,494 - services.chat - INFO - [chat.py:81] - [Chat API] Message processed in 16.17s
+2025-07-10 13:41:44,656 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 13:41:46,093 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 13:41:48,844 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 13:41:48,930 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 13:41:48,935 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 13:41:55,639 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 13:41:55,639 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 13:41:55,640 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 13:48:14,082 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 13:48:15,404 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 13:48:17,994 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 13:48:18,071 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 13:48:18,076 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 13:48:24,460 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 13:48:24,543 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 13:48:24,545 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 13:48:42,371 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 13:48:43,761 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 13:48:46,391 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 13:48:46,469 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 13:48:46,474 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 13:48:52,685 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 13:48:52,686 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 13:48:52,687 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 13:51:20,658 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 13:51:22,051 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 13:51:24,711 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 13:51:24,793 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 13:51:24,798 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 13:51:31,033 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 13:51:31,035 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 13:51:31,036 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 13:51:36,293 - services.chat - INFO - [chat.py:25] - [Chat API] Received chat request - seller_id: 1, user_id: user5, session_id: session_12345
+2025-07-10 13:51:36,294 - services.chat - INFO - [chat.py:31] - [Chat API] Validating seller_id
+2025-07-10 13:51:36,294 - services.chat - INFO - [chat.py:38] - [Chat API] Validating user_id
+2025-07-10 13:51:36,294 - services.chat - INFO - [chat.py:45] - [Chat API] Checking if user exists
+2025-07-10 13:51:36,295 - services.chat - INFO - [chat.py:60] - [Chat API] Formatting chat history
+2025-07-10 13:51:36,295 - services.chat - INFO - [chat.py:68] - [Chat API] Creating optimized chatbot
+2025-07-10 13:51:36,324 - services.chat - INFO - [chat.py:72] - [Chat API] Chatbot created in 0.03s
+2025-07-10 13:51:36,325 - services.chat - INFO - [chat.py:75] - [Chat API] Processing user input through optimized chatbot
+2025-07-10 13:51:36,325 - agent.agent - INFO - [agent.py:295] - [Optimized] Detected intent: general_inquiry for message: 'hi' in 0.00s
+2025-07-10 13:51:36,326 - vector_store.vector_store - INFO - [vector_store.py:38] - [FastVectorStore] Loading embeddings...
+2025-07-10 13:51:36,416 - vector_store.vector_store - INFO - [vector_store.py:48] - [FastVectorStore] Loaded 53744 Bitext documents
+2025-07-10 13:51:36,473 - vector_store.vector_store - INFO - [vector_store.py:79] - [FastVectorStore] Built FAISS index with 53744 vectors
+2025-07-10 13:51:36,473 - vector_store.vector_store - INFO - [vector_store.py:82] - [FastVectorStore] Loading embedding model all-MiniLM-L6-v2...
+2025-07-10 13:51:36,475 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:219] - Use pytorch device_name: cpu
+2025-07-10 13:51:36,475 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:227] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-10 13:51:51,520 - vector_store.vector_store - INFO - [vector_store.py:85] - [FastVectorStore] Embedding model all-MiniLM-L6-v2 loaded
+2025-07-10 13:51:51,528 - vector_store.vector_store - INFO - [vector_store.py:92] - [FastVectorStore] Embeddings and model loaded in 15.20s
+2025-07-10 13:51:51,574 - agent.agent - INFO - [agent.py:299] - [Optimized] Retrieved RAG examples: We're all ears! I'm tuned into the idea that you're unsure about the steps to speak to our customer support team. Don't worry; I'm here to guide you. To get in touch with our dedicated customer suppor... (Intent: contact_customer_service)... for intent: general_inquiry
+2025-07-10 13:51:58,544 - agent.agent - INFO - [agent.py:329] - [Optimized] Total processing time: 22.22s
+2025-07-10 13:51:58,545 - services.chat - INFO - [chat.py:81] - [Chat API] Message processed in 22.22s
+2025-07-10 13:52:31,494 - services.chat - INFO - [chat.py:25] - [Chat API] Received chat request - seller_id: 1, user_id: user5, session_id: session_12345
+2025-07-10 13:52:31,494 - services.chat - INFO - [chat.py:31] - [Chat API] Validating seller_id
+2025-07-10 13:52:31,494 - services.chat - INFO - [chat.py:38] - [Chat API] Validating user_id
+2025-07-10 13:52:31,495 - services.chat - INFO - [chat.py:45] - [Chat API] Checking if user exists
+2025-07-10 13:52:31,495 - services.chat - INFO - [chat.py:60] - [Chat API] Formatting chat history
+2025-07-10 13:52:31,495 - services.chat - INFO - [chat.py:68] - [Chat API] Creating optimized chatbot
+2025-07-10 13:52:31,524 - services.chat - INFO - [chat.py:72] - [Chat API] Chatbot created in 0.03s
+2025-07-10 13:52:31,524 - services.chat - INFO - [chat.py:75] - [Chat API] Processing user input through optimized chatbot
+2025-07-10 13:52:31,525 - agent.agent - INFO - [agent.py:295] - [Optimized] Detected intent: product_info for message: 'what are the products do you have' in 0.00s
+2025-07-10 13:52:31,924 - agent.agent - INFO - [agent.py:299] - [Optimized] Retrieved RAG examples: We're here for you to us! We appreciate your interest in acquiring a few of our products. We're here to guide you through the process and ensure a seamless experience. Kindly provide us with the speci... (Intent: place_order)... for intent: product_info
+2025-07-10 13:52:44,326 - agent.agent - INFO - [agent.py:329] - [Optimized] Total processing time: 12.80s
+2025-07-10 13:52:44,326 - services.chat - INFO - [chat.py:81] - [Chat API] Message processed in 12.80s
+2025-07-10 13:57:41,138 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 13:57:42,542 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 13:57:45,393 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 13:57:45,478 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 13:57:45,483 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 13:57:52,563 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 13:57:52,564 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 13:57:52,565 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 13:59:02,929 - services.chat - INFO - [chat.py:25] - [Chat API] Received chat request - seller_id: 1, user_id: user5, session_id: session_12345
+2025-07-10 13:59:02,930 - services.chat - INFO - [chat.py:31] - [Chat API] Validating seller_id
+2025-07-10 13:59:02,930 - services.chat - INFO - [chat.py:38] - [Chat API] Validating user_id
+2025-07-10 13:59:02,931 - services.chat - INFO - [chat.py:45] - [Chat API] Checking if user exists
+2025-07-10 13:59:02,931 - services.chat - INFO - [chat.py:60] - [Chat API] Formatting chat history
+2025-07-10 13:59:02,931 - services.chat - INFO - [chat.py:68] - [Chat API] Creating optimized chatbot
+2025-07-10 13:59:02,962 - services.chat - INFO - [chat.py:72] - [Chat API] Chatbot created in 0.03s
+2025-07-10 13:59:02,962 - services.chat - INFO - [chat.py:75] - [Chat API] Processing user input through optimized chatbot
+2025-07-10 13:59:02,963 - agent.agent - INFO - [agent.py:295] - [Optimized] Detected intent: general_inquiry for message: 'what is my name' in 0.00s
+2025-07-10 13:59:02,963 - vector_store.vector_store - INFO - [vector_store.py:38] - [FastVectorStore] Loading embeddings...
+2025-07-10 13:59:03,057 - vector_store.vector_store - INFO - [vector_store.py:48] - [FastVectorStore] Loaded 53744 Bitext documents
+2025-07-10 13:59:03,084 - vector_store.vector_store - INFO - [vector_store.py:79] - [FastVectorStore] Built FAISS index with 53744 vectors
+2025-07-10 13:59:03,084 - vector_store.vector_store - INFO - [vector_store.py:82] - [FastVectorStore] Loading embedding model all-MiniLM-L6-v2...
+2025-07-10 13:59:03,086 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:219] - Use pytorch device_name: cpu
+2025-07-10 13:59:03,086 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:227] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-10 13:59:10,171 - vector_store.vector_store - INFO - [vector_store.py:85] - [FastVectorStore] Embedding model all-MiniLM-L6-v2 loaded
+2025-07-10 13:59:10,172 - vector_store.vector_store - INFO - [vector_store.py:92] - [FastVectorStore] Embeddings and model loaded in 7.21s
+2025-07-10 13:59:10,220 - agent.agent - INFO - [agent.py:299] - [Optimized] Retrieved RAG examples: I'm aware that you're feeling dissatisfied with our work, and I apologize for any inconvenience caused. Your feedback is crucial to us, and I want to ensure that your concern is addressed promptly and... (Intent: complaint)
+We're all ears! I'm tuned into the idea that you need assistance in contacting our customer service team. We're here to help! To get in touch with our dedicated support representatives, you can reach ... (Intent: contact_customer_service)
+We're all ears! I'm tuned into the idea that you're unsure about the steps to speak to our customer support team. Don't worry; I'm here to guide you. To get in touch with our dedicated customer suppor... (Intent: contact_customer_service)... for intent: general_inquiry
+2025-07-10 14:00:02,377 - agent.agent - INFO - [agent.py:329] - [Optimized] Total processing time: 59.41s
+2025-07-10 14:00:02,378 - services.chat - INFO - [chat.py:81] - [Chat API] Message processed in 59.42s
+2025-07-10 14:00:51,589 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 14:00:52,905 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 14:00:55,529 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 14:00:55,611 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 14:00:55,616 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 14:01:01,921 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 14:01:01,922 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 14:01:01,923 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 14:01:01,925 - services.chat - INFO - [chat.py:25] - [Chat API] Received chat request - seller_id: 1, user_id: user5, session_id: session_12345
+2025-07-10 14:01:01,925 - services.chat - INFO - [chat.py:31] - [Chat API] Validating seller_id
+2025-07-10 14:01:01,925 - services.chat - INFO - [chat.py:38] - [Chat API] Validating user_id
+2025-07-10 14:01:01,925 - services.chat - INFO - [chat.py:45] - [Chat API] Checking if user exists
+2025-07-10 14:01:01,926 - services.chat - INFO - [chat.py:60] - [Chat API] Formatting chat history
+2025-07-10 14:01:01,926 - services.chat - INFO - [chat.py:68] - [Chat API] Creating optimized chatbot
+2025-07-10 14:01:01,965 - services.chat - INFO - [chat.py:72] - [Chat API] Chatbot created in 0.03s
+2025-07-10 14:01:01,965 - services.chat - INFO - [chat.py:75] - [Chat API] Processing user input through optimized chatbot
+2025-07-10 14:01:01,965 - agent.agent - INFO - [agent.py:295] - [Optimized] Detected intent: general_inquiry for message: 'what is my name' in 0.00s
+2025-07-10 14:01:01,966 - vector_store.vector_store - INFO - [vector_store.py:38] - [FastVectorStore] Loading embeddings...
+2025-07-10 14:01:02,059 - vector_store.vector_store - INFO - [vector_store.py:48] - [FastVectorStore] Loaded 53744 Bitext documents
+2025-07-10 14:01:02,087 - vector_store.vector_store - INFO - [vector_store.py:79] - [FastVectorStore] Built FAISS index with 53744 vectors
+2025-07-10 14:01:02,087 - vector_store.vector_store - INFO - [vector_store.py:82] - [FastVectorStore] Loading embedding model all-MiniLM-L6-v2...
+2025-07-10 14:01:02,089 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:219] - Use pytorch device_name: cpu
+2025-07-10 14:01:02,089 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:227] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-10 14:01:08,446 - vector_store.vector_store - INFO - [vector_store.py:85] - [FastVectorStore] Embedding model all-MiniLM-L6-v2 loaded
+2025-07-10 14:01:08,447 - vector_store.vector_store - INFO - [vector_store.py:92] - [FastVectorStore] Embeddings and model loaded in 6.48s
+2025-07-10 14:01:08,480 - agent.agent - INFO - [agent.py:299] - [Optimized] Retrieved RAG examples: I'm aware that you're feeling dissatisfied with our work, and I apologize for any inconvenience caused. Your feedback is crucial to us, and I want to ensure that your concern is addressed promptly and... (Intent: complaint)... for intent: general_inquiry
+2025-07-10 14:01:13,980 - agent.agent - INFO - [agent.py:329] - [Optimized] Total processing time: 12.02s
+2025-07-10 14:01:13,981 - services.chat - INFO - [chat.py:81] - [Chat API] Message processed in 12.02s
+2025-07-10 14:02:17,303 - services.chat - INFO - [chat.py:25] - [Chat API] Received chat request - seller_id: 1, user_id: user5, session_id: session_12345
+2025-07-10 14:02:17,304 - services.chat - INFO - [chat.py:31] - [Chat API] Validating seller_id
+2025-07-10 14:02:17,304 - services.chat - INFO - [chat.py:38] - [Chat API] Validating user_id
+2025-07-10 14:02:17,304 - services.chat - INFO - [chat.py:45] - [Chat API] Checking if user exists
+2025-07-10 14:02:17,304 - services.chat - INFO - [chat.py:60] - [Chat API] Formatting chat history
+2025-07-10 14:02:17,304 - services.chat - INFO - [chat.py:68] - [Chat API] Creating optimized chatbot
+2025-07-10 14:02:17,332 - services.chat - INFO - [chat.py:72] - [Chat API] Chatbot created in 0.03s
+2025-07-10 14:02:17,332 - services.chat - INFO - [chat.py:75] - [Chat API] Processing user input through optimized chatbot
+2025-07-10 14:02:17,332 - agent.agent - INFO - [agent.py:295] - [Optimized] Detected intent: general_inquiry for message: 'your produt is so bad' in 0.00s
+2025-07-10 14:02:17,471 - agent.agent - INFO - [agent.py:299] - [Optimized] Retrieved RAG examples: I'm aware that you're feeling dissatisfied with our work, and I apologize for any inconvenience caused. Your feedback is crucial to us, and I want to ensure that your concern is addressed promptly and... (Intent: complaint)... for intent: general_inquiry
+2025-07-10 14:02:26,146 - agent.agent - INFO - [agent.py:329] - [Optimized] Total processing time: 8.81s
+2025-07-10 14:02:26,147 - services.chat - INFO - [chat.py:81] - [Chat API] Message processed in 8.82s
+2025-07-10 14:04:41,858 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 14:04:43,397 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 14:04:46,322 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 14:04:46,420 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 14:04:46,426 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 14:04:52,734 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 14:04:52,735 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 14:04:52,736 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 14:05:21,436 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 14:05:22,984 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 14:05:25,790 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 14:05:25,876 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 14:05:25,881 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 14:05:32,362 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 14:05:32,363 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 14:05:32,365 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 14:06:00,720 - services.chat - INFO - [chat.py:25] - [Chat API] Received chat request - seller_id: 1, user_id: user5, session_id: session_12345
+2025-07-10 14:06:00,721 - services.chat - INFO - [chat.py:31] - [Chat API] Validating seller_id
+2025-07-10 14:06:00,721 - services.chat - INFO - [chat.py:38] - [Chat API] Validating user_id
+2025-07-10 14:06:00,721 - services.chat - INFO - [chat.py:45] - [Chat API] Checking if user exists
+2025-07-10 14:06:00,721 - services.chat - INFO - [chat.py:60] - [Chat API] Formatting chat history
+2025-07-10 14:06:00,722 - services.chat - INFO - [chat.py:68] - [Chat API] Creating optimized chatbot
+2025-07-10 14:06:00,753 - services.chat - INFO - [chat.py:72] - [Chat API] Chatbot created in 0.03s
+2025-07-10 14:06:00,753 - services.chat - INFO - [chat.py:75] - [Chat API] Processing user input through optimized chatbot
+2025-07-10 14:06:00,753 - agent.agent - INFO - [agent.py:295] - [Optimized] Detected intent: general_inquiry for message: 'can I see what you have' in 0.00s
+2025-07-10 14:06:00,754 - vector_store.vector_store - INFO - [vector_store.py:38] - [FastVectorStore] Loading embeddings...
+2025-07-10 14:06:00,845 - vector_store.vector_store - INFO - [vector_store.py:48] - [FastVectorStore] Loaded 53744 Bitext documents
+2025-07-10 14:06:00,869 - vector_store.vector_store - INFO - [vector_store.py:79] - [FastVectorStore] Built FAISS index with 53744 vectors
+2025-07-10 14:06:00,870 - vector_store.vector_store - INFO - [vector_store.py:82] - [FastVectorStore] Loading embedding model all-MiniLM-L6-v2...
+2025-07-10 14:06:00,872 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:219] - Use pytorch device_name: cpu
+2025-07-10 14:06:00,872 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:227] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-10 14:06:08,473 - vector_store.vector_store - INFO - [vector_store.py:85] - [FastVectorStore] Embedding model all-MiniLM-L6-v2 loaded
+2025-07-10 14:06:08,473 - vector_store.vector_store - INFO - [vector_store.py:92] - [FastVectorStore] Embeddings and model loaded in 7.72s
+2025-07-10 14:06:08,506 - agent.agent - INFO - [agent.py:299] - [Optimized] Retrieved RAG examples: ... for intent: general_inquiry
+2025-07-10 14:06:20,745 - agent.agent - INFO - [agent.py:329] - [Optimized] Total processing time: 19.99s
+2025-07-10 14:06:20,745 - services.chat - INFO - [chat.py:81] - [Chat API] Message processed in 19.99s
+2025-07-10 14:06:31,061 - services.chat - INFO - [chat.py:25] - [Chat API] Received chat request - seller_id: 1, user_id: user5, session_id: session_12345
+2025-07-10 14:06:31,147 - services.chat - INFO - [chat.py:31] - [Chat API] Validating seller_id
+2025-07-10 14:06:31,148 - services.chat - INFO - [chat.py:38] - [Chat API] Validating user_id
+2025-07-10 14:06:31,148 - services.chat - INFO - [chat.py:45] - [Chat API] Checking if user exists
+2025-07-10 14:06:31,148 - services.chat - INFO - [chat.py:60] - [Chat API] Formatting chat history
+2025-07-10 14:06:31,149 - services.chat - INFO - [chat.py:68] - [Chat API] Creating optimized chatbot
+2025-07-10 14:06:31,175 - services.chat - INFO - [chat.py:72] - [Chat API] Chatbot created in 0.03s
+2025-07-10 14:06:31,175 - services.chat - INFO - [chat.py:75] - [Chat API] Processing user input through optimized chatbot
+2025-07-10 14:06:31,176 - agent.agent - INFO - [agent.py:295] - [Optimized] Detected intent: product_info for message: 'you have very bad products' in 0.00s
+2025-07-10 14:06:31,195 - agent.agent - INFO - [agent.py:299] - [Optimized] Retrieved RAG examples: ... for intent: product_info
+2025-07-10 14:06:38,790 - agent.agent - INFO - [agent.py:329] - [Optimized] Total processing time: 7.61s
+2025-07-10 14:06:38,790 - services.chat - INFO - [chat.py:81] - [Chat API] Message processed in 7.61s
+2025-07-10 14:06:52,921 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 14:06:54,264 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 14:06:56,870 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 14:06:56,956 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 14:06:56,961 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 14:07:03,308 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 14:07:03,310 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 14:07:03,311 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 14:07:46,890 - services.chat - INFO - [chat.py:25] - [Chat API] Received chat request - seller_id: 1, user_id: user5, session_id: session_12345
+2025-07-10 14:07:46,890 - services.chat - INFO - [chat.py:31] - [Chat API] Validating seller_id
+2025-07-10 14:07:46,890 - services.chat - INFO - [chat.py:38] - [Chat API] Validating user_id
+2025-07-10 14:07:46,891 - services.chat - INFO - [chat.py:45] - [Chat API] Checking if user exists
+2025-07-10 14:07:46,891 - services.chat - INFO - [chat.py:60] - [Chat API] Formatting chat history
+2025-07-10 14:07:46,891 - services.chat - INFO - [chat.py:68] - [Chat API] Creating optimized chatbot
+2025-07-10 14:07:46,921 - services.chat - INFO - [chat.py:72] - [Chat API] Chatbot created in 0.03s
+2025-07-10 14:07:46,921 - services.chat - INFO - [chat.py:75] - [Chat API] Processing user input through optimized chatbot
+2025-07-10 14:07:46,921 - agent.agent - INFO - [agent.py:295] - [Optimized] Detected intent: product_info for message: 'your products are bad' in 0.00s
+2025-07-10 14:07:46,921 - vector_store.vector_store - INFO - [vector_store.py:38] - [FastVectorStore] Loading embeddings...
+2025-07-10 14:07:47,014 - vector_store.vector_store - INFO - [vector_store.py:48] - [FastVectorStore] Loaded 53744 Bitext documents
+2025-07-10 14:07:47,039 - vector_store.vector_store - INFO - [vector_store.py:79] - [FastVectorStore] Built FAISS index with 53744 vectors
+2025-07-10 14:07:47,040 - vector_store.vector_store - INFO - [vector_store.py:82] - [FastVectorStore] Loading embedding model all-MiniLM-L6-v2...
+2025-07-10 14:07:47,042 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:219] - Use pytorch device_name: cpu
+2025-07-10 14:07:47,042 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:227] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-10 14:08:03,778 - vector_store.vector_store - INFO - [vector_store.py:85] - [FastVectorStore] Embedding model all-MiniLM-L6-v2 loaded
+2025-07-10 14:08:03,779 - vector_store.vector_store - INFO - [vector_store.py:92] - [FastVectorStore] Embeddings and model loaded in 16.86s
+2025-07-10 14:08:03,812 - agent.agent - INFO - [agent.py:299] - [Optimized] Retrieved RAG examples: ... for intent: product_info
+2025-07-10 14:08:14,159 - agent.agent - INFO - [agent.py:329] - [Optimized] Total processing time: 27.24s
+2025-07-10 14:08:14,159 - services.chat - INFO - [chat.py:81] - [Chat API] Message processed in 27.24s
+2025-07-10 14:08:35,071 - services.chat - INFO - [chat.py:25] - [Chat API] Received chat request - seller_id: 1, user_id: user5, session_id: session_12345
+2025-07-10 14:08:35,071 - services.chat - INFO - [chat.py:31] - [Chat API] Validating seller_id
+2025-07-10 14:08:35,071 - services.chat - INFO - [chat.py:38] - [Chat API] Validating user_id
+2025-07-10 14:08:35,072 - services.chat - INFO - [chat.py:45] - [Chat API] Checking if user exists
+2025-07-10 14:08:35,072 - services.chat - INFO - [chat.py:60] - [Chat API] Formatting chat history
+2025-07-10 14:08:35,072 - services.chat - INFO - [chat.py:68] - [Chat API] Creating optimized chatbot
+2025-07-10 14:08:35,101 - services.chat - INFO - [chat.py:72] - [Chat API] Chatbot created in 0.03s
+2025-07-10 14:08:35,101 - services.chat - INFO - [chat.py:75] - [Chat API] Processing user input through optimized chatbot
+2025-07-10 14:08:35,102 - agent.agent - INFO - [agent.py:295] - [Optimized] Detected intent: general_inquiry for message: 'hi' in 0.00s
+2025-07-10 14:08:35,115 - agent.agent - INFO - [agent.py:299] - [Optimized] Retrieved RAG examples: ... for intent: general_inquiry
+2025-07-10 14:08:40,625 - agent.agent - INFO - [agent.py:329] - [Optimized] Total processing time: 5.52s
+2025-07-10 14:08:40,625 - services.chat - INFO - [chat.py:81] - [Chat API] Message processed in 5.52s
+2025-07-10 14:09:43,388 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 14:09:44,747 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 14:09:47,417 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 14:09:47,503 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 14:09:47,508 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 14:09:54,347 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 14:09:54,348 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 14:09:54,349 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 14:09:54,351 - services.chat - INFO - [chat.py:25] - [Chat API] Received chat request - seller_id: 1, user_id: user5, session_id: session_12345
+2025-07-10 14:09:54,352 - services.chat - INFO - [chat.py:31] - [Chat API] Validating seller_id
+2025-07-10 14:09:54,352 - services.chat - INFO - [chat.py:38] - [Chat API] Validating user_id
+2025-07-10 14:09:54,352 - services.chat - INFO - [chat.py:45] - [Chat API] Checking if user exists
+2025-07-10 14:09:54,352 - services.chat - INFO - [chat.py:60] - [Chat API] Formatting chat history
+2025-07-10 14:09:54,352 - services.chat - INFO - [chat.py:68] - [Chat API] Creating optimized chatbot
+2025-07-10 14:09:54,383 - services.chat - INFO - [chat.py:72] - [Chat API] Chatbot created in 0.03s
+2025-07-10 14:09:54,384 - services.chat - INFO - [chat.py:75] - [Chat API] Processing user input through optimized chatbot
+2025-07-10 14:09:54,384 - agent.agent - INFO - [agent.py:295] - [Optimized] Detected intent: general_inquiry for message: 'hi' in 0.00s
+2025-07-10 14:09:54,384 - vector_store.vector_store - INFO - [vector_store.py:38] - [FastVectorStore] Loading embeddings...
+2025-07-10 14:09:54,488 - vector_store.vector_store - INFO - [vector_store.py:48] - [FastVectorStore] Loaded 53744 Bitext documents
+2025-07-10 14:09:54,518 - vector_store.vector_store - INFO - [vector_store.py:79] - [FastVectorStore] Built FAISS index with 53744 vectors
+2025-07-10 14:09:54,518 - vector_store.vector_store - INFO - [vector_store.py:82] - [FastVectorStore] Loading embedding model all-MiniLM-L6-v2...
+2025-07-10 14:09:54,521 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:219] - Use pytorch device_name: cpu
+2025-07-10 14:09:54,521 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:227] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-10 14:10:06,330 - vector_store.vector_store - INFO - [vector_store.py:85] - [FastVectorStore] Embedding model all-MiniLM-L6-v2 loaded
+2025-07-10 14:10:06,331 - vector_store.vector_store - INFO - [vector_store.py:92] - [FastVectorStore] Embeddings and model loaded in 11.95s
+2025-07-10 14:10:06,362 - agent.agent - INFO - [agent.py:299] - [Optimized] Retrieved RAG examples: ... for intent: general_inquiry
+2025-07-10 14:10:11,923 - agent.agent - INFO - [agent.py:329] - [Optimized] Total processing time: 17.54s
+2025-07-10 14:10:11,923 - services.chat - INFO - [chat.py:81] - [Chat API] Message processed in 17.54s
+2025-07-10 14:12:11,021 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 14:12:12,330 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 14:12:15,026 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 14:12:15,108 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 14:12:15,113 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 14:12:22,278 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 14:12:22,278 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 14:12:22,279 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 14:15:55,243 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 14:15:56,622 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 14:15:59,194 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 14:15:59,278 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 14:15:59,283 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 14:16:05,605 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 14:16:05,606 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 14:16:05,607 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 14:16:07,344 - services.chat - INFO - [chat.py:25] - [Chat API] Received chat request - seller_id: 1, user_id: user5, session_id: session_12345
+2025-07-10 14:16:07,344 - services.chat - INFO - [chat.py:31] - [Chat API] Validating seller_id
+2025-07-10 14:16:07,344 - services.chat - INFO - [chat.py:38] - [Chat API] Validating user_id
+2025-07-10 14:16:07,344 - services.chat - INFO - [chat.py:45] - [Chat API] Checking if user exists
+2025-07-10 14:16:07,345 - services.chat - INFO - [chat.py:60] - [Chat API] Formatting chat history
+2025-07-10 14:16:07,345 - services.chat - INFO - [chat.py:68] - [Chat API] Creating optimized chatbot
+2025-07-10 14:16:07,375 - services.chat - INFO - [chat.py:72] - [Chat API] Chatbot created in 0.03s
+2025-07-10 14:16:07,376 - services.chat - INFO - [chat.py:75] - [Chat API] Processing user input through optimized chatbot
+2025-07-10 14:16:07,376 - agent.agent - INFO - [agent.py:295] - [Optimized] Detected intent: general_inquiry for message: 'hi' in 0.00s
+2025-07-10 14:16:07,376 - vector_store.vector_store - INFO - [vector_store.py:38] - [FastVectorStore] Loading embeddings...
+2025-07-10 14:16:07,466 - vector_store.vector_store - INFO - [vector_store.py:48] - [FastVectorStore] Loaded 53744 Bitext documents
+2025-07-10 14:16:07,492 - vector_store.vector_store - INFO - [vector_store.py:79] - [FastVectorStore] Built FAISS index with 53744 vectors
+2025-07-10 14:16:07,492 - vector_store.vector_store - INFO - [vector_store.py:82] - [FastVectorStore] Loading embedding model all-MiniLM-L6-v2...
+2025-07-10 14:16:07,494 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:219] - Use pytorch device_name: cpu
+2025-07-10 14:16:07,495 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:227] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-10 14:16:14,658 - vector_store.vector_store - INFO - [vector_store.py:85] - [FastVectorStore] Embedding model all-MiniLM-L6-v2 loaded
+2025-07-10 14:16:14,658 - vector_store.vector_store - INFO - [vector_store.py:92] - [FastVectorStore] Embeddings and model loaded in 7.28s
+2025-07-10 14:16:14,688 - agent.agent - INFO - [agent.py:299] - [Optimized] Retrieved RAG examples: ... for intent: general_inquiry
+2025-07-10 14:16:20,909 - agent.agent - INFO - [agent.py:329] - [Optimized] Total processing time: 13.53s
+2025-07-10 14:16:20,910 - services.chat - INFO - [chat.py:81] - [Chat API] Message processed in 13.53s
+2025-07-10 14:17:09,066 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 14:17:10,452 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 14:17:13,159 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 14:17:13,238 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 14:17:13,242 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 14:17:19,508 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 14:17:19,509 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 14:17:19,510 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 14:17:19,512 - services.chat - INFO - [chat.py:25] - [Chat API] Received chat request - seller_id: 1, user_id: user5, session_id: session_12345
+2025-07-10 14:17:19,513 - services.chat - INFO - [chat.py:31] - [Chat API] Validating seller_id
+2025-07-10 14:17:19,513 - services.chat - INFO - [chat.py:38] - [Chat API] Validating user_id
+2025-07-10 14:17:19,513 - services.chat - INFO - [chat.py:45] - [Chat API] Checking if user exists
+2025-07-10 14:17:19,513 - services.chat - INFO - [chat.py:60] - [Chat API] Formatting chat history
+2025-07-10 14:17:19,514 - services.chat - INFO - [chat.py:68] - [Chat API] Creating optimized chatbot
+2025-07-10 14:17:19,541 - services.chat - INFO - [chat.py:72] - [Chat API] Chatbot created in 0.03s
+2025-07-10 14:17:19,541 - services.chat - INFO - [chat.py:75] - [Chat API] Processing user input through optimized chatbot
+2025-07-10 14:17:19,541 - agent.agent - INFO - [agent.py:295] - [Optimized] Detected intent: general_inquiry for message: 'hi' in 0.00s
+2025-07-10 14:17:19,542 - vector_store.vector_store - INFO - [vector_store.py:38] - [FastVectorStore] Loading embeddings...
+2025-07-10 14:17:19,634 - vector_store.vector_store - INFO - [vector_store.py:48] - [FastVectorStore] Loaded 53744 Bitext documents
+2025-07-10 14:17:19,660 - vector_store.vector_store - INFO - [vector_store.py:79] - [FastVectorStore] Built FAISS index with 53744 vectors
+2025-07-10 14:17:19,661 - vector_store.vector_store - INFO - [vector_store.py:82] - [FastVectorStore] Loading embedding model all-MiniLM-L6-v2...
+2025-07-10 14:17:19,663 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:219] - Use pytorch device_name: cpu
+2025-07-10 14:17:19,663 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:227] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-10 14:17:27,989 - vector_store.vector_store - INFO - [vector_store.py:85] - [FastVectorStore] Embedding model all-MiniLM-L6-v2 loaded
+2025-07-10 14:17:27,989 - vector_store.vector_store - INFO - [vector_store.py:92] - [FastVectorStore] Embeddings and model loaded in 8.45s
+2025-07-10 14:17:28,017 - agent.agent - INFO - [agent.py:299] - [Optimized] Retrieved RAG examples: We're all ears! I'm tuned into the idea that you're unsure about the steps to speak to our customer support team. Don't worry; I'm here to guide you. To get in touch with our dedicated customer suppor... (Intent: contact_customer_service)
+I'm aware that you're feeling dissatisfied with our work, and I apologize for any inconvenience caused. Your feedback is crucial to us, and I want to ensure that your concern is addressed promptly and... (Intent: complaint)
+We're all ears! I'm tuned into the idea that you need assistance in contacting our customer service team. We're here to help! To get in touch with our dedicated support representatives, you can reach ... (Intent: contact_customer_service)... for intent: general_inquiry
+2025-07-10 14:17:34,740 - agent.agent - INFO - [agent.py:329] - [Optimized] Total processing time: 15.20s
+2025-07-10 14:17:34,742 - services.chat - INFO - [chat.py:81] - [Chat API] Message processed in 15.20s
+2025-07-10 14:18:03,008 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 14:18:04,408 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 14:18:07,002 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 14:18:07,084 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 14:18:07,089 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 14:18:13,411 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 14:18:13,412 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 14:18:13,413 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 14:18:13,416 - services.chat - INFO - [chat.py:25] - [Chat API] Received chat request - seller_id: 1, user_id: user5, session_id: session_12345
+2025-07-10 14:18:13,416 - services.chat - INFO - [chat.py:31] - [Chat API] Validating seller_id
+2025-07-10 14:18:13,416 - services.chat - INFO - [chat.py:38] - [Chat API] Validating user_id
+2025-07-10 14:18:13,416 - services.chat - INFO - [chat.py:45] - [Chat API] Checking if user exists
+2025-07-10 14:18:13,416 - services.chat - INFO - [chat.py:60] - [Chat API] Formatting chat history
+2025-07-10 14:18:13,417 - services.chat - INFO - [chat.py:68] - [Chat API] Creating optimized chatbot
+2025-07-10 14:18:13,445 - services.chat - INFO - [chat.py:72] - [Chat API] Chatbot created in 0.03s
+2025-07-10 14:18:13,445 - services.chat - INFO - [chat.py:75] - [Chat API] Processing user input through optimized chatbot
+2025-07-10 14:18:13,445 - agent.agent - INFO - [agent.py:295] - [Optimized] Detected intent: general_inquiry for message: 'hi' in 0.00s
+2025-07-10 14:18:13,446 - vector_store.vector_store - INFO - [vector_store.py:38] - [FastVectorStore] Loading embeddings...
+2025-07-10 14:18:13,539 - vector_store.vector_store - INFO - [vector_store.py:48] - [FastVectorStore] Loaded 53744 Bitext documents
+2025-07-10 14:18:13,566 - vector_store.vector_store - INFO - [vector_store.py:79] - [FastVectorStore] Built FAISS index with 53744 vectors
+2025-07-10 14:18:13,567 - vector_store.vector_store - INFO - [vector_store.py:82] - [FastVectorStore] Loading embedding model all-MiniLM-L6-v2...
+2025-07-10 14:18:13,568 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:219] - Use pytorch device_name: cpu
+2025-07-10 14:18:13,569 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:227] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-10 14:18:20,611 - vector_store.vector_store - INFO - [vector_store.py:85] - [FastVectorStore] Embedding model all-MiniLM-L6-v2 loaded
+2025-07-10 14:18:20,611 - vector_store.vector_store - INFO - [vector_store.py:92] - [FastVectorStore] Embeddings and model loaded in 7.16s
+2025-07-10 14:18:20,639 - vector_store.vector_store - INFO - [vector_store.py:142] - [FastVectorStore] Found match at index 16487 with distance 2.4827
+2025-07-10 14:18:20,639 - vector_store.vector_store - INFO - [vector_store.py:142] - [FastVectorStore] Found match at index 14425 with distance 2.5044
+2025-07-10 14:18:20,639 - vector_store.vector_store - INFO - [vector_store.py:142] - [FastVectorStore] Found match at index 16033 with distance 2.5195
+2025-07-10 14:18:20,640 - agent.agent - INFO - [agent.py:299] - [Optimized] Retrieved RAG examples: We're all ears! I'm tuned into the idea that you're unsure about the steps to speak to our customer support team. Don't worry; I'm here to guide you. To get in touch with our dedicated customer suppor... (Intent: contact_customer_service)
+I'm aware that you're feeling dissatisfied with our work, and I apologize for any inconvenience caused. Your feedback is crucial to us, and I want to ensure that your concern is addressed promptly and... (Intent: complaint)
+We're all ears! I'm tuned into the idea that you need assistance in contacting our customer service team. We're here to help! To get in touch with our dedicated support representatives, you can reach ... (Intent: contact_customer_service)... for intent: general_inquiry
+2025-07-10 14:18:30,137 - agent.agent - INFO - [agent.py:329] - [Optimized] Total processing time: 16.69s
+2025-07-10 14:18:30,138 - services.chat - INFO - [chat.py:81] - [Chat API] Message processed in 16.69s
+2025-07-10 14:20:09,647 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 14:20:11,219 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 14:20:14,118 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 14:20:14,220 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 14:20:14,225 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 14:20:20,683 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 14:20:20,685 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 14:20:20,686 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 14:20:20,688 - services.chat - INFO - [chat.py:25] - [Chat API] Received chat request - seller_id: 1, user_id: user5, session_id: session_12345
+2025-07-10 14:20:20,688 - services.chat - INFO - [chat.py:31] - [Chat API] Validating seller_id
+2025-07-10 14:20:20,688 - services.chat - INFO - [chat.py:38] - [Chat API] Validating user_id
+2025-07-10 14:20:20,689 - services.chat - INFO - [chat.py:45] - [Chat API] Checking if user exists
+2025-07-10 14:20:20,689 - services.chat - INFO - [chat.py:60] - [Chat API] Formatting chat history
+2025-07-10 14:20:20,689 - services.chat - INFO - [chat.py:68] - [Chat API] Creating optimized chatbot
+2025-07-10 14:20:20,719 - services.chat - INFO - [chat.py:72] - [Chat API] Chatbot created in 0.03s
+2025-07-10 14:20:20,719 - services.chat - INFO - [chat.py:75] - [Chat API] Processing user input through optimized chatbot
+2025-07-10 14:20:20,719 - agent.agent - INFO - [agent.py:295] - [Optimized] Detected intent: general_inquiry for message: 'hi' in 0.00s
+2025-07-10 14:20:20,719 - vector_store.vector_store - INFO - [vector_store.py:38] - [FastVectorStore] Loading embeddings...
+2025-07-10 14:20:20,816 - vector_store.vector_store - INFO - [vector_store.py:48] - [FastVectorStore] Loaded 53744 Bitext documents
+2025-07-10 14:20:20,842 - vector_store.vector_store - INFO - [vector_store.py:79] - [FastVectorStore] Built FAISS index with 53744 vectors
+2025-07-10 14:20:20,842 - vector_store.vector_store - INFO - [vector_store.py:82] - [FastVectorStore] Loading embedding model all-MiniLM-L6-v2...
+2025-07-10 14:20:20,844 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:219] - Use pytorch device_name: cpu
+2025-07-10 14:20:20,845 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:227] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-10 14:20:28,300 - vector_store.vector_store - INFO - [vector_store.py:85] - [FastVectorStore] Embedding model all-MiniLM-L6-v2 loaded
+2025-07-10 14:20:28,301 - vector_store.vector_store - INFO - [vector_store.py:92] - [FastVectorStore] Embeddings and model loaded in 7.58s
+2025-07-10 14:20:28,332 - vector_store.vector_store - INFO - [vector_store.py:142] - [FastVectorStore] Found match at index 16487 with distance 2.4827
+2025-07-10 14:20:28,332 - agent.agent - INFO - [agent.py:299] - [Optimized] Retrieved RAG examples: We're all ears! I'm tuned into the idea that you're unsure about the steps to speak to our customer support team. Don't worry; I'm here to guide you. To get in touch with our dedicated customer suppor... (Intent: contact_customer_service)... for intent: general_inquiry
+2025-07-10 14:20:37,324 - agent.agent - INFO - [agent.py:329] - [Optimized] Total processing time: 16.60s
+2025-07-10 14:20:37,324 - services.chat - INFO - [chat.py:81] - [Chat API] Message processed in 16.61s
+2025-07-10 14:24:28,706 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 14:24:30,023 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 14:24:32,611 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 14:24:32,689 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 14:24:32,694 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 14:24:39,573 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 14:24:39,574 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 14:24:39,575 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 14:25:33,897 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 14:25:35,275 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 14:25:38,052 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 14:25:38,134 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 14:25:38,139 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 14:25:44,983 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 14:25:44,985 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 14:25:44,987 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
+2025-07-10 14:25:46,486 - main - INFO - [main.py:36] - 👋 Business Chat Assistant is shutting down...
+2025-07-10 14:25:47,951 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-10 14:25:50,679 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-10 14:25:50,761 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-10 14:25:50,766 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-10 14:25:58,135 - main - INFO - [main.py:18] - 🚀 Business Chat Assistant starting up...
+2025-07-10 14:25:58,136 - main - INFO - [main.py:22] - ✅ Chat routes registered
+2025-07-10 14:25:58,138 - main - INFO - [main.py:32] - 🎉 Business Chat Assistant is ready to serve requests!
