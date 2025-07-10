@@ -71,6 +71,13 @@ class GlobalLogger:
         logging.getLogger("langchain_openai").setLevel(logging.WARNING)
         logging.getLogger("langchain_deepseek").setLevel(logging.WARNING)
         
+        # Suppress uvicorn/fastapi file watching debug messages
+        logging.getLogger("watchfiles").setLevel(logging.WARNING)
+        logging.getLogger("watchfiles.main").setLevel(logging.WARNING)
+        logging.getLogger("uvicorn").setLevel(logging.INFO)
+        logging.getLogger("uvicorn.error").setLevel(logging.INFO)
+        logging.getLogger("uvicorn.access").setLevel(logging.INFO)
+        
         # Set application loggers to appropriate levels
         app_modules = [
             "agent.agent",

@@ -1,0 +1,49 @@
+# Optimized requirements for faster chatbot performance
+# Core FastAPI and async support
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+
+# LangChain with optimized versions
+langchain==0.1.0
+langchain-openai==0.0.5
+langchain-community==0.0.10
+langchain-core==0.1.0
+
+# DeepSeek (if available, otherwise use OpenAI)
+# langchain-deepseek
+
+# Vector store and embeddings (optimized)
+faiss-cpu==1.7.4  # CPU version for better compatibility
+numpy==1.24.3
+sentence-transformers==2.2.2  # For generating embeddings
+
+# Database (optimized connection pooling)
+sqlalchemy==2.0.23
+psycopg2-binary==2.9.7  # If using PostgreSQL
+# sqlite3 is built-in for development
+
+# Async support and performance
+aiohttp==3.9.1
+asyncio-mqtt==0.11.0
+
+# Data processing (optimized)
+pandas==2.1.4
+ujson==5.8.0  # Faster JSON parsing
+
+# Environment and configuration
+python-dotenv==1.0.0
+
+# Monitoring and logging
+structlog==23.2.0
+
+# Testing and performance monitoring
+pytest==7.4.3
+requests==2.31.0
+
+# Optional: Memory optimization
+psutil==5.9.6
+
+# Optional: Caching
+redis==5.0.1  # If using Redis for caching
+diskcache==5.6.3  # Local disk caching alternative

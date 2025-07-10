@@ -1,8 +1,10 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List, Dict
-from agent.agent import create_multi_agent_system, log_query, check_user_exists, create_tmp_user_id
+from agent.agent import create_optimized_chatbot
+from agent.agent import log_query, check_user_exists, create_tmp_user_id
 from utils.logger import get_logger
+import time
 
 # Get logger for this module
 logger = get_logger(__name__)
@@ -62,27 +64,24 @@ async def chat(request: ChatRequest):
         ]
         logger.debug(f"[Chat API] Formatted history: {formatted_history}")
 
-        # Create agent executor with seller_id and user_id bound to tools
-        logger.info("[Chat API] Creating multi-agent system")
-        agent_system = create_multi_agent_system(request.seller_id, user_id)
-        logger.info(f"[Chat API] Agent system created successfully for seller_id: {request.seller_id}, user_id: {user_id}")
+        # Create optimized chatbot instance
+        logger.info("[Chat API] Creating optimized chatbot")
+        start_time = time.time()
         
-        # Get the process_input function from the agent system
-        logger.info("[Chat API] Getting process_input function from agent system")
-        process_input = agent_system["executor"]
+        chatbot = create_optimized_chatbot(request.seller_id, user_id)
+        logger.info(f"[Chat API] Chatbot created in {time.time() - start_time:.2f}s")
         
-        # Call process_input with the message and external_chat_history
-        logger.info("[Chat API] Processing user input through multi-agent system")
-        logger.debug(f"[Chat API] Input data: {{'input': {request.message}}}")
+        # Process the message
+        logger.info("[Chat API] Processing user input through optimized chatbot")
+        start_time = time.time()
         
-        response = process_input({
-            "input": request.message
-        }, external_chat_history=formatted_history)
+        response = chatbot.process_message(request.message, formatted_history)
         
-        logger.info("[Chat API] Successfully processed user input")
+        processing_time = time.time() - start_time
+        logger.info(f"[Chat API] Message processed in {processing_time:.2f}s")
         logger.debug(f"[Chat API] Response: {response}")
 
-        return {"response": response}
+        return {"response": response, "processing_time": f"{processing_time:.2f}s"}
         
     except ValueError as ve:
         logger.error(f"[Chat API] ValueError: {str(ve)}")
