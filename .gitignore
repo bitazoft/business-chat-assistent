@@ -3,3 +3,5 @@ Admin-Portal/backend/node_modules
 Admin-Portal/frontend/node_modules
 .env
 venv
+chatbot/cache
+chatbot/__pycache__
