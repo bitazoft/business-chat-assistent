@@ -53,7 +53,7 @@ export function DashboardOverview() {
           return (
             <Card
               key={index}
-              className="bg-gradient-to-br from-[#1a1a2e] to-[#16213e] border-gray-700 hover:border-violet-400/50 transition-all duration-300 hover:shadow-lg hover:shadow-violet-500/10 animate-in slide-in-from-bottom-4 duration-700"
+              className="bg-gradient-to-br from-[#1a1a2e] to-[#16213e] border-gray-700 hover:border-violet-400/50 transition-all hover:shadow-lg hover:shadow-violet-500/10 animate-in slide-in-from-bottom-4 duration-700"
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
