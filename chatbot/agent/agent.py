@@ -1,271 +1,364 @@
 from langchain_openai import ChatOpenAI
 from langchain_deepseek.chat_models import ChatDeepSeek
+from langchain_openai import OpenAIEmbeddings
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain.tools import Tool
+from langchain.tools import Tool, StructuredTool
 from langchain.agents import AgentExecutor, create_openai_tools_agent
+from langchain_core.runnables import RunnablePassthrough
+from langchain_core.output_parsers import StrOutputParser
+from langchain_community.vectorstores import FAISS
 from db.database import SessionLocal
-from models.schemas import Product, Order, ChatLog, OrderItem, User
-from vector_store.vector_store import vector_store
+import pandas as pd
+from utils.logger import get_logger,GlobalLogger
+import json
+from pydantic import BaseModel, Field
+from typing import List, Dict, Any
+import asyncio
+import time
+from functools import lru_cache
+import threading
+
+# Get logger for this module
+logger = get_logger(__name__)
+
+# Import existing tools
+from repositories.tools import (
+    get_product_info,
+    track_order,
+    place_order,
+    log_query,
+    get_user_info,
+    update_user_info,
+    check_user_exists,
+    save_user,
+    create_tmp_user_id,
+    get_all_products
+)
+from vector_store.vector_store import fast_vector_store as vector_store
+from agent.customer_service_rag import customer_service_rag
 import os
-import numpy as np
-import requests
-from datetime import datetime
-from typing import List
-from functools import partial
 
 # Load environment variables
 DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
 DEEPSEEK_API_BASE = os.getenv("DEEPSEEK_API_BASE", "https://api.deepseek.com/v1")
 
-# Make functions available for import
-__all__ = ['create_agent_executor', 'log_query', 'get_product_info', 'track_order', 'place_order', 'get_user_info', 'update_user_info', 'check_user_exists', 'save_user', 'create_tmp_user_id']
-
-# LangChain Tools
-def get_product_info(product_name: str, seller_id: str) -> str:
-    db = SessionLocal()
-    try:
-        product = db.query(Product).filter(Product.name.ilike(f"%{product_name}%"), Product.seller_id == int(seller_id)).first()
-        if product:
-            return f"Product: {product.name}, Description: {product.description}, Price: ${product.price}, Stock: {product.stock}"
-        return "Product not found"
-    finally:
-        db.close()
-
-def track_order(order_id: str) -> str:
-    db = SessionLocal()
-    try:
-        order = db.query(Order).filter(Order.id == int(order_id)).first()
-        if order:
-            return f"Order ID: {order.id}, Status: {order.status}, Created: {order.created_at}"
-        return "Order not found"
-    finally:
-        db.close()
-
-def place_order(seller_id: str, user_id: str, items: List[dict]) -> str:
-    db = SessionLocal()
-    try:
-        total_amount = 0
-        order = Order(seller_id=int(seller_id), user_id=user_id, status="pending", total_amount=0)
-        db.add(order)
-        db.flush()  # Get order.id before committing
-        for item in items:
-            product = None
-            
-            # Check if product_id is numeric (ID) or string (name)
-            product_identifier = item["product_id"]
-            
-            if str(product_identifier).isdigit():
-                # Look up by product ID
-                product = db.query(Product).filter(Product.id == int(product_identifier), Product.seller_id == int(seller_id)).first()
-            else:
-                # Look up by product name
-                product = db.query(Product).filter(Product.name.ilike(f"%{product_identifier}%"), Product.seller_id == int(seller_id)).first()
-            
-            if not product:
-                db.rollback()
-                return f"Product '{product_identifier}' not found"
-            
-            if product.stock < item["quantity"]:
-                db.rollback()
-                return f"Product '{product.name}' has insufficient stock. Available: {product.stock}, Requested: {item['quantity']}"
-            
-            total_amount += product.price * item["quantity"]
-            order_item = OrderItem(order_id=order.id, product_id=product.id, price=product.price, quantity=item["quantity"])
-            db.add(order_item)
-            product.stock -= item["quantity"]
-        order.total_amount = total_amount
-        db.commit()
-        return f"Order placed successfully. Order ID: {order.id}, Total Amount: ${total_amount:.2f}"
-    except Exception as e:
-        db.rollback()
-        return f"Error placing order: {str(e)}"
-    finally:
-        db.close()
-
-def check_user_exists(user_id: str) -> bool:
-    db = SessionLocal()
-    try:
-        user = db.query(User).filter(User.id == user_id).first()
-        return user is not None
-    finally:
-        db.close()       
-
-def get_user_info(user_id: str) -> str:
-    """Get user information from database"""
-    db = SessionLocal()
-    try:
-        user = db.query(User).filter(User.id == user_id).first()
-        if user:
-            return f"User ID: {user.id}, Name: {user.name}, Email: {user.email}, Address: {user.address}, Phone: {user.number}"
-        return "User not found"
-    finally:
-        db.close()
-
-def update_user_info(user_id: str, name: str = None, email: str = None, address: str = None, number: str = None) -> str:
-    """Update user information in database"""
-    db = SessionLocal()
-    try:
-        user = db.query(User).filter(User.id == user_id).first()
-        if not user:
-            return "User not found"
-        
-        # Update only provided fields
-        if name is not None:
-            user.name = name
-        if email is not None:
-            user.email = email
-        if address is not None:
-            user.address = address
-        if number is not None:
-            user.number = number
-            
-        db.commit()
-        return f"User information updated successfully. Updated details: Name: {user.name}, Email: {user.email}, Address: {user.address}, Phone: {user.number}"
-    except Exception as e:
-        db.rollback()
-        return f"Error updating user information: {str(e)}"
-    finally:
-        db.close()
-
-def create_tmp_user_id() -> str:
-    """Create a temporary user ID based on current timestamp and random number"""
-    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-    random_number = np.random.randint(1000, 9999)
-    return f"user_{timestamp}_{random_number}"         
-
-def save_user(user_id: str, name: str, email: str, address: str, number: str) -> None:
-    db = SessionLocal()
-    try:
-        user = User(id=user_id, name=name, email=email, address=address, number=number)
-        db.add(user)
-        db.commit()
-    except Exception as e:
-        db.rollback()
-        raise e
-    finally:
-        db.close()
-
-def log_query(query: str, intent: str, entities: str, response: str, seller_id: str, user_id: str) -> None:
-    db = SessionLocal()
-    try:
-        chat_log = ChatLog(
-            user_query=query,
-            intent=intent,
-            entities=entities,
-            response=response,
-            seller_id=int(seller_id),
-            user_id=user_id
-        )
-        db.add(chat_log)
-        db.commit()
-    finally:
-        db.close()
-
-def query_context(query: str, seller_id: str) -> str:
-    headers = {"Authorization": f"Bearer {DEEPSEEK_API_KEY}", "Content-Type": "application/json"}
-    payload = {"input": query, "model": "deepseek-embedding"}  # Replace with DeepSeek's embedding model
-    response = requests.post(f"{DEEPSEEK_API_BASE}/embeddings", json=payload, headers=headers)
-    response.raise_for_status()
-    query_embedding = np.array(response.json()["data"][0]["embedding"], dtype=np.float32).reshape(1, -1)
-    results = vector_store.search(query_embedding, seller_id)
-    return "\n".join(results)
-
-# LangChain Agent Setup
+# Configure LLM with optimized settings for speed
 llm = ChatDeepSeek(
-    model="deepseek-chat",  # Replace with actual DeepSeek model name
+    model="deepseek-chat",
     api_key=DEEPSEEK_API_KEY,
-    base_url=DEEPSEEK_API_BASE
+    base_url=DEEPSEEK_API_BASE,
+    temperature=0.1,  # Lower temperature for faster, more deterministic responses
+    max_tokens=512,   # Limit response length for speed
+    timeout=60,     
+    max_retries=3     # Reduce retries for faster failure handling
 )
 
-def create_agent_executor(seller_id: str, user_id: str):
-    """Create an agent executor with seller_id and user_id bound to tools"""
+# Caching for frequently accessed data
+@lru_cache(maxsize=100)
+def get_cached_rag_examples(user_input: str, seller_id: str, k: int = 2,threshold: float = 3):
+    """Cached RAG examples with reduced k for speed"""
+    try:
+        # Simplified RAG - only get essential examples
+        results = vector_store.similarity_search(user_input, k=k, threshold=threshold)
+        examples = []
+        
+        for result in results:
+            if hasattr(result, 'metadata'):
+                result_seller = result.metadata.get('seller_id') or result.metadata.get('category')
+                result_intent = result.metadata.get('intent')  # Extract intent from metadata
+                examples.append(f"{result.page_content[:200]}... (Intent: {result_intent})")  # Include intent in the examples
+                    
+        return "\n".join(examples[:k]) if examples else ""
+    except Exception as e:
+        logger.warning(f"[RAG Cache] Error: {str(e)}")
+        return ""
+
+@lru_cache(maxsize=50)
+def get_cached_intents(seller_id: str):
+    """Cached intent retrieval"""
+    try:
+        # Use hardcoded intents for speed instead of RAG lookup
+        return "product_info, order_tracking, place_order, user_management, general_inquiry"
+    except Exception as e:
+        logger.warning(f"[Intent Cache] Error: {str(e)}")
+        return "product_info, order_tracking, place_order, user_management, general_inquiry"
+
+# Fast intent detection using keywords instead of LLM
+def fast_intent_detection(user_input: str) -> str:
+    """Fast rule-based intent detection"""
+    user_input_lower = user_input.lower()
     
-    # Create tools with bound seller_id and user_id
-    tools = [
-        Tool(
-            name="get_product_info", 
-            func=partial(get_product_info, seller_id=seller_id), 
-            description="Get product details by name. Required parameters: product_name (string)"
-        ),
-        Tool(
-            name="track_order", 
-            func=track_order, 
-            description="Track order status by order ID. Required parameters: order_id (string)"
-        ),
-        Tool(
-            name="place_order", 
-            func=partial(place_order, seller_id=seller_id, user_id=user_id), 
-            description="Place an order for multiple products. Required parameters: items (list of dictionaries with product_id and quantity keys). product_id can be either numeric ID or product name string."
-        ),
-        Tool(
-            name="log_query", 
-            func=partial(log_query, seller_id=seller_id, user_id=user_id), 
-            description="Log user queries with intent, entities, and response. Required parameters: query (string), intent (string), entities (string), response (string)"
-        ),
-        Tool(
-            name="save_user",
-            func=partial(save_user, user_id=user_id),
-            description="Create a new user with provided details. Required parameters: name (string), email (string), address (string), number (string)"
-        ),
-        Tool(
-            name="get_user_info",
-            func=partial(get_user_info, user_id=user_id),
-            description="Retrieve user information from database. No additional parameters required - user_id is automatically provided."
-        ),
-        # Tool(
-        #     name="check_user_exists",
-        #     func=partial(check_user_exists, user_id=user_id),
-        #     description="Check if user exists in database."
-        # ),
-        Tool(
-            name="update_user_info",
-            func=partial(update_user_info, user_id=user_id),
-            description="Update user information in database. Parameters: name (string, optional), email (string, optional), address (string, optional), number (string, optional). Only provided parameters will be updated."
+    # Order tracking keywords
+    if any(keyword in user_input_lower for keyword in ['track', 'order', 'status', 'delivery', 'shipped']):
+        return "order_tracking"
+    
+    # Place order keywords
+    if any(keyword in user_input_lower for keyword in ['buy', 'purchase', 'order', 'cart', 'checkout']):
+        return "place_order"
+    
+    # Product info keywords
+    if any(keyword in user_input_lower for keyword in ['product', 'price', 'cost', 'available', 'stock', 'details']):
+        return "product_info"
+    
+    # User management keywords
+    if any(keyword in user_input_lower for keyword in ['profile', 'account', 'update', 'change', 'personal']):
+        return "user_management"
+    
+    # Default to general inquiry
+    return "general_inquiry"
+
+class OptimizedChatbot:
+    """Optimized single-agent chatbot for faster responses"""
+    
+    def __init__(self, seller_id: str, user_id: str):
+        self.seller_id = seller_id
+        self.user_id = user_id
+        self.chat_history = []
+        self.tools = self._create_tools()
+        self.agent = self._create_agent()
+        
+    def _create_tools(self):
+        """Create optimized tools with embedded context"""
+        
+        # Define input schemas
+        class GetProductInfoInput(BaseModel):
+            product_name: str = Field(description="Name of the product")
+
+        class TrackOrderInput(BaseModel):
+            order_id: str = Field(description="Order ID to track")
+
+        class PlaceOrderInput(BaseModel):
+            items: List[dict] = Field(description="List of items with product_id and quantity")
+
+        class SaveUserInput(BaseModel):
+            name: str = Field(description="User's full name")
+            email: str = Field(description="User's email address")
+            address: str = Field(description="User's address")
+            number: str = Field(description="User's phone number")
+
+        class UpdateUserInfoInput(BaseModel):
+            name: str = Field(description="User's name", default="")
+            email: str = Field(description="User's email", default="")
+            address: str = Field(description="User's address", default="")
+            number: str = Field(description="User's phone", default="")
+
+        class EmptyInput(BaseModel):
+            pass
+
+        # Wrapper functions with context
+        def get_product_info_wrapper(product_name: str) -> dict:
+            return get_product_info(seller_id=self.seller_id, product_name=product_name)
+
+        def track_order_wrapper(order_id: str) -> dict:
+            return track_order(order_id=order_id)
+
+        def place_order_wrapper(items: List[dict]) -> dict:
+            return place_order(seller_id=self.seller_id, user_id=self.user_id, items=items)
+
+        def save_user_wrapper(name: str, email: str, address: str, number: str) -> dict:
+            return save_user(user_id=self.user_id, name=name, email=email, address=address, number=number)
+
+        def get_user_info_wrapper() -> dict:
+            return get_user_info(user_id=self.user_id)
+
+        def check_user_exists_wrapper() -> bool:
+            return check_user_exists(user_id=self.user_id)
+
+        def get_all_products_wrapper() -> List[str]:
+            return get_all_products(seller_id=self.seller_id)
+
+        def update_user_info_wrapper(name: str = "", email: str = "", address: str = "", number: str = "") -> dict:
+            name = None if not name else name
+            email = None if not email else email
+            address = None if not address else address
+            number = None if not number else number
+            return update_user_info(user_id=self.user_id, name=name, email=email, address=address, number=number)
+
+        # Create tools
+        return [
+            StructuredTool(
+                name="get_product_info",
+                func=get_product_info_wrapper,
+                description="Get product details by name",
+                args_schema=GetProductInfoInput
+            ),
+            StructuredTool(
+                name="track_order",
+                func=track_order_wrapper,
+                description="Track order status by order ID",
+                args_schema=TrackOrderInput
+            ),
+            StructuredTool(
+                name="place_order",
+                func=place_order_wrapper,
+                description="Place an order with list of items",
+                args_schema=PlaceOrderInput
+            ),
+            StructuredTool(
+                name="save_user",
+                func=save_user_wrapper,
+                description="Create new user with details",
+                args_schema=SaveUserInput
+            ),
+            StructuredTool(
+                name="get_user_info",
+                func=get_user_info_wrapper,
+                description="Get current user information",
+                args_schema=EmptyInput
+            ),
+            StructuredTool(
+                name="check_user_exists",
+                func=check_user_exists_wrapper,
+                description="Check if user exists",
+                args_schema=EmptyInput
+            ),
+            StructuredTool(
+                name="update_user_info",
+                func=update_user_info_wrapper,
+                description="Update user information",
+                args_schema=UpdateUserInfoInput
+            ),
+            StructuredTool(
+                name="get_all_products",
+                func=get_all_products_wrapper,
+                description="Get all products for seller",
+                args_schema=EmptyInput
+            )
+        ]
+    
+    def _create_agent(self):
+        """Create optimized single agent"""
+        llm_with_tools = llm.bind_tools(self.tools)
+        
+        # Simplified prompt for faster processing
+        prompt = ChatPromptTemplate.from_messages([
+            ("system", f"""You are a fast business assistant for seller {self.seller_id}.
+
+                    Available tools: {[tool.name for tool in self.tools]}
+
+                    Instructions:
+                    1. For product info: use get_product_info
+                    2. For order tracking: use track_order  
+                    3. For placing orders: check_user_exists first, then place_order
+                    4. For user management: use appropriate user tools
+                    5. Be concise and direct
+
+                    CRITICAL USER DATA WORKFLOW FOR ORDERS:
+                    When user wants to place an order, follow this EXACT sequence:
+                    1. FIRST: Always use check_user_exists to verify if user exists
+                    2. IF user does NOT exist:
+                    - NEVER create fake or assumed user data
+                    - NEVER use save_user without explicit user-provided information
+                    - Ask the user: "To place your order, I need your details. Please provide your full name, email address, physical address, and phone number."
+                    - WAIT for user response with their actual details
+                    - ONLY then use save_user with the information they provided
+                    3. IF user exists: Use get_user_info to show their details and confirm they're correct
+                    4. ONLY after user confirmation, proceed with place_order
+                    
+                    IMPORTANT RULES:
+                    - NEVER generate, assume, or create fake user information
+                    - NEVER use save_user without explicit user input containing name, email, address, phone
+                    - For product info and order tracking: No user details needed
+                    - For placing orders: User details are MANDATORY and must be explicitly provided by the user
+                    - Extract parameters accurately from user input and chat history
+                    - Execute tools directly; do not describe actions without executing
+
+                    Context: {{examples}}"""),
+            MessagesPlaceholder(variable_name="chat_history"),
+            ("human", "{input}"),
+            MessagesPlaceholder(variable_name="agent_scratchpad")
+        ])
+        
+        agent = create_openai_tools_agent(llm_with_tools, self.tools, prompt)
+        return AgentExecutor(
+            agent=agent, 
+            tools=self.tools, 
+            verbose=False,  # Disable verbose for speed
+            max_iterations=3,  # Limit iterations
+            handle_parsing_errors=True
         )
-        # Tool(name="query_context", func=partial(query_context, seller_id=seller_id), description="Search product/FAQ documents using RAG. Required parameters: query (string)")
-    ]
+    
+    def process_message(self, message: str, external_chat_history: List[Dict] = None) -> str:
+        """Process message with optimizations"""
+        start_time = time.time()
+        
+        try:
+            # Use external chat history if provided
+            if external_chat_history:
+                self.chat_history = external_chat_history
+            
+            # Add user message
+            self.chat_history.append({"role": "user", "content": message})
+            
+            # Fast intent detection (skip LLM call)
+            intent = fast_intent_detection(message)
+            logger.info(f"[Optimized] Detected intent: {intent} for message: '{message}' in {time.time() - start_time:.2f}s")
+            
+            # Get minimal RAG examples
+            examples = get_cached_rag_examples(message, self.seller_id, k=1)
+            logger.info(f"[Optimized] Retrieved RAG examples: {examples}... for intent: {intent}")
+            # Format chat history for agent
+            formatted_history = []
+            for msg in self.chat_history[-6:]:  # Only last 3 exchanges for speed
+                if msg["role"] == "user":
+                    formatted_history.append(("human", msg["content"]))
+                elif msg["role"] == "assistant":
+                    formatted_history.append(("assistant", msg["content"]))
+            
+            # Execute agent (single LLM call)
+            result = self.agent.invoke({
+                "input": message,
+                "examples": examples,
+                "intent": intent,
+                "chat_history": formatted_history
+            })
+            
+            response = result.get("output", "I couldn't process your request.")
+            
+            # Add assistant response
+            self.chat_history.append({"role": "assistant", "content": response})
+            
+            # Limit chat history
+            if len(self.chat_history) > 10:
+                self.chat_history = self.chat_history[-10:]
+            
+            # Log query asynchronously (don't wait)
+            threading.Thread(target=self._log_query_async, args=(message, intent, response)).start()
+            
+            total_time = time.time() - start_time
+            logger.info(f"[Optimized] Total processing time: {total_time:.2f}s")
+            
+            return response
+            
+        except Exception as e:
+            logger.error(f"[Optimized] Error: {str(e)}")
+            return "I'm experiencing technical difficulties. Please try again."
+    
+    def _log_query_async(self, query: str, intent: str, response: str):
+        """Log query asynchronously to avoid blocking"""
+        try:
+            log_query(
+                query=query,
+                intent=intent,
+                entities="fast_detected",
+                response=response,
+                seller_id=self.seller_id,
+                user_id=self.user_id
+            )
+        except Exception as e:
+            logger.error(f"[Optimized] Async logging error: {str(e)}")
 
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", f"""You are a business assistant for seller ID: {seller_id}. Use tools to fetch product info, track orders, or place orders. The seller_id and user_id are automatically provided to tools that need them. 
+def create_optimized_chatbot(seller_id: str, user_id: str) -> OptimizedChatbot:
+    """Factory function to create optimized chatbot"""
+    return OptimizedChatbot(seller_id, user_id)
 
-        USER MANAGEMENT WORKFLOW:
-        - For general inquiries (product info, order tracking, questions): No need to collect user details
-        - ONLY when user wants to PLACE AN ORDER:
-          1. Check if user exists using check_user_exists
-          2. If user doesn't exist, ask for their details (name, email, address, phone number) and create them using save_user
-          3. If user exists, get their info using get_user_info and show it to confirm details are correct
-          4. If user wants to update any information, use update_user_info with only the fields they want to change
-          5. Only proceed with placing order after confirming user details
-
-        GENERAL INSTRUCTIONS:
-        - Log all queries using log_query
-        - For product questions, use get_product_info (no user details needed)
-        - For order tracking, use track_order (no user details needed)
-        - For placing orders, use place_order (user details required first)
-        - Always be helpful and only ask for information when necessary"""),
-        MessagesPlaceholder(variable_name="chat_history"),
-        ("human", "{input}"),
-        MessagesPlaceholder(variable_name="agent_scratchpad")
-    ])
-
-    agent = create_openai_tools_agent(llm, tools, prompt)
-    return AgentExecutor(agent=agent, tools=tools, verbose=True)
-
-# # Default agent executor (will be replaced by create_agent_executor)
-# tools = [
-#     Tool(name="get_product_info", func=get_product_info, description="Get product details by name and seller ID. Required parameters: product_name (string), seller_id (string)"),
-#     Tool(name="track_order", func=track_order, description="Track order status by order ID. Required parameters: order_id (string)"),
-#     Tool(name="place_order", func=place_order, description="Place an order for multiple products. Required parameters: seller_id (string), user_id (string), items (list of dictionaries with product_id and quantity keys)"),
-#     Tool(name="log_query", func=log_query, description="Log user queries with intent, entities, response, seller ID and user ID. Required parameters: query (string), intent (string), entities (string), response (string), seller_id (string), user_id (string)"),
-#     # Tool(name="query_context", func=query_context, description="Search product/FAQ documents using RAG. Required parameters: query (string), seller_id (string)")
-# ]
-
-# prompt = ChatPromptTemplate.from_messages([
-#     ("system", "You are a business assistant for seller ID: {seller_id}. Use tools to fetch product info, track orders, or place orders. Always include the seller_id parameter when calling tools. Log all queries. For general questions, use RAG context if relevant."),
-#     MessagesPlaceholder(variable_name="chat_history"),
-#     ("human", "{input}"),
-#     MessagesPlaceholder(variable_name="agent_scratchpad")
-# ])
-
-# agent = create_openai_tools_agent(llm, tools, prompt)
-# agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+# Backward compatibility wrapper
+def create_multi_agent_system(seller_id: str, user_id: str):
+    """Optimized replacement for the original multi-agent system"""
+    chatbot = create_optimized_chatbot(seller_id, user_id)
+    
+    def process_input(input_data, external_chat_history: list = None):
+        message = input_data.get("input", "")
+        return chatbot.process_message(message, external_chat_history)
+    
+    return {"executor": process_input, "chat_history": chatbot.chat_history}
