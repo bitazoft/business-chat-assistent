@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  customer
+  seller
+  admin
+}
+
+model users {
+  id               Int               @id @default(autoincrement())
+  name             String
+  email            String            @unique
+  phone            String
+  password         String
+  role             UserRole          @default(customer)
+  address          String?
+  createdAt        DateTime          @default(now())
+
+  sellerProfile    SellerProfile?
+  customerProfile  CustomerProfile?
+  chat_logs        chat_logs[]
+  orders           orders[]
+  products         products[]
+}
+
+model SellerProfile {
+  id         Int    @id @default(autoincrement())
+  userId     Int    @unique
+  shopName   String
+  gstNumber  String?
+
+  user       users  @relation(fields: [userId], references: [id])
+}
+
+model CustomerProfile {
+  id          Int    @id @default(autoincrement())
+  userId      Int    @unique
+  preferences String?
+
+  user        users  @relation(fields: [userId], references: [id])
+}
+
+model chat_logs {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  user_query String   @db.VarChar
+  intent     String?  @db.VarChar
+  entities   String?  @db.VarChar
+  response   String   @db.VarChar
+  timestamp  DateTime @default(now()) @db.Timestamp(6)
+
+  user       users    @relation(fields: [userId], references: [id])
+}
+
+model orders {
+  id           Int           @id @default(autoincrement())
+  userId       Int
+  status       String        @db.VarChar
+  total_amount Float
+  created_at   DateTime?     @default(now()) @db.Timestamp(6)
+
+  order_items  order_items[]
+  user         users         @relation(fields: [userId], references: [id])
+}
+
+model order_items {
+  id         Int      @id @default(autoincrement())
+  order_id   Int
+  product_id Int
+  price      Float
+  quantity   Int
+
+  orders     orders   @relation(fields: [order_id], references: [id])
+  products   products @relation(fields: [product_id], references: [id])
+}
+
+model products {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  name        String   @db.VarChar
+  description String?  @db.VarChar
+  price       Float
+  stock       Int
+
+  user        users    @relation(fields: [userId], references: [id])
+  order_items order_items[]
+}
