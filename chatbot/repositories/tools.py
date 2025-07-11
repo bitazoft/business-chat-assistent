@@ -18,6 +18,16 @@ def get_product_info(product_name: str, seller_id: str) -> str:
     finally:
         db.close()
 
+def get_all_products(seller_id: str) -> List[str]:
+    db = SessionLocal()
+    try:
+        products = db.query(Product).filter(Product.seller_id == int(seller_id)).all()
+        if products:
+            return [f"Product: {p.name}, Price: ${p.price}, Stock: {p.stock}" for p in products]
+        return ["No products found for this seller"]
+    finally:
+        db.close()
+
 def track_order(order_id: str) -> str:
     db = SessionLocal()
     try:
@@ -120,15 +130,16 @@ def create_tmp_user_id() -> str:
     random_number = np.random.randint(1000, 9999)
     return f"user_{timestamp}_{random_number}"         
 
-def save_user(user_id: str, name: str, email: str, address: str, number: str) -> None:
+def save_user(user_id: str, name: str, email: str, address: str, number: str) -> str:
     db = SessionLocal()
     try:
         user = User(id=user_id, name=name, email=email, address=address, number=number)
         db.add(user)
         db.commit()
+        return f"User successfully created: {name} ({email}). Account ID: {user_id}"
     except Exception as e:
         db.rollback()
-        raise e
+        return f"Error creating user: {str(e)}"
     finally:
         db.close()
 
