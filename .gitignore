@@ -6,3 +6,4 @@ venv
 chatbot/cache
 chatbot/__pycache__
 chatbot/data/bitext_embeddings.pkl
+chatbot/logs/chatbot_20250712.log
