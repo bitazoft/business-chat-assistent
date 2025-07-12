@@ -91,9 +91,9 @@ def get_user_info(user_id: str) -> str:
     """Get user information from database"""
     db = SessionLocal()
     try:
-        user = db.query(Customers).filter(Customers.id == user_id).first()
-        if user:
-            return f"User ID: {user.id}, Name: {user.name}, Email: {user.email}, Address: {user.address}, Phone: {user.number}"
+        customer = db.query(Customers).filter(Customers.id == user_id).first()
+        if customer:
+            return f"User ID: {customer.id}, Name: {customer.name}, Email: {customer.email}, Address: {customer.address}, Phone: {customer.number1}"
         return "User not found"
     finally:
         db.close()
@@ -102,22 +102,22 @@ def update_user_info(user_id: str, name: str = None, email: str = None, address:
     """Update user information in database"""
     db = SessionLocal()
     try:
-        user = db.query(Customers).filter(Customers.id == user_id).first()
-        if not user:
+        customer = db.query(Customers).filter(Customers.id == user_id).first()
+        if not customer:
             return "User not found"
         
         # Update only provided fields
         if name is not None:
-            user.name = name
+            customer.name = name
         if email is not None:
-            user.email = email
+            customer.email = email
         if address is not None:
-            user.address = address
+            customer.address = address
         if number is not None:
-            user.number = number
+            customer.number1 = number
             
         db.commit()
-        return f"User information updated successfully. Updated details: Name: {user.name}, Email: {user.email}, Address: {user.address}, Phone: {user.number}"
+        return f"User information updated successfully. Updated details: Name: {customer.name}, Email: {customer.email}, Address: {customer.address}, Phone: {customer.number1}"
     except Exception as e:
         db.rollback()
         return f"Error updating user information: {str(e)}"
@@ -133,8 +133,8 @@ def create_tmp_user_id() -> str:
 def save_user(user_id: str, name: str, email: str, address: str, number: str) -> str:
     db = SessionLocal()
     try:
-        user = Customers(id=user_id, name=name, email=email, address=address, number1=number)
-        db.add(user)
+        customer = Customers(id=user_id, name=name, email=email, address=address, number1=number)
+        db.add(customer)
         db.commit()
         return f"User successfully created: {name} ({email}). Account ID: {user_id}"
     except Exception as e:
