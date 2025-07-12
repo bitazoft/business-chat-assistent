@@ -25,7 +25,8 @@ class Customers(Base):
     name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     address = Column(String, nullable=True)
-    number = Column(String, nullable=False) 
+    number1 = Column(String, nullable=False) 
+    number2 = Column(String, nullable=False) 
     created_at = Column(DateTime, default=datetime.utcnow)
 
 class Order(Base):
