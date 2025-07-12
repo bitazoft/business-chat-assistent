@@ -1,5 +1,5 @@
 from db.database import SessionLocal
-from models.schemas import Product, Order, ChatLog, OrderItem, User
+from models.schemas import Product, Order, ChatLog, OrderItem, Customers
 from vector_store.vector_store import vector_store
 import os
 import numpy as np
@@ -11,7 +11,7 @@ from typing import List
 def get_product_info(product_name: str, seller_id: str) -> str:
     db = SessionLocal()
     try:
-        product = db.query(Product).filter(Product.name.ilike(f"%{product_name}%"), Product.seller_id == int(seller_id)).first()
+        product = db.query(Product).filter(Product.name.ilike(f"%{product_name}%"), Product.sellerId == int(seller_id)).first()
         if product:
             return f"Product: {product.name}, Description: {product.description}, Price: ${product.price}, Stock: {product.stock}"
         return "Product not found"
@@ -21,7 +21,7 @@ def get_product_info(product_name: str, seller_id: str) -> str:
 def get_all_products(seller_id: str) -> List[str]:
     db = SessionLocal()
     try:
-        products = db.query(Product).filter(Product.seller_id == int(seller_id)).all()
+        products = db.query(Product).filter(Product.sellerId == int(seller_id)).all()
         if products:
             return [f"Product: {p.name}, Price: ${p.price}, Stock: {p.stock}" for p in products]
         return ["No products found for this seller"]
@@ -42,7 +42,7 @@ def place_order(seller_id: str, user_id: str, items: List[dict]) -> str:
     db = SessionLocal()
     try:
         total_amount = 0
-        order = Order(seller_id=int(seller_id), user_id=user_id, status="pending", total_amount=0)
+        order = Order(sellerId=int(seller_id), customerId=user_id, status="pending", total_amount=0)
         db.add(order)
         db.flush()  # Get order.id before committing
         for item in items:
@@ -53,10 +53,10 @@ def place_order(seller_id: str, user_id: str, items: List[dict]) -> str:
             
             if str(product_identifier).isdigit():
                 # Look up by product ID
-                product = db.query(Product).filter(Product.id == int(product_identifier), Product.seller_id == int(seller_id)).first()
+                product = db.query(Product).filter(Product.id == int(product_identifier), Product.sellerId == int(seller_id)).first()
             else:
                 # Look up by product name
-                product = db.query(Product).filter(Product.name.ilike(f"%{product_identifier}%"), Product.seller_id == int(seller_id)).first()
+                product = db.query(Product).filter(Product.name.ilike(f"%{product_identifier}%"), Product.sellerId == int(seller_id)).first()
             
             if not product:
                 db.rollback()
@@ -82,7 +82,7 @@ def place_order(seller_id: str, user_id: str, items: List[dict]) -> str:
 def check_user_exists(user_id: str) -> bool:
     db = SessionLocal()
     try:
-        user = db.query(User).filter(User.id == user_id).first()
+        user = db.query(Customers).filter(Customers.id == user_id).first()
         return user is not None
     finally:
         db.close()       
@@ -91,7 +91,7 @@ def get_user_info(user_id: str) -> str:
     """Get user information from database"""
     db = SessionLocal()
     try:
-        user = db.query(User).filter(User.id == user_id).first()
+        user = db.query(Customers).filter(Customers.id == user_id).first()
         if user:
             return f"User ID: {user.id}, Name: {user.name}, Email: {user.email}, Address: {user.address}, Phone: {user.number}"
         return "User not found"
@@ -102,7 +102,7 @@ def update_user_info(user_id: str, name: str = None, email: str = None, address:
     """Update user information in database"""
     db = SessionLocal()
     try:
-        user = db.query(User).filter(User.id == user_id).first()
+        user = db.query(Customers).filter(Customers.id == user_id).first()
         if not user:
             return "User not found"
         
@@ -133,7 +133,7 @@ def create_tmp_user_id() -> str:
 def save_user(user_id: str, name: str, email: str, address: str, number: str) -> str:
     db = SessionLocal()
     try:
-        user = User(id=user_id, name=name, email=email, address=address, number=number)
+        user = Customers(id=user_id, name=name, email=email, address=address, number1=number)
         db.add(user)
         db.commit()
         return f"User successfully created: {name} ({email}). Account ID: {user_id}"
@@ -151,8 +151,8 @@ def log_query(query: str, intent: str, entities: str, response: str, seller_id: 
             intent=intent,
             entities=entities,
             response=response,
-            seller_id=int(seller_id),
-            user_id=user_id
+            sellerId=int(seller_id),
+            customerId=user_id
         )
         db.add(chat_log)
         db.commit()
