@@ -49,25 +49,26 @@ model CustomerProfile {
 
 model chat_logs {
   id         Int      @id @default(autoincrement())
-  userId     Int
+  sellerId   Int
+  customerId String
   user_query String   @db.VarChar
   intent     String?  @db.VarChar
   entities   String?  @db.VarChar
   response   String   @db.VarChar
   timestamp  DateTime @default(now()) @db.Timestamp(6)
 
-  user       users    @relation(fields: [userId], references: [id])
+  user       users    @relation(fields: [sellerId], references: [id])
 }
 
 model orders {
   id           Int           @id @default(autoincrement())
-  userId       Int
+  sellerId     Int
   status       String        @db.VarChar
   total_amount Float
   created_at   DateTime?     @default(now()) @db.Timestamp(6)
 
   order_items  order_items[]
-  user         users         @relation(fields: [userId], references: [id])
+  user         users         @relation(fields: [sellerId], references: [id])
 }
 
 model order_items {
@@ -83,12 +84,12 @@ model order_items {
 
 model products {
   id          Int      @id @default(autoincrement())
-  userId      Int
+  sellerId    Int
   name        String   @db.VarChar
   description String?  @db.VarChar
   price       Float
   stock       Int
 
-  user        users    @relation(fields: [userId], references: [id])
+  user        users    @relation(fields: [sellerId], references: [id])
   order_items order_items[]
 }
