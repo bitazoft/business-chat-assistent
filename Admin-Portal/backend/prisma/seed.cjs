@@ -283,7 +283,7 @@ async function main() {
     for (const product of seller.products) {
       await prisma.products.create({
         data: {
-          userId: user.id,
+          sellerId: user.id,
           name: product.name,
           description: product.description,
           price: product.price,

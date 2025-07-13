@@ -7,57 +7,37 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRole {
-  customer
-  seller
-  admin
-}
-
 model users {
-  id               Int               @id @default(autoincrement())
-  name             String
-  email            String            @unique
-  phone            String
-  password         String
-  role             UserRole          @default(customer)
-  address          String?
-  createdAt        DateTime          @default(now())
-
-  sellerProfile    SellerProfile?
-  customerProfile  CustomerProfile?
-  chat_logs        chat_logs[]
-  orders           orders[]
-  products         products[]
+  id            Int            @id @default(autoincrement())
+  name          String
+  email         String         @unique
+  phone         String
+  password      String
+  role          UserRole       @default(customer)
+  address       String?
+  createdAt     DateTime       @default(now())
+  sellerProfile SellerProfile?
+  orders        orders[]
+  products      products[]
 }
 
 model SellerProfile {
-  id         Int    @id @default(autoincrement())
-  userId     Int    @unique
-  shopName   String
-  gstNumber  String?
-
-  user       users  @relation(fields: [userId], references: [id])
-}
-
-model CustomerProfile {
-  id          Int    @id @default(autoincrement())
-  userId      Int    @unique
-  preferences String?
-
-  user        users  @relation(fields: [userId], references: [id])
+  id        Int     @id @default(autoincrement())
+  userId    Int     @unique
+  shopName  String
+  gstNumber String?
+  user      users   @relation(fields: [userId], references: [id])
 }
 
 model chat_logs {
   id         Int      @id @default(autoincrement())
-  sellerId   Int
-  customerId String
+  customerId String?  @db.VarChar
   user_query String   @db.VarChar
   intent     String?  @db.VarChar
   entities   String?  @db.VarChar
   response   String   @db.VarChar
   timestamp  DateTime @default(now()) @db.Timestamp(6)
-
-  user       users    @relation(fields: [sellerId], references: [id])
+  sellerId   Int
 }
 
 model orders {
@@ -66,9 +46,10 @@ model orders {
   status       String        @db.VarChar
   total_amount Float
   created_at   DateTime?     @default(now()) @db.Timestamp(6)
-
+  customerId   String?       @db.VarChar
   order_items  order_items[]
-  user         users         @relation(fields: [sellerId], references: [id])
+  customers    customers?    @relation(fields: [customerId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orders_customers_fk")
+  user         users         @relation(fields: [sellerId], references: [id], map: "orders_userId_fkey")
 }
 
 model order_items {
@@ -77,19 +58,34 @@ model order_items {
   product_id Int
   price      Float
   quantity   Int
-
   orders     orders   @relation(fields: [order_id], references: [id])
   products   products @relation(fields: [product_id], references: [id])
 }
 
 model products {
-  id          Int      @id @default(autoincrement())
+  id          Int           @id @default(autoincrement())
   sellerId    Int
-  name        String   @db.VarChar
-  description String?  @db.VarChar
+  name        String        @db.VarChar
+  description String?       @db.VarChar
   price       Float
   stock       Int
-
-  user        users    @relation(fields: [sellerId], references: [id])
   order_items order_items[]
+  user        users         @relation(fields: [sellerId], references: [id], map: "products_userId_fkey")
+}
+
+model customers {
+  id         String    @id() @db.VarChar
+  name       String    @db.VarChar
+  address    String    @db.VarChar
+  number1    String    @db.VarChar
+  number2    String?   @db.VarChar
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  email      String?   @db.VarChar
+  orders     orders[]
+}
+
+enum UserRole {
+  customer
+  seller
+  admin
 }
