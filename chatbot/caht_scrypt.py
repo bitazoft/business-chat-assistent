@@ -2,7 +2,7 @@ import requests
 
 # Chat session configuration
 session_id = "session_12345"
-seller_id = "1"
+seller_id = "5"
 user_id = "user5"
 
 # Initialize chat history

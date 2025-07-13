@@ -17,6 +17,7 @@ import asyncio
 import time
 from functools import lru_cache
 import threading
+from typing import Union, List, Dict, Optional
 
 # Get logger for this module
 logger = get_logger(__name__)
@@ -32,7 +33,8 @@ from repositories.tools import (
     check_user_exists,
     save_user,
     create_tmp_user_id,
-    get_all_products
+    get_all_products,
+    edit_order
 )
 from vector_store.vector_store import fast_vector_store as vector_store
 from agent.customer_service_rag import customer_service_rag
@@ -49,7 +51,7 @@ llm = ChatDeepSeek(
     base_url=DEEPSEEK_API_BASE,
     temperature=0.1,  # Lower temperature for faster, more deterministic responses
     max_tokens=512,   # Limit response length for speed
-    timeout=60,     
+    timeout=300,     
     max_retries=3     # Reduce retries for faster failure handling
 )
 
@@ -141,6 +143,15 @@ class OptimizedChatbot:
             email: str = Field(description="User's email", default="")
             address: str = Field(description="User's address", default="")
             number: str = Field(description="User's phone", default="")
+            
+        class OrderItemInput(BaseModel):
+            product_id: Union[int, str] = Field(..., description="Product ID or Name")
+            quantity: int = Field(..., gt=0, description="Quantity of the product")
+
+        class EditOrderInput(BaseModel):
+            customer_id: str = Field(..., description="User ID who placed the order")
+            order_id: Union[str, int] = Field(..., description="Order ID to be edited")
+            new_items: List[OrderItemInput] = Field(..., description="Updated list of order items")
 
         class EmptyInput(BaseModel):
             pass
@@ -173,6 +184,13 @@ class OptimizedChatbot:
             address = None if not address else address
             number = None if not number else number
             return update_user_info(user_id=self.user_id, name=name, email=email, address=address, number=number)
+        
+        def edit_order_wrapper(customer_id: str, order_id: str, new_items: List[dict]) -> str:
+            return edit_order(
+                customer_id=customer_id,
+                order_id=order_id,
+                new_items=new_items
+            )
 
         # Create tools
         return [
@@ -223,6 +241,12 @@ class OptimizedChatbot:
                 func=get_all_products_wrapper,
                 description="Get all products for seller",
                 args_schema=EmptyInput
+            ),
+            StructuredTool(
+                name="edit_order",
+                func=edit_order_wrapper,
+                description="Edit an existing pending order by specifying new items and their quantities",
+                args_schema=EditOrderInput
             )
         ]
     
@@ -254,6 +278,12 @@ class OptimizedChatbot:
                     - ONLY then use save_user with the information they provided
                     3. IF user exists: Use get_user_info to show their details and confirm they're correct
                     4. ONLY after user confirmation, proceed with place_order
+                    5. For editing orders: use edit_order
+                    - Always request order ID and updated items (product + quantity) from the user
+                    - Only editable if the order status is 'pending'
+                    - If user says something like "change my order", clarify: "Please provide the order ID and the updated items (product name or ID and quantity)"
+                    - Do not assume or guess missing product info
+
                     
                     IMPORTANT RULES:
                     - NEVER generate, assume, or create fake user information
@@ -273,7 +303,7 @@ class OptimizedChatbot:
         return AgentExecutor(
             agent=agent, 
             tools=self.tools, 
-            verbose=False,  # Disable verbose for speed
+            verbose=True,  # Disable verbose for speed
             max_iterations=3,  # Limit iterations
             handle_parsing_errors=True
         )

@@ -167,3 +167,67 @@ def query_context(query: str, seller_id: str) -> str:
     query_embedding = np.array(response.json()["data"][0]["embedding"], dtype=np.float32).reshape(1, -1)
     results = vector_store.search(query_embedding, seller_id)
     return "\n".join(results)
+
+def edit_order(customer_id: str, order_id: str, new_items: List[dict]) -> str:
+    """
+    Edit an existing pending order by user.
+    Each item in new_items must have:
+    - 'product_id' or 'name'
+    - 'quantity'
+    """
+    db = SessionLocal()
+    try:
+        # customer_id = user_id
+        order = db.query(Order).filter(Order.id == int(order_id)).first()
+        if not order:
+            return "Order not found"
+        if order.status != "pending":
+            return f"Order cannot be edited. Current status: {order.status}"
+
+        
+        print("going to restock")
+        # Fetch existing order items and restock
+        existing_items = db.query(OrderItem).filter(OrderItem.order_id == order.id).all()
+        for item in existing_items:
+            product = db.query(Product).filter(Product.id == item.product_id).first()
+            if product:
+                product.stock += item.quantity  # Restock
+            db.delete(item)  # Remove old items
+        print("Item restocked")
+
+        db.flush()
+
+        # Now add new items as per the updated list
+        total_amount = 0
+        for item in new_items:
+            product = None
+            identifier = item["product_id"]
+            
+            if str(identifier).isdigit():
+                product = db.query(Product).filter(Product.id == int(identifier), Product.seller_id == order.seller_id).first()
+            else:
+                product = db.query(Product).filter(Product.name.ilike(f"%{identifier}%"), Product.seller_id == order.seller_id).first()
+            
+            if not product:
+                db.rollback()
+                return f"Product '{identifier}' not found"
+            if product.stock < item["quantity"]:
+                db.rollback()
+                return f"Insufficient stock for product '{product.name}'. Available: {product.stock}, Requested: {item['quantity']}"
+
+            total_amount += product.price * item["quantity"]
+            order_item = OrderItem(order_id=order.id, product_id=product.id, price=product.price, quantity=item["quantity"])
+            db.add(order_item)
+            product.stock -= item["quantity"]
+
+        # Update the total and commit
+        order.total_amount = total_amount
+        db.commit()
+
+        return f"Order {order.id} successfully updated. New total: ${total_amount:.2f}"
+
+    except Exception as e:
+        db.rollback()
+        return f"Error editing order: {str(e)}"
+    finally:
+        db.close()
