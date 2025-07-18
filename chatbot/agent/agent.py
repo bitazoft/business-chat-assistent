@@ -34,7 +34,12 @@ from repositories.tools import (
     save_user,
     create_tmp_user_id,
     get_all_products,
-    edit_order
+    # edit_order
+    get_all_orders_for_customer,
+    get_pending_orders,
+    get_order_details,
+    check_product_stock,
+    edit_order_with_stock_update
 )
 from vector_store.vector_store import fast_vector_store as vector_store
 from agent.customer_service_rag import customer_service_rag
@@ -152,6 +157,17 @@ class OptimizedChatbot:
             customer_id: str = Field(..., description="User ID who placed the order")
             order_id: Union[str, int] = Field(..., description="Order ID to be edited")
             new_items: List[OrderItemInput] = Field(..., description="Updated list of order items")
+        
+        class GetOrdersInput(BaseModel):
+            customer_id: str = Field(..., description="User ID to retrieve orders for")
+            
+        class GetOrderDetailsInput(BaseModel):
+            order_id: Union[int, str] = Field(..., description="Order ID to retrieve")
+
+        class CheckStockInput(BaseModel):
+            product_id: Union[int, str] = Field(..., description="Product ID to check")
+            quantity: int = Field(..., gt=0, description="Quantity to verify against stock")
+
 
         class EmptyInput(BaseModel):
             pass
@@ -185,12 +201,27 @@ class OptimizedChatbot:
             number = None if not number else number
             return update_user_info(user_id=self.user_id, name=name, email=email, address=address, number=number)
         
-        def edit_order_wrapper(customer_id: str, order_id: str, new_items: List[dict]) -> str:
-            return edit_order(
-                customer_id=customer_id,
-                order_id=order_id,
-                new_items=new_items
-            )
+        # def edit_order_wrapper(customer_id: str, order_id: str, new_items: List[dict]) -> str:
+        #     return edit_order(
+        #         customer_id=customer_id,
+        #         order_id=order_id,
+        #         new_items=new_items
+        #     )
+        
+        def get_all_orders_for_customer_wrapper(customer_id: str) -> list:
+            return get_all_orders_for_customer(customer_id=customer_id)
+
+        def get_pending_orders_wrapper(self, customer_id: str) -> list:
+            return get_pending_orders(customer_id=customer_id)
+        
+        def get_order_details_wrapper(self, order_id: int) -> dict:
+            return get_order_details(order_id=order_id)
+
+        def check_product_stock_wrapper(self, product_id: int, quantity: int) -> dict:
+            return check_product_stock(product_id=product_id, quantity=quantity)
+
+        def edit_order_with_stock_update_wrapper(self, order_id: int, customer_id: str, new_items: list[dict]) -> dict:
+            return edit_order_with_stock_update(order_id=order_id, customer_id=customer_id, new_items=new_items)
 
         # Create tools
         return [
@@ -242,10 +273,40 @@ class OptimizedChatbot:
                 description="Get all products for seller",
                 args_schema=EmptyInput
             ),
+            # StructuredTool(
+            #     name="edit_order",
+            #     func=edit_order_wrapper,
+            #     description="Edit an existing pending order by specifying new items and their quantities",
+            #     args_schema=EditOrderInput
+            # ),
             StructuredTool(
-                name="edit_order",
-                func=edit_order_wrapper,
-                description="Edit an existing pending order by specifying new items and their quantities",
+                name="get_all_orders_for_customer",
+                description="Get all orders and their items for a customer by ID.",
+                func=get_all_orders_for_customer_wrapper,
+                args_schema=GetOrdersInput
+            ),
+            StructuredTool(
+                name="get_pending_orders",
+                description="Retrieve all pending orders for a specific customer.",
+                func=get_pending_orders_wrapper,
+                args_schema=GetOrdersInput
+            ),
+            StructuredTool(
+                name="get_order_details",
+                description="Get detailed information about a specific order.",
+                func=get_order_details_wrapper,
+                args_schema=GetOrderDetailsInput
+            ),
+            StructuredTool(
+                name="check_product_stock",
+                description="Check if a product has enough stock before editing.",
+                func=check_product_stock_wrapper,
+                args_schema=CheckStockInput
+            ),
+            StructuredTool(
+                name="edit_order_with_stock_update",
+                description="Edit a pending order and update stock in a single transaction.",
+                func=edit_order_with_stock_update_wrapper,
                 args_schema=EditOrderInput
             )
         ]
@@ -258,42 +319,52 @@ class OptimizedChatbot:
         prompt = ChatPromptTemplate.from_messages([
             ("system", f"""You are a fast business assistant for seller {self.seller_id}.
 
-                    Available tools: {[tool.name for tool in self.tools]}
+                Available tools: {[tool.name for tool in self.tools]}
 
-                    Instructions:
-                    1. For product info: use get_product_info
-                    2. For order tracking: use track_order  
-                    3. For placing orders: check_user_exists first, then place_order
-                    4. For user management: use appropriate user tools
-                    5. Be concise and direct
+                Instructions:
+                1. For product info: use get_product_info
+                2. For order tracking: use track_order  
+                3. For placing orders: check_user_exists first, then place_order
+                4. For user management: use appropriate user tools
+                5. For editing orders: use edit_order and related tools (see below)
+                6. Be concise and direct
 
-                    CRITICAL USER DATA WORKFLOW FOR ORDERS:
-                    When user wants to place an order, follow this EXACT sequence:
-                    1. FIRST: Always use check_user_exists to verify if user exists
-                    2. IF user does NOT exist:
-                    - NEVER create fake or assumed user data
-                    - NEVER use save_user without explicit user-provided information
-                    - Ask the user: "To place your order, I need your details. Please provide your full name, email address, physical address, and phone number."
-                    - WAIT for user response with their actual details
-                    - ONLY then use save_user with the information they provided
-                    3. IF user exists: Use get_user_info to show their details and confirm they're correct
-                    4. ONLY after user confirmation, proceed with place_order
-                    5. For editing orders: use edit_order
-                    - Always request order ID and updated items (product + quantity) from the user
-                    - Only editable if the order status is 'pending'
-                    - If user says something like "change my order", clarify: "Please provide the order ID and the updated items (product name or ID and quantity)"
-                    - Do not assume or guess missing product info
+                CRITICAL USER DATA WORKFLOW FOR ORDERS:
+                When user wants to place an order, follow this EXACT sequence:
+                1. FIRST: Always use check_user_exists to verify if user exists
+                2. IF user does NOT exist:
+                - NEVER create fake or assumed user data
+                - NEVER use save_user without explicit user-provided information
+                - Ask the user: "To place your order, I need your details. Please provide your full name, email address, physical address, and phone number."
+                - WAIT for user response with their actual details
+                - ONLY then use save_user with the information they provided
+                3. IF user exists: Use get_user_info to show their details and confirm they're correct
+                4. ONLY after user confirmation, proceed with place_order
 
-                    
-                    IMPORTANT RULES:
-                    - NEVER generate, assume, or create fake user information
-                    - NEVER use save_user without explicit user input containing name, email, address, phone
-                    - For product info and order tracking: No user details needed
-                    - For placing orders: User details are MANDATORY and must be explicitly provided by the user
-                    - Extract parameters accurately from user input and chat history
-                    - Execute tools directly; do not describe actions without executing
+                EDITING ORDER FLOW:
+                Use this exact sequence when user wants to modify or change an existing order:
+                1. ALWAYS confirm or extract the order ID from user
+                2. If user does not remember the order ID, use get_pending_orders to show editable orders for the customer
+                3. If order ID is found, use get_order_details to display order items
+                4. Ask user: "Please provide the updated items (product name or ID and quantity) you'd like to add or change in your order."
+                5. Once updated item info is received:
+                - Internally call check_product_stock for each item to verify stock is available
+                - If all stock is sufficient, call edit_order to update the order and reduce product stock
+                - If any item is out of stock, notify the user and cancel the edit attempt
 
-                    Context: {{examples}}"""),
+                IMPORTANT RULES:
+                - Only allow editing if order status is 'pending' (use get_pending_orders to verify)
+                - NEVER assume missing order ID or product details
+                - NEVER edit an order without both valid ID and item list from user
+                - NEVER proceed if stock is not available — validate first
+                - NEVER generate, assume, or create fake user information
+                - NEVER use save_user without explicit user input containing name, email, address, phone
+                - For product info and order tracking: No user details needed
+                - For placing or editing orders: User details and/or order info are MANDATORY
+                - Extract parameters accurately from user input and chat history
+                - Execute tools directly; do not describe actions without executing
+
+                Context: {{examples}}"""),
             MessagesPlaceholder(variable_name="chat_history"),
             ("human", "{input}"),
             MessagesPlaceholder(variable_name="agent_scratchpad")
