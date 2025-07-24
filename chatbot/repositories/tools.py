@@ -298,57 +298,104 @@ def get_pending_orders(customer_id: str) -> list:
     """Get all pending orders and items for a customer"""
     db = SessionLocal()
     try:
-        orders = (
-            db.query(Orders)
-            .filter(Orders.customerId == customer_id, Orders.status == "pending")
-            .all()
-        )
-        result = []
-        for order in orders:
-            items = [
-                {
-                    "product": item.products.name,
-                    "quantity": item.quantity,
-                    "price": item.price
-                }
-                for item in order.order_items
-            ]
-            result.append({
-                "order_id": order.id,
-                "status": order.status,
-                "total_amount": order.total_amount,
-                "created_at": str(order.created_at),
-                "items": items
+        sql = text("""
+            SELECT 
+                o.id AS order_id,
+                o.status,
+                o.total_amount,
+                o.created_at,
+                oi.quantity,
+                oi.price,
+                p.name AS product_name
+            FROM orders o
+            JOIN order_items oi ON oi.order_id = o.id
+            JOIN products p ON p.id = oi.product_id
+            WHERE o."customerId" = :customer_id
+              AND o.status = 'pending'
+            ORDER BY o.created_at DESC
+        """)
+
+        rows = db.execute(sql, {"customer_id": customer_id}).mappings().fetchall()
+
+        order_map = defaultdict(lambda: {
+            "order_id": None,
+            "status": None,
+            "total_amount": None,
+            "created_at": None,
+            "items": []
+        })
+
+        for row in rows:
+            order_id = row["order_id"]
+            order = order_map[order_id]
+
+            if order["order_id"] is None:
+                order.update({
+                    "order_id": row["order_id"],
+                    "status": row["status"],
+                    "total_amount": row["total_amount"],
+                    "created_at": str(row["created_at"]),
+                })
+
+            order["items"].append({
+                "product": row["product_name"],
+                "quantity": row["quantity"],
+                "price": row["price"]
             })
-        return result
+
+        if order_map:
+            return list(order_map.values())
+        return [{"message": "No pending orders found"}]
+
     finally:
         db.close()
 
 def get_order_details(order_id: int) -> dict:
-    """Get detailed info for a specific order"""
+    """Get detailed info for a specific order using raw SQL"""
     db = SessionLocal()
     try:
-        order = db.query(Orders).filter(Orders.id == order_id).first()
-        if not order:
+        sql = text("""
+            SELECT 
+                o.id AS order_id,
+                o."customerId",
+                o.status,
+                o.total_amount,
+                o.created_at,
+                oi.quantity,
+                oi.price,
+                p.name AS product_name
+            FROM orders o
+            JOIN order_items oi ON oi.order_id = o.id
+            JOIN products p ON p.id = oi.product_id
+            WHERE o.id = :order_id
+        """)
+
+        rows = db.execute(sql, {"order_id": order_id}).mappings().fetchall()
+
+        if not rows:
             return {"error": "Order not found"}
 
-        items = [
-            {
-                "product": item.products.name,
-                "quantity": item.quantity,
-                "price": item.price
-            }
-            for item in order.order_items
-        ]
-
-        return {
-            "order_id": order.id,
-            "customer_id": order.customerId,
-            "status": order.status,
-            "total_amount": order.total_amount,
-            "created_at": str(order.created_at),
-            "items": items
+        # Use first row for order-level info
+        order_info = rows[0]
+        order_data = {
+            "order_id": order_info["order_id"],
+            "customer_id": order_info["customerId"],
+            "status": order_info["status"],
+            "total_amount": order_info["total_amount"],
+            "created_at": str(order_info["created_at"]),
+            "items": []
         }
+
+        # Collect items
+        for row in rows:
+            order_data["items"].append({
+                "product": row["product_name"],
+                "quantity": row["quantity"],
+                "price": row["price"]
+            })
+
+        return order_data
+
     finally:
         db.close()
 

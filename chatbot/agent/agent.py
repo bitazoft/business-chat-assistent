@@ -211,16 +211,16 @@ class OptimizedChatbot:
         def get_all_orders_for_customer_wrapper(customer_id: str) -> list:
             return get_all_orders_for_customer(customer_id=customer_id)
 
-        def get_pending_orders_wrapper(self, customer_id: str) -> list:
+        def get_pending_orders_wrapper(customer_id: str) -> list:
             return get_pending_orders(customer_id=customer_id)
         
-        def get_order_details_wrapper(self, order_id: int) -> dict:
+        def get_order_details_wrapper(order_id: int) -> dict:
             return get_order_details(order_id=order_id)
 
-        def check_product_stock_wrapper(self, product_id: int, quantity: int) -> dict:
+        def check_product_stock_wrapper(product_id: int, quantity: int) -> dict:
             return check_product_stock(product_id=product_id, quantity=quantity)
 
-        def edit_order_with_stock_update_wrapper(self, order_id: int, customer_id: str, new_items: list[dict]) -> dict:
+        def edit_order_with_stock_update_wrapper(order_id: int, customer_id: str, new_items: list[dict]) -> dict:
             return edit_order_with_stock_update(order_id=order_id, customer_id=customer_id, new_items=new_items)
 
         # Create tools
