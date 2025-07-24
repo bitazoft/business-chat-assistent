@@ -170,69 +170,227 @@ def query_context(query: str, seller_id: str) -> str:
     results = vector_store.search(query_embedding, seller_id)
     return "\n".join(results)
 
-# def edit_order(customer_id: str, order_id: str, new_items: List[dict]) -> str:
-#     """
-#     Edit an existing pending order by user.
-#     Each item in new_items must have:
-#     - 'product_id' or 'name'
-#     - 'quantity'
-#     """
-#     db = SessionLocal()
-#     try:
-#         # customer_id = user_id
-#         order = db.query(Order).filter(Order.id == int(order_id)).first()
-#         if not order:
-#             return "Order not found"
-#         if order.status != "pending":
-#             return f"Order cannot be edited. Current status: {order.status}"
+def add_item_to_order(customer_id: str, order_id: str, product_identifier: str, quantity: int) -> str:
+    """
+    Add an item to an existing pending order or update quantity if item already exists.
+    product_identifier can be product ID (numeric) or product name (string)
+    """
+    db = SessionLocal()
+    try:
+        # Validate order exists and belongs to customer
+        order = db.query(Order).filter(Order.id == int(order_id), Order.customerId == customer_id).first()
+        if not order:
+            return "Order not found or doesn't belong to this customer"
+        if order.status != "pending":
+            return f"Order cannot be edited. Current status: {order.status}"
 
+        # Find the product
+        product = None
+        if str(product_identifier).isdigit():
+            product = db.query(Product).filter(Product.id == int(product_identifier), Product.sellerId == order.sellerId).first()
+        else:
+            product = db.query(Product).filter(Product.name.ilike(f"%{product_identifier}%"), Product.sellerId == order.sellerId).first()
         
-#         print("going to restock")
-#         # Fetch existing order items and restock
-#         existing_items = db.query(OrderItem).filter(OrderItem.order_id == order.id).all()
-#         for item in existing_items:
-#             product = db.query(Product).filter(Product.id == item.product_id).first()
-#             if product:
-#                 product.stock += item.quantity  # Restock
-#             db.delete(item)  # Remove old items
-#         print("Item restocked")
+        if not product:
+            return f"Product '{product_identifier}' not found for this seller"
 
-#         db.flush()
-
-#         # Now add new items as per the updated list
-#         total_amount = 0
-#         for item in new_items:
-#             product = None
-#             identifier = item["product_id"]
+        # Check if item already exists in order
+        existing_item = db.query(OrderItem).filter(OrderItem.order_id == order.id, OrderItem.product_id == product.id).first()
+        
+        if existing_item:
+            # Update existing item quantity
+            old_quantity = existing_item.quantity
+            new_quantity = quantity
+            quantity_diff = new_quantity - old_quantity
             
-#             if str(identifier).isdigit():
-#                 product = db.query(Product).filter(Product.id == int(identifier), Product.seller_id == order.seller_id).first()
-#             else:
-#                 product = db.query(Product).filter(Product.name.ilike(f"%{identifier}%"), Product.seller_id == order.seller_id).first()
+            if product.stock < quantity_diff:
+                return f"Insufficient stock for product '{product.name}'. Available: {product.stock}, Additional needed: {quantity_diff}"
             
-#             if not product:
-#                 db.rollback()
-#                 return f"Product '{identifier}' not found"
-#             if product.stock < item["quantity"]:
-#                 db.rollback()
-#                 return f"Insufficient stock for product '{product.name}'. Available: {product.stock}, Requested: {item['quantity']}"
+            existing_item.quantity = new_quantity
+            product.stock -= quantity_diff
+            order.total_amount += product.price * quantity_diff
+            
+            action = f"Updated quantity for '{product.name}' from {old_quantity} to {new_quantity}"
+        else:
+            # Add new item to order
+            if product.stock < quantity:
+                return f"Insufficient stock for product '{product.name}'. Available: {product.stock}, Requested: {quantity}"
+            
+            order_item = OrderItem(order_id=order.id, product_id=product.id, price=product.price, quantity=quantity)
+            db.add(order_item)
+            product.stock -= quantity
+            order.total_amount += product.price * quantity
+            
+            action = f"Added '{product.name}' (quantity: {quantity}) to order"
 
-#             total_amount += product.price * item["quantity"]
-#             order_item = OrderItem(order_id=order.id, product_id=product.id, price=product.price, quantity=item["quantity"])
-#             db.add(order_item)
-#             product.stock -= item["quantity"]
+        db.commit()
+        return f"{action}. Order total: ${order.total_amount:.2f}"
 
-#         # Update the total and commit
-#         order.total_amount = total_amount
-#         db.commit()
+    except Exception as e:
+        db.rollback()
+        return f"Error adding item to order: {str(e)}"
+    finally:
+        db.close()
 
-#         return f"Order {order.id} successfully updated. New total: ${total_amount:.2f}"
+def remove_item_from_order(customer_id: str, order_id: str, product_identifier: str) -> str:
+    """
+    Remove an item completely from an existing pending order.
+    product_identifier can be product ID (numeric) or product name (string)
+    """
+    db = SessionLocal()
+    try:
+        # Validate order exists and belongs to customer
+        order = db.query(Order).filter(Order.id == int(order_id), Order.customerId == customer_id).first()
+        if not order:
+            return "Order not found or doesn't belong to this customer"
+        if order.status != "pending":
+            return f"Order cannot be edited. Current status: {order.status}"
 
-#     except Exception as e:
-#         db.rollback()
-#         return f"Error editing order: {str(e)}"
-#     finally:
-#         db.close()
+        # Find the product
+        product = None
+        if str(product_identifier).isdigit():
+            product = db.query(Product).filter(Product.id == int(product_identifier), Product.sellerId == order.sellerId).first()
+        else:
+            product = db.query(Product).filter(Product.name.ilike(f"%{product_identifier}%"), Product.sellerId == order.sellerId).first()
+        
+        if not product:
+            return f"Product '{product_identifier}' not found for this seller"
+
+        # Find the order item
+        order_item = db.query(OrderItem).filter(OrderItem.order_id == order.id, OrderItem.product_id == product.id).first()
+        
+        if not order_item:
+            return f"Product '{product.name}' is not in this order"
+
+        # Restock the product and remove from order
+        product.stock += order_item.quantity
+        order.total_amount -= order_item.price * order_item.quantity
+        
+        db.delete(order_item)
+        db.commit()
+        
+        return f"Removed '{product.name}' from order. Order total: ${order.total_amount:.2f}"
+
+    except Exception as e:
+        db.rollback()
+        return f"Error removing item from order: {str(e)}"
+    finally:
+        db.close()
+
+def update_item_quantity_in_order(customer_id: str, order_id: str, product_identifier: str, new_quantity: int) -> str:
+    """
+    Update the quantity of a specific item in an existing pending order.
+    product_identifier can be product ID (numeric) or product name (string)
+    """
+    db = SessionLocal()
+    try:
+        # Validate order exists and belongs to customer
+        order = db.query(Order).filter(Order.id == int(order_id), Order.customerId == customer_id).first()
+        if not order:
+            return "Order not found or doesn't belong to this customer"
+        if order.status != "pending":
+            return f"Order cannot be edited. Current status: {order.status}"
+
+        # Find the product
+        product = None
+        if str(product_identifier).isdigit():
+            product = db.query(Product).filter(Product.id == int(product_identifier), Product.sellerId == order.sellerId).first()
+        else:
+            product = db.query(Product).filter(Product.name.ilike(f"%{product_identifier}%"), Product.sellerId == order.sellerId).first()
+        
+        if not product:
+            return f"Product '{product_identifier}' not found for this seller"
+
+        # Find the order item
+        order_item = db.query(OrderItem).filter(OrderItem.order_id == order.id, OrderItem.product_id == product.id).first()
+        
+        if not order_item:
+            return f"Product '{product.name}' is not in this order"
+
+        if new_quantity <= 0:
+            return "Quantity must be greater than 0. Use remove_item_from_order to remove items completely"
+
+        # Calculate stock adjustment
+        old_quantity = order_item.quantity
+        quantity_diff = new_quantity - old_quantity
+        
+        if quantity_diff > 0 and product.stock < quantity_diff:
+            return f"Insufficient stock for product '{product.name}'. Available: {product.stock}, Additional needed: {quantity_diff}"
+
+        # Update quantity and stock
+        order_item.quantity = new_quantity
+        product.stock -= quantity_diff  # If negative, it adds stock back
+        order.total_amount += product.price * quantity_diff
+        
+        db.commit()
+        return f"Updated '{product.name}' quantity from {old_quantity} to {new_quantity}. Order total: ${order.total_amount:.2f}"
+
+    except Exception as e:
+        db.rollback()
+        return f"Error updating item quantity: {str(e)}"
+    finally:
+        db.close()
+
+def replace_order_items(customer_id: str, order_id: str, new_items: List[dict]) -> str:
+    """
+    Replace all items in an existing pending order with new items.
+    Each item in new_items must have:
+    - 'product_id' (can be numeric ID or product name)
+    - 'quantity'
+    """
+    db = SessionLocal()
+    try:
+        # Validate order exists and belongs to customer
+        order = db.query(Order).filter(Order.id == int(order_id), Order.customerId == customer_id).first()
+        if not order:
+            return "Order not found or doesn't belong to this customer"
+        if order.status != "pending":
+            return f"Order cannot be edited. Current status: {order.status}"
+
+        # First, restock all existing items
+        existing_items = db.query(OrderItem).filter(OrderItem.order_id == order.id).all()
+        for item in existing_items:
+            product = db.query(Product).filter(Product.id == item.product_id).first()
+            if product:
+                product.stock += item.quantity  # Restock
+            db.delete(item)  # Remove old items
+
+        db.flush()
+
+        # Now add new items
+        total_amount = 0
+        for item in new_items:
+            product = None
+            identifier = item["product_id"]
+            
+            if str(identifier).isdigit():
+                product = db.query(Product).filter(Product.id == int(identifier), Product.sellerId == order.sellerId).first()
+            else:
+                product = db.query(Product).filter(Product.name.ilike(f"%{identifier}%"), Product.sellerId == order.sellerId).first()
+            
+            if not product:
+                db.rollback()
+                return f"Product '{identifier}' not found for this seller"
+            if product.stock < item["quantity"]:
+                db.rollback()
+                return f"Insufficient stock for product '{product.name}'. Available: {product.stock}, Requested: {item['quantity']}"
+
+            total_amount += product.price * item["quantity"]
+            order_item = OrderItem(order_id=order.id, product_id=product.id, price=product.price, quantity=item["quantity"])
+            db.add(order_item)
+            product.stock -= item["quantity"]
+
+        # Update the total and commit
+        order.total_amount = total_amount
+        db.commit()
+
+        return f"Order {order.id} successfully updated with {len(new_items)} items. New total: ${total_amount:.2f}"
+
+    except Exception as e:
+        db.rollback()
+        return f"Error replacing order items: {str(e)}"
+    finally:
+        db.close()
 
 def get_all_orders_for_customer(customer_id: str) -> list:
     """Get all orders and items for a specific customer using raw SQL"""
@@ -403,7 +561,7 @@ def check_product_stock(product_id: int, quantity: int) -> dict:
     """Check if a product has enough stock"""
     db = SessionLocal()
     try:
-        product = db.query(Products).filter(Products.id == product_id).first()
+        product = db.query(Product).filter(Product.id == product_id).first()
         if not product:
             return {"available": False, "stock": 0, "error": "Product not found"}
         return {
@@ -418,7 +576,7 @@ def edit_order_with_stock_update(order_id: int, customer_id: str, new_items: lis
     """Edit a pending order and update product stock in a single transaction"""
     db = SessionLocal()
     try:
-        order = db.query(Orders).filter(Orders.id == order_id).first()
+        order = db.query(Order).filter(Order.id == order_id).first()
 
         if not order:
             return {"success": False, "error": "Order not found"}
@@ -429,7 +587,7 @@ def edit_order_with_stock_update(order_id: int, customer_id: str, new_items: lis
 
         # Validate stock for all items first
         for item in new_items:
-            product = db.query(Products).filter(Products.id == item["product_id"]).first()
+            product = db.query(Product).filter(Product.id == item["product_id"]).first()
             if not product:
                 return {"success": False, "error": f"Product {item['product_id']} not found"}
             if product.stock < item["quantity"]:
@@ -439,14 +597,14 @@ def edit_order_with_stock_update(order_id: int, customer_id: str, new_items: lis
                 }
 
         # Delete old order items
-        db.query(OrderItems).filter(OrderItems.order_id == order_id).delete()
+        db.query(OrderItem).filter(OrderItem.order_id == order_id).delete()
 
         total = 0
         for item in new_items:
-            product = db.query(Products).filter(Products.id == item["product_id"]).first()
+            product = db.query(Product).filter(Product.id == item["product_id"]).first()
 
             # Create new order item
-            order_item = OrderItems(
+            order_item = OrderItem(
                 order_id=order_id,
                 product_id=item["product_id"],
                 quantity=item["quantity"],

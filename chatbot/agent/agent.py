@@ -34,12 +34,14 @@ from repositories.tools import (
     save_user,
     create_tmp_user_id,
     get_all_products,
-    # edit_order
+    add_item_to_order,
+    remove_item_from_order,
+    update_item_quantity_in_order,
+    replace_order_items,
     get_all_orders_for_customer,
     get_pending_orders,
     get_order_details,
-    check_product_stock,
-    edit_order_with_stock_update
+    check_product_stock
 )
 from vector_store.vector_store import fast_vector_store as vector_store
 from agent.customer_service_rag import customer_service_rag
@@ -103,14 +105,15 @@ def get_unified_system_prompt(seller_id: str) -> str:
             - If user writes in Sinhala (සිංහල): Respond in Sinhala
             - If user writes in Singlish (mixed): Respond in Sinhala
 
-            Available tools: {', '.join(['get_product_info', 'track_order', 'place_order', 'get_user_info', 'save_user', 'check_user_exists', 'update_user_info', 'edit_order'])}
+            Available tools: {', '.join(['get_product_info', 'track_order', 'place_order', 'get_user_info', 'save_user', 'check_user_exists', 'update_user_info', 'add_item_to_order', 'remove_item_from_order', 'update_item_quantity_in_order', 'replace_order_items', 'get_all_orders_for_customer', 'get_pending_orders'])}
 
             CORE INSTRUCTIONS:
             1. Product information: use get_product_info
             2. Order tracking: use track_order  
             3. Place orders: ALWAYS check_user_exists first, then place_order
             4. User management: use appropriate user tools
-            5. Be helpful and match the user's communication style
+            5. Order management: use new granular order editing tools
+            6. Be helpful and match the user's communication style
 
             CRITICAL ORDER WORKFLOW:
             When user wants to place an order:
@@ -124,9 +127,14 @@ def get_unified_system_prompt(seller_id: str) -> str:
             3. IF user exists: Use get_user_info and confirm details
             4. ONLY after confirmation: proceed with place_order
 
-            ORDER EDITING:
-            - Use edit_order tool
-            - Always request order ID and updated items
+            ORDER EDITING (New Granular Tools):
+            - add_item_to_order: Add new item to existing pending order
+            - remove_item_from_order: Remove specific item from pending order  
+            - update_item_quantity_in_order: Change quantity of existing item
+            - replace_order_items: Replace all items (like old edit_order)
+            - get_pending_orders: View user's pending orders
+            - get_all_orders_for_customer: View all user's orders
+            - Always request order ID and specific action needed
             - Only editable if order status is 'pending'
 
             IMPORTANT RULES:
@@ -229,6 +237,24 @@ class OptimizedChatbot:
             order_id: Union[str, int] = Field(..., description="Order ID to be edited")
             new_items: List[OrderItemInput] = Field(..., description="Updated list of order items")
         
+        class AddItemToOrderInput(BaseModel):
+            order_id: str = Field(..., description="Order ID to add item to")
+            product_identifier: str = Field(..., description="Product ID (numeric) or product name (string)")
+            quantity: int = Field(..., gt=0, description="Quantity to add")
+
+        class RemoveItemFromOrderInput(BaseModel):
+            order_id: str = Field(..., description="Order ID to remove item from")
+            product_identifier: str = Field(..., description="Product ID (numeric) or product name (string)")
+
+        class UpdateItemQuantityInput(BaseModel):
+            order_id: str = Field(..., description="Order ID to update item in")
+            product_identifier: str = Field(..., description="Product ID (numeric) or product name (string)")
+            new_quantity: int = Field(..., gt=0, description="New quantity for the item")
+
+        class ReplaceOrderItemsInput(BaseModel):
+            order_id: str = Field(..., description="Order ID to replace items in")
+            new_items: List[OrderItemInput] = Field(..., description="New list of order items")
+        
         class GetOrdersInput(BaseModel):
             customer_id: str = Field(..., description="User ID to retrieve orders for")
             
@@ -272,27 +298,47 @@ class OptimizedChatbot:
             number = None if not number else number
             return update_user_info(user_id=self.user_id, name=name, email=email, address=address, number=number)
         
-        # def edit_order_wrapper(customer_id: str, order_id: str, new_items: List[dict]) -> str:
-        #     return edit_order(
-        #         customer_id=customer_id,
-        #         order_id=order_id,
-        #         new_items=new_items
-        #     )
-        
-        def get_all_orders_for_customer_wrapper(customer_id: str) -> list:
-            return get_all_orders_for_customer(customer_id=customer_id)
+        def add_item_to_order_wrapper(order_id: str, product_identifier: str, quantity: int) -> str:
+            return add_item_to_order(
+                customer_id=self.user_id,
+                order_id=order_id,
+                product_identifier=product_identifier,
+                quantity=quantity
+            )
 
-        def get_pending_orders_wrapper(customer_id: str) -> list:
-            return get_pending_orders(customer_id=customer_id)
+        def remove_item_from_order_wrapper(order_id: str, product_identifier: str) -> str:
+            return remove_item_from_order(
+                customer_id=self.user_id,
+                order_id=order_id,
+                product_identifier=product_identifier
+            )
+
+        def update_item_quantity_in_order_wrapper(order_id: str, product_identifier: str, new_quantity: int) -> str:
+            return update_item_quantity_in_order(
+                customer_id=self.user_id,
+                order_id=order_id,
+                product_identifier=product_identifier,
+                new_quantity=new_quantity
+            )
+
+        def replace_order_items_wrapper(order_id: str, new_items: List[dict]) -> str:
+            return replace_order_items(
+                customer_id=self.user_id,
+                order_id=order_id,
+                new_items=new_items
+            )
+        
+        def get_all_orders_for_customer_wrapper() -> list:
+            return get_all_orders_for_customer(customer_id=self.user_id)
+
+        def get_pending_orders_wrapper() -> list:
+            return get_pending_orders(customer_id=self.user_id)
         
         def get_order_details_wrapper(order_id: int) -> dict:
             return get_order_details(order_id=order_id)
 
         def check_product_stock_wrapper(product_id: int, quantity: int) -> dict:
             return check_product_stock(product_id=product_id, quantity=quantity)
-
-        def edit_order_with_stock_update_wrapper(order_id: int, customer_id: str, new_items: list[dict]) -> dict:
-            return edit_order_with_stock_update(order_id=order_id, customer_id=customer_id, new_items=new_items)
 
         # Create tools
         return [
@@ -344,23 +390,41 @@ class OptimizedChatbot:
                 description="Get all products for seller",
                 args_schema=EmptyInput
             ),
-            # StructuredTool(
-            #     name="edit_order",
-            #     func=edit_order_wrapper,
-            #     description="Edit an existing pending order by specifying new items and their quantities",
-            #     args_schema=EditOrderInput
-            # ),
+            StructuredTool(
+                name="add_item_to_order",
+                func=add_item_to_order_wrapper,
+                description="Add an item to an existing pending order or update quantity if item already exists",
+                args_schema=AddItemToOrderInput
+            ),
+            StructuredTool(
+                name="remove_item_from_order",
+                func=remove_item_from_order_wrapper,
+                description="Remove an item completely from an existing pending order",
+                args_schema=RemoveItemFromOrderInput
+            ),
+            StructuredTool(
+                name="update_item_quantity_in_order",
+                func=update_item_quantity_in_order_wrapper,
+                description="Update the quantity of a specific item in an existing pending order",
+                args_schema=UpdateItemQuantityInput
+            ),
+            StructuredTool(
+                name="replace_order_items",
+                func=replace_order_items_wrapper,
+                description="Replace all items in an existing pending order with new items (like original edit_order)",
+                args_schema=ReplaceOrderItemsInput
+            ),
             StructuredTool(
                 name="get_all_orders_for_customer",
-                description="Get all orders and their items for a customer by ID.",
+                description="Get all orders and their items for the current customer",
                 func=get_all_orders_for_customer_wrapper,
-                args_schema=GetOrdersInput
+                args_schema=EmptyInput
             ),
             StructuredTool(
                 name="get_pending_orders",
-                description="Retrieve all pending orders for a specific customer.",
+                description="Retrieve all pending orders for the current customer",
                 func=get_pending_orders_wrapper,
-                args_schema=GetOrdersInput
+                args_schema=EmptyInput
             ),
             StructuredTool(
                 name="get_order_details",
@@ -373,12 +437,6 @@ class OptimizedChatbot:
                 description="Check if a product has enough stock before editing.",
                 func=check_product_stock_wrapper,
                 args_schema=CheckStockInput
-            ),
-            StructuredTool(
-                name="edit_order_with_stock_update",
-                description="Edit a pending order and update stock in a single transaction.",
-                func=edit_order_with_stock_update_wrapper,
-                args_schema=EditOrderInput
             )
         ]
     
@@ -398,7 +456,7 @@ class OptimizedChatbot:
         return AgentExecutor(
             agent=agent, 
             tools=self.tools, 
-            verbose=False,  # Disable verbose for speed
+            verbose=True,  # Disable verbose for speed
             max_iterations=3,  # Limit iterations
             handle_parsing_errors=True
         )
