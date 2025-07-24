@@ -43,7 +43,9 @@ from repositories.tools import (
 )
 from vector_store.vector_store import fast_vector_store as vector_store
 from agent.customer_service_rag import customer_service_rag
+from agent.language_agent import get_language_agent, detect_language_detailed
 import os
+import re
 
 # Load environment variables
 DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
@@ -90,25 +92,94 @@ def get_cached_intents(seller_id: str):
         logger.warning(f"[Intent Cache] Error: {str(e)}")
         return "product_info, order_tracking, place_order, user_management, general_inquiry"
 
+def get_unified_system_prompt(seller_id: str) -> str:
+    """Get unified system prompt that handles all languages"""
+    return f"""You are a business assistant for seller {seller_id}. You can communicate in English, Sinhala, and Singlish (mixed Sinhala-English).
+
+            LANGUAGE ADAPTATION RULES:
+            - Detect the user's language from their message
+            - Respond in the SAME language style the user is using
+            - If user writes in English: Respond in English
+            - If user writes in Sinhala (සිංහල): Respond in Sinhala
+            - If user writes in Singlish (mixed): Respond in Sinhala
+
+            Available tools: {', '.join(['get_product_info', 'track_order', 'place_order', 'get_user_info', 'save_user', 'check_user_exists', 'update_user_info', 'edit_order'])}
+
+            CORE INSTRUCTIONS:
+            1. Product information: use get_product_info
+            2. Order tracking: use track_order  
+            3. Place orders: ALWAYS check_user_exists first, then place_order
+            4. User management: use appropriate user tools
+            5. Be helpful and match the user's communication style
+
+            CRITICAL ORDER WORKFLOW:
+            When user wants to place an order:
+            1. FIRST: Always use check_user_exists
+            2. IF user does NOT exist:
+            - NEVER create fake user data
+            - Ask for details in user's language:
+                * English: "To place your order, I need your details. Please provide your full name, email address, physical address, and phone number."
+                * Sinhala: "ඔබගේ ඇණවුම සිදු කිරීම සදහා ඔබගේ විස්තර අවශ්‍යයි. කරුණාකර ඔබගේ සම්පූර්ණ නම, ඊමේල් ලිපිනය, ගෘහ ලිපිනය සහ දුරකථන අංකය ලබා දෙන්න."
+                * Singlish: "ඔබගේ ඇණවුම සිදු කිරීම සදහා ඔබගේ විස්තර අවශ්‍යයි. කරුණාකර ඔබගේ සම්පූර්ණ නම, ඊමේල් ලිපිනය, ගෘහ ලිපිනය සහ දුරකථන අංකය ලබා දෙන්න."
+            3. IF user exists: Use get_user_info and confirm details
+            4. ONLY after confirmation: proceed with place_order
+
+            ORDER EDITING:
+            - Use edit_order tool
+            - Always request order ID and updated items
+            - Only editable if order status is 'pending'
+
+            IMPORTANT RULES:
+            - NEVER generate fake user information
+            - NEVER use save_user without explicit user input
+            - Extract parameters accurately from user input
+            - Execute tools directly, don't just describe actions
+            - Match user's language and tone"""
+
 # Fast intent detection using keywords instead of LLM
 def fast_intent_detection(user_input: str) -> str:
-    """Fast rule-based intent detection"""
+    """Fast rule-based intent detection for multiple languages"""
     user_input_lower = user_input.lower()
     
-    # Order tracking keywords
-    if any(keyword in user_input_lower for keyword in ['track', 'order', 'status', 'delivery', 'shipped']):
-        return "order_tracking"
+    # Order tracking keywords (English, Sinhala, Singlish)
+    order_tracking_keywords = [
+        # English
+        'track', 'order', 'status', 'delivery', 'shipped', 'tracking',
+        
+    ]
     
     # Place order keywords
-    if any(keyword in user_input_lower for keyword in ['buy', 'purchase', 'order', 'cart', 'checkout']):
-        return "place_order"
+    place_order_keywords = [
+        # English
+        'buy', 'purchase', 'order', 'cart', 'checkout', 'want to buy',
+        
+    ]
     
     # Product info keywords
-    if any(keyword in user_input_lower for keyword in ['product', 'price', 'cost', 'available', 'stock', 'details']):
-        return "product_info"
+    product_info_keywords = [
+        # English
+        'product', 'price', 'cost', 'available', 'stock', 'details', 'info',
+       
+    ]
     
     # User management keywords
-    if any(keyword in user_input_lower for keyword in ['profile', 'account', 'update', 'change', 'personal']):
+    user_management_keywords = [
+        # English
+        'profile', 'account', 'update', 'change', 'personal', 'details',
+       
+    ]
+    
+    # Check keywords
+    if any(keyword in user_input_lower for keyword in order_tracking_keywords):
+        return "order_tracking"
+    
+    if any(keyword in user_input_lower for keyword in place_order_keywords):
+        return "place_order"
+    
+    if any(keyword in user_input_lower for keyword in product_info_keywords):
+        return "product_info"
+    
+    if any(keyword in user_input_lower for keyword in user_management_keywords):
         return "user_management"
     
     # Default to general inquiry
@@ -312,75 +383,28 @@ class OptimizedChatbot:
         ]
     
     def _create_agent(self):
-        """Create optimized single agent"""
+        """Create optimized single agent with unified language support"""
         llm_with_tools = llm.bind_tools(self.tools)
         
-        # Simplified prompt for faster processing
+        # Unified prompt that handles all languages with dynamic examples
         prompt = ChatPromptTemplate.from_messages([
-            ("system", f"""You are a fast business assistant for seller {self.seller_id}.
 
-                Available tools: {[tool.name for tool in self.tools]}
-
-                Instructions:
-                1. For product info: use get_product_info
-                2. For order tracking: use track_order  
-                3. For placing orders: check_user_exists first, then place_order
-                4. For user management: use appropriate user tools
-                5. For editing orders: use edit_order and related tools (see below)
-                6. Be concise and direct
-
-                CRITICAL USER DATA WORKFLOW FOR ORDERS:
-                When user wants to place an order, follow this EXACT sequence:
-                1. FIRST: Always use check_user_exists to verify if user exists
-                2. IF user does NOT exist:
-                - NEVER create fake or assumed user data
-                - NEVER use save_user without explicit user-provided information
-                - Ask the user: "To place your order, I need your details. Please provide your full name, email address, physical address, and phone number."
-                - WAIT for user response with their actual details
-                - ONLY then use save_user with the information they provided
-                3. IF user exists: Use get_user_info to show their details and confirm they're correct
-                4. ONLY after user confirmation, proceed with place_order
-
-                EDITING ORDER FLOW:
-                Use this exact sequence when user wants to modify or change an existing order:
-                1. ALWAYS confirm or extract the order ID from user
-                2. If user does not remember the order ID, use get_pending_orders to show editable orders for the customer
-                3. If order ID is found, use get_order_details to display order items
-                4. Ask user: "Please provide the updated items (product name or ID and quantity) you'd like to add or change in your order."
-                5. Once updated item info is received:
-                - Internally call check_product_stock for each item to verify stock is available
-                - If all stock is sufficient, call edit_order to update the order and reduce product stock
-                - If any item is out of stock, notify the user and cancel the edit attempt
-
-                IMPORTANT RULES:
-                - Only allow editing if order status is 'pending' (use get_pending_orders to verify)
-                - NEVER assume missing order ID or product details
-                - NEVER edit an order without both valid ID and item list from user
-                - NEVER proceed if stock is not available — validate first
-                - NEVER generate, assume, or create fake user information
-                - NEVER use save_user without explicit user input containing name, email, address, phone
-                - For product info and order tracking: No user details needed
-                - For placing or editing orders: User details and/or order info are MANDATORY
-                - Extract parameters accurately from user input and chat history
-                - Execute tools directly; do not describe actions without executing
-
-                Context: {{examples}}"""),
+            ("system", get_unified_system_prompt(self.seller_id) + "\n\nContext Examples: {examples}"),
             MessagesPlaceholder(variable_name="chat_history"),
             ("human", "{input}"),
             MessagesPlaceholder(variable_name="agent_scratchpad")
         ])
-        
         agent = create_openai_tools_agent(llm_with_tools, self.tools, prompt)
         return AgentExecutor(
             agent=agent, 
             tools=self.tools, 
-            verbose=True,  # Disable verbose for speed
+            verbose=False,  # Disable verbose for speed
             max_iterations=3,  # Limit iterations
             handle_parsing_errors=True
         )
     
     def process_message(self, message: str, external_chat_history: List[Dict] = None) -> str:
-        """Process message with optimizations"""
+        """Process message with language detection and optimizations"""
         start_time = time.time()
         
         try:
@@ -391,6 +415,12 @@ class OptimizedChatbot:
             # Add user message
             self.chat_history.append({"role": "user", "content": message})
             
+            # Detect language from user message using language agent
+            language_agent = get_language_agent()
+            language_result = detect_language_detailed(message)
+            detected_language = language_result.language
+            logger.info(f"[Language] Detected language: {detected_language} (confidence: {language_result.confidence:.2f}) for message: '{message}'")
+            
             # Fast intent detection (skip LLM call)
             intent = fast_intent_detection(message)
             logger.info(f"[Optimized] Detected intent: {intent} for message: '{message}' in {time.time() - start_time:.2f}s")
@@ -398,15 +428,17 @@ class OptimizedChatbot:
             # Get minimal RAG examples
             examples = get_cached_rag_examples(message, self.seller_id, k=1)
             logger.info(f"[Optimized] Retrieved RAG examples: {examples}... for intent: {intent}")
+            
             # Format chat history for agent
             formatted_history = []
-            for msg in self.chat_history[-6:]:  # Only last 3 exchanges for speed
+            for msg in self.chat_history[-20:]:  # Only last 3 exchanges for speed
                 if msg["role"] == "user":
                     formatted_history.append(("human", msg["content"]))
                 elif msg["role"] == "assistant":
                     formatted_history.append(("assistant", msg["content"]))
             
-            # Execute agent (single LLM call)
+            # Execute agent with unified prompt that includes examples
+            # The prompt will automatically detect language and respond appropriately
             result = self.agent.invoke({
                 "input": message,
                 "examples": examples,
@@ -423,25 +455,33 @@ class OptimizedChatbot:
             if len(self.chat_history) > 10:
                 self.chat_history = self.chat_history[-10:]
             
-            # Log query asynchronously (don't wait)
-            threading.Thread(target=self._log_query_async, args=(message, intent, response)).start()
+            # Log query asynchronously (don't wait) with language info
+            threading.Thread(target=self._log_query_async, args=(message, intent, response, detected_language)).start()
             
             total_time = time.time() - start_time
-            logger.info(f"[Optimized] Total processing time: {total_time:.2f}s")
+            logger.info(f"[Optimized] Total processing time: {total_time:.2f}s, Language: {detected_language}")
             
             return response
             
         except Exception as e:
             logger.error(f"[Optimized] Error: {str(e)}")
-            return "I'm experiencing technical difficulties. Please try again."
+            # Return error message in appropriate language
+            language_agent = get_language_agent()
+            error_language = language_agent.detect_language_simple(message)
+            if error_language == 'sinhala':
+                return "මට තාක්ෂණික ගැටලුවක් ඇත. කරුණාකර නැවත උත්සාහ කරන්න."
+            elif error_language == 'singlish':
+                return "මට තාක්ෂණික ගැටලුවක් ඇත. කරුණාකර නැවත උත්සාහ කරන්න."
+            else:
+                return "I'm experiencing technical difficulties. Please try again."
     
-    def _log_query_async(self, query: str, intent: str, response: str):
+    def _log_query_async(self, query: str, intent: str, response: str, language: str = "english"):
         """Log query asynchronously to avoid blocking"""
         try:
             log_query(
                 query=query,
                 intent=intent,
-                entities="fast_detected",
+                entities=f"fast_detected_lang_{language}",
                 response=response,
                 seller_id=self.seller_id,
                 user_id=self.user_id

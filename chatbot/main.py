@@ -1,5 +1,6 @@
 import os
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from services.chat import router as chat_router 
 
@@ -14,8 +15,18 @@ logger = get_logger(__name__)
 # Initialize FastAPI app
 app = FastAPI(title="Business Chat Assistant")
 
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # In production, replace with specific origins
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Log application startup
 logger.info("🚀 Business Chat Assistant starting up...")
+logger.info("✅ CORS middleware configured")
 
 # Include chat routes
 app.include_router(chat_router)
