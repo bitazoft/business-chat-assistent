@@ -5,8 +5,7 @@ import { Pool } from "pg";
 dotenv.config();
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
+  connectionString: process.env.DATABASE_URL
 });
 
 const dbConnect = async () => {
