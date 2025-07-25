@@ -35,6 +35,18 @@ export function Dashboard({ user, onLogout }: DashboardProps) {
     }
   }
 
+  const handleLogout = async () => {
+    try {
+      await fetch("http://localhost:7001/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      onLogout();
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
+  };
+
   return (
     <div className="flex h-screen bg-[#0f0f23]">
       <Sidebar
@@ -44,7 +56,7 @@ export function Dashboard({ user, onLogout }: DashboardProps) {
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
       />
       <div className="flex-1 flex flex-col transition-all duration-300">
-        <TopBar user={user} onLogout={onLogout} />
+        <TopBar user={user} onLogout={handleLogout} />
         <main className="flex-1 overflow-auto p-6">
           <div className="transition-all duration-500 ease-in-out transform">{renderContent()}</div>
         </main>

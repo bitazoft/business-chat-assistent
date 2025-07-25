@@ -27,7 +27,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#0f0f23] text-white font-inter">
-      {currentPage === "landing" && <LandingPage onAuth={handleAuth} />}
+      {currentPage === "landing" && <LandingPage onAuth={handleAuth} onLogin={handleLogin} />}
       {currentPage === "auth" && (
         <AuthPage
           mode={authMode}

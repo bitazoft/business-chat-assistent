@@ -64,6 +64,7 @@ export function AuthPage({
 
         const res = await fetch("http://localhost:7001/api/auth/login", {
           method: "POST",
+          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, password }),
         });
@@ -71,11 +72,9 @@ export function AuthPage({
         const data = await res.json();
 
         if (!res.ok) {
-          setError( data.error || 'Invalid credentials');
+          setError( data.message || 'Invalid credentials');
           return;
         }
-        
-        saveAuth(data.token, data.user);
 
         if (data.user.role === 'admin') {
           router.push('/admin/dashboard');

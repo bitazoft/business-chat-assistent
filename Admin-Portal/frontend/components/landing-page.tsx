@@ -3,17 +3,45 @@
 import { useState, useEffect } from "react"
 import { MessageCircle, Zap, TrendingUp, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { on } from "events";
 
 interface LandingPageProps {
-  onAuth: (mode: "login" | "register") => void
+  onAuth: (mode: "login" | "register") => void;
+  onLogin: (userData: { businessName: string; email: string }) => void;
 }
 
-export function LandingPage({ onAuth }: LandingPageProps) {
+export function LandingPage({ onAuth,
+  onLogin, }: LandingPageProps) {
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
     setIsVisible(true)
   }, [])
+
+  const autoLogin = async () => {
+    try {
+      const res = await fetch("http://localhost:7001/api/auth/me", {
+        method: "GET",
+        credentials: "include",
+      });
+  
+      if (res.ok) {
+        const data = await res.json();
+        console.log("Already logged in:", data.user);
+        onLogin({
+          businessName: data.name || "Demo Business",
+          email: data.email,
+        });
+      } else {
+        console.log("Not logged in");
+        onAuth("login");
+      }
+    } catch (err) {
+      console.error("Auto-login error", err);
+      onAuth("login");
+    }
+  };
+  
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0f0f23] to-[#1a1a2e] relative overflow-hidden">
@@ -35,7 +63,7 @@ export function LandingPage({ onAuth }: LandingPageProps) {
           <div className="space-x-4">
             <Button
               variant="outline"
-              onClick={() => onAuth("login")}
+              onClick={async () => await autoLogin()}
               className="border-violet-400 text-violet-400 hover:bg-violet-400 hover:text-white transition-all duration-300"
             >
               Login
