@@ -4203,3 +4203,4438 @@ Number: 0713966820' in 6.06s
 }...
 2025-07-26 11:49:02,901 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
 2025-07-26 11:49:02,901 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:50:00,755 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Dilshan Liyanage"
+                },
+                "wa_id": "94701461095"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94701461095",
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwODU4QzU1QjVEMDhERUYyRUQxAA==",
+                "timestamp": "1753510798",
+                "text": {
+                  "body": "hi"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:50:00,756 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94701461095: hi...
+2025-07-26 11:50:00,757 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94701461095
+2025-07-26 11:50:00,758 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94701461095: hi...
+2025-07-26 11:50:00,758 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:30] - Creating new chatbot session for 94701461095
+2025-07-26 11:50:00,817 - agent.agent - INFO - [agent.py:480] - [Language] Detected language: english (confidence: 0.70) for message: 'hi'
+2025-07-26 11:50:00,818 - agent.agent - INFO - [agent.py:484] - [Optimized] Detected intent: general_inquiry for message: 'hi' in 0.00s
+2025-07-26 11:50:04,646 - agent.agent - INFO - [agent.py:520] - [Optimized] Total processing time: 3.83s, Language: english
+2025-07-26 11:50:04,647 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94701461095: Hello! How can I assist you today? 😊...
+2025-07-26 11:50:06,180 - services.whatsapp_service - INFO - [whatsapp_service.py:143] - ✅ Message sent successfully. Message ID: wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBIwOEI0MEQ3RkYzOUY3RDUyREYA
+2025-07-26 11:50:06,181 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:58] - ✅ Response sent to 94701461095: Hello! How can I assist you today? 😊...
+2025-07-26 11:50:07,103 - services.whatsapp_service - INFO - [whatsapp_service.py:344] - ✅ Message wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwODU4QzU1QjVEMDhERUYyRUQxAA== marked as read
+2025-07-26 11:50:08,946 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBIwOEI0MEQ3RkYzOUY3RDUyREYA",
+                "status": "sent",
+                "timestamp": "1753510806",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "2bf7c851caaa0adeaf0d7ae422d7abc8",
+                  "expiration_timestamp": "1753510806",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:50:08,948 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:50:08,948 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:50:08,950 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBIwOEI0MEQ3RkYzOUY3RDUyREYA",
+                "status": "read",
+                "timestamp": "1753510807",
+                "recipient_id": "94701461095"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:50:08,950 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:50:08,951 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:50:08,952 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBIwOEI0MEQ3RkYzOUY3RDUyREYA",
+                "status": "delivered",
+                "timestamp": "1753510807",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "2bf7c851caaa0adeaf0d7ae422d7abc8",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:50:08,953 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:50:08,953 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:50:08,955 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBIwOEI0MEQ3RkYzOUY3RDUyREYA",
+                "status": "delivered",
+                "timestamp": "1753510806",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "2bf7c851caaa0adeaf0d7ae422d7abc8",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:50:08,955 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:50:08,955 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:50:31,761 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Srinath"
+                },
+                "wa_id": "94703284362"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94703284362",
+                "id": "wamid.HBgLOTQ3MDMyODQzNjIVAgASGBQzRjM5NUI2RjY3MTUyREM0NDEwRAA=",
+                "timestamp": "1753510830",
+                "text": {
+                  "body": "i want to buy egg pack"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:50:31,762 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94703284362: i want to buy egg pack...
+2025-07-26 11:50:31,764 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94703284362
+2025-07-26 11:50:31,765 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94703284362: i want to buy egg pack...
+2025-07-26 11:50:35,804 - agent.language_agent - INFO - [language_agent.py:211] - [LanguageAgent] Combined detection: english (rule: 0.50, llm: english)
+2025-07-26 11:50:35,804 - agent.agent - INFO - [agent.py:480] - [Language] Detected language: english (confidence: 0.70) for message: 'i want to buy egg pack'
+2025-07-26 11:50:35,804 - agent.agent - INFO - [agent.py:484] - [Optimized] Detected intent: place_order for message: 'i want to buy egg pack' in 4.04s
+2025-07-26 11:50:48,064 - agent.agent - INFO - [agent.py:520] - [Optimized] Total processing time: 16.30s, Language: english
+2025-07-26 11:50:48,064 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94703284362: To place your order for the **Organic Eggs (12 pac...
+2025-07-26 11:50:49,290 - services.whatsapp_service - INFO - [whatsapp_service.py:143] - ✅ Message sent successfully. Message ID: wamid.HBgLOTQ3MDMyODQzNjIVAgARGBJCN0UzMkREMDQ4MERDMDdFRDcA
+2025-07-26 11:50:49,291 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:58] - ✅ Response sent to 94703284362: To place your order for the **Organic Eggs (12 pac...
+2025-07-26 11:50:50,324 - services.whatsapp_service - INFO - [whatsapp_service.py:344] - ✅ Message wamid.HBgLOTQ3MDMyODQzNjIVAgASGBQzRjM5NUI2RjY3MTUyREM0NDEwRAA= marked as read
+2025-07-26 11:50:51,568 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDMyODQzNjIVAgARGBJCN0UzMkREMDQ4MERDMDdFRDcA",
+                "status": "sent",
+                "timestamp": "1753510849",
+                "recipient_id": "94703284362",
+                "conversation": {
+                  "id": "1301e31ffd462217a43950676972777d",
+                  "expiration_timestamp": "1753510849",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:50:51,569 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:50:51,569 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:50:52,364 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDMyODQzNjIVAgARGBJCN0UzMkREMDQ4MERDMDdFRDcA",
+                "status": "delivered",
+                "timestamp": "1753510851",
+                "recipient_id": "94703284362",
+                "conversation": {
+                  "id": "1301e31ffd462217a43950676972777d",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:50:52,365 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:50:52,365 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:50:52,466 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDMyODQzNjIVAgARGBJCN0UzMkREMDQ4MERDMDdFRDcA",
+                "status": "delivered",
+                "timestamp": "1753510851",
+                "recipient_id": "94703284362",
+                "conversation": {
+                  "id": "1301e31ffd462217a43950676972777d",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:50:52,467 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:50:52,467 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:51:00,081 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDMyODQzNjIVAgARGBJCN0UzMkREMDQ4MERDMDdFRDcA",
+                "status": "read",
+                "timestamp": "1753510858",
+                "recipient_id": "94703284362"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:51:00,082 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:51:00,082 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:51:17,860 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Dilshan Liyanage"
+                },
+                "wa_id": "94701461095"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94701461095",
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwOERBREJEOTFFNDIxQzRDMkUwAA==",
+                "timestamp": "1753510876",
+                "text": {
+                  "body": "what kind of products do you have"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:51:17,861 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94701461095: what kind of products do you have...
+2025-07-26 11:51:17,862 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94701461095
+2025-07-26 11:51:17,863 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94701461095: what kind of products do you have...
+2025-07-26 11:51:22,276 - agent.language_agent - INFO - [language_agent.py:211] - [LanguageAgent] Combined detection: english (rule: 0.64, llm: english)
+2025-07-26 11:51:22,277 - agent.agent - INFO - [agent.py:480] - [Language] Detected language: english (confidence: 0.84) for message: 'what kind of products do you have'
+2025-07-26 11:51:22,277 - agent.agent - INFO - [agent.py:484] - [Optimized] Detected intent: product_info for message: 'what kind of products do you have' in 4.41s
+2025-07-26 11:51:37,785 - agent.agent - INFO - [agent.py:520] - [Optimized] Total processing time: 19.92s, Language: english
+2025-07-26 11:51:37,785 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94701461095: Here are the products we currently offer:
+
+1. **Or...
+2025-07-26 11:51:38,892 - services.whatsapp_service - INFO - [whatsapp_service.py:143] - ✅ Message sent successfully. Message ID: wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBI4QjBDREU4MUIzMUJGNzNEQzQA
+2025-07-26 11:51:38,893 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:58] - ✅ Response sent to 94701461095: Here are the products we currently offer:
+
+1. **Or...
+2025-07-26 11:51:39,542 - services.whatsapp_service - INFO - [whatsapp_service.py:344] - ✅ Message wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwOERBREJEOTFFNDIxQzRDMkUwAA== marked as read
+2025-07-26 11:51:40,798 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBI4QjBDREU4MUIzMUJGNzNEQzQA",
+                "status": "sent",
+                "timestamp": "1753510899",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "9c165acda2d0162edd9b947caef36670",
+                  "expiration_timestamp": "1753510899",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:51:40,799 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:51:40,799 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:51:40,884 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBI4QjBDREU4MUIzMUJGNzNEQzQA",
+                "status": "delivered",
+                "timestamp": "1753510899",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "9c165acda2d0162edd9b947caef36670",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:51:40,886 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:51:40,886 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:51:40,984 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBI4QjBDREU4MUIzMUJGNzNEQzQA",
+                "status": "delivered",
+                "timestamp": "1753510899",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "9c165acda2d0162edd9b947caef36670",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:51:40,985 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:51:40,985 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:51:41,671 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBI4QjBDREU4MUIzMUJGNzNEQzQA",
+                "status": "read",
+                "timestamp": "1753510899",
+                "recipient_id": "94701461095"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:51:41,673 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:51:41,673 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:53:07,939 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Dilshan Liyanage"
+                },
+                "wa_id": "94701461095"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94701461095",
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwMDE3Qzk2ODJFQkZBQ0EyMjNBAA==",
+                "timestamp": "1753510986",
+                "text": {
+                  "body": "Any discounts today ?"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:53:07,940 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94701461095: Any discounts today ?...
+2025-07-26 11:53:07,941 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94701461095
+2025-07-26 11:53:07,941 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94701461095: Any discounts today ?...
+2025-07-26 11:53:12,244 - agent.language_agent - INFO - [language_agent.py:211] - [LanguageAgent] Combined detection: english (rule: 0.50, llm: english)
+2025-07-26 11:53:12,245 - agent.agent - INFO - [agent.py:480] - [Language] Detected language: english (confidence: 0.70) for message: 'Any discounts today ?'
+2025-07-26 11:53:12,245 - agent.agent - INFO - [agent.py:484] - [Optimized] Detected intent: general_inquiry for message: 'Any discounts today ?' in 4.30s
+2025-07-26 11:53:19,305 - agent.agent - INFO - [agent.py:520] - [Optimized] Total processing time: 11.36s, Language: english
+2025-07-26 11:53:19,306 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94701461095: Currently, we don't have any ongoing discounts, bu...
+2025-07-26 11:53:20,633 - services.whatsapp_service - INFO - [whatsapp_service.py:143] - ✅ Message sent successfully. Message ID: wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJEOEIxQzJGRkUzQUUyNTk4NTAA
+2025-07-26 11:53:20,633 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:58] - ✅ Response sent to 94701461095: Currently, we don't have any ongoing discounts, bu...
+2025-07-26 11:53:21,719 - services.whatsapp_service - INFO - [whatsapp_service.py:344] - ✅ Message wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwMDE3Qzk2ODJFQkZBQ0EyMjNBAA== marked as read
+2025-07-26 11:53:22,696 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJEOEIxQzJGRkUzQUUyNTk4NTAA",
+                "status": "sent",
+                "timestamp": "1753511001",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "e5dd1664327fbc8740b0ca552cf258dc",
+                  "expiration_timestamp": "1753511001",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:53:22,697 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:53:22,697 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:53:22,786 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJEOEIxQzJGRkUzQUUyNTk4NTAA",
+                "status": "delivered",
+                "timestamp": "1753511001",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "e5dd1664327fbc8740b0ca552cf258dc",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:53:22,787 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:53:22,787 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:53:23,098 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJEOEIxQzJGRkUzQUUyNTk4NTAA",
+                "status": "read",
+                "timestamp": "1753511001",
+                "recipient_id": "94701461095"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:53:23,099 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:53:23,099 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:53:23,194 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJEOEIxQzJGRkUzQUUyNTk4NTAA",
+                "status": "delivered",
+                "timestamp": "1753511001",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "e5dd1664327fbc8740b0ca552cf258dc",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:53:23,195 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:53:23,195 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:53:36,029 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Dilshan Liyanage"
+                },
+                "wa_id": "94701461095"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94701461095",
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwOUU5M0QyOTFCNUFDQjA4NkU1AA==",
+                "timestamp": "1753511014",
+                "text": {
+                  "body": "no need"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:53:36,029 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94701461095: no need...
+2025-07-26 11:53:36,030 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94701461095
+2025-07-26 11:53:36,031 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94701461095: no need...
+2025-07-26 11:53:41,022 - agent.language_agent - INFO - [language_agent.py:211] - [LanguageAgent] Combined detection: english (rule: 0.50, llm: english)
+2025-07-26 11:53:41,022 - agent.agent - INFO - [agent.py:480] - [Language] Detected language: english (confidence: 0.70) for message: 'no need'
+2025-07-26 11:53:41,023 - agent.agent - INFO - [agent.py:484] - [Optimized] Detected intent: general_inquiry for message: 'no need' in 4.99s
+2025-07-26 11:53:45,928 - agent.agent - INFO - [agent.py:520] - [Optimized] Total processing time: 9.90s, Language: english
+2025-07-26 11:53:45,929 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94701461095: Alright, no problem! If you change your mind or ne...
+2025-07-26 11:53:47,222 - services.whatsapp_service - INFO - [whatsapp_service.py:143] - ✅ Message sent successfully. Message ID: wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJENThGNjMwRjU1MDMyQjgyMjAA
+2025-07-26 11:53:47,300 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:58] - ✅ Response sent to 94701461095: Alright, no problem! If you change your mind or ne...
+2025-07-26 11:53:48,691 - services.whatsapp_service - INFO - [whatsapp_service.py:344] - ✅ Message wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwOUU5M0QyOTFCNUFDQjA4NkU1AA== marked as read
+2025-07-26 11:53:49,427 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Dilshan Liyanage"
+                },
+                "wa_id": "94701461095"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94701461095",
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwRTNBNDE2RDkyM0U5QTYyQkJGAA==",
+                "timestamp": "1753511028",
+                "text": {
+                  "body": "What are the best-selling items?"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:53:49,428 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94701461095: What are the best-selling items?...
+2025-07-26 11:53:49,429 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94701461095
+2025-07-26 11:53:49,431 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94701461095: What are the best-selling items?...
+2025-07-26 11:53:52,786 - agent.language_agent - INFO - [language_agent.py:211] - [LanguageAgent] Combined detection: english (rule: 0.70, llm: english)
+2025-07-26 11:53:52,787 - agent.agent - INFO - [agent.py:480] - [Language] Detected language: english (confidence: 0.90) for message: 'What are the best-selling items?'
+2025-07-26 11:53:52,787 - agent.agent - INFO - [agent.py:484] - [Optimized] Detected intent: general_inquiry for message: 'What are the best-selling items?' in 3.36s
+2025-07-26 11:54:01,541 - agent.agent - INFO - [agent.py:520] - [Optimized] Total processing time: 12.11s, Language: english
+2025-07-26 11:54:01,541 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94701461095: Here are our current best-selling items based on p...
+2025-07-26 11:54:02,425 - services.whatsapp_service - INFO - [whatsapp_service.py:143] - ✅ Message sent successfully. Message ID: wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBI4OEI4MEM3NzZBOEQ4QjNFODAA
+2025-07-26 11:54:02,425 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:58] - ✅ Response sent to 94701461095: Here are our current best-selling items based on p...
+2025-07-26 11:54:03,404 - services.whatsapp_service - INFO - [whatsapp_service.py:344] - ✅ Message wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwRTNBNDE2RDkyM0U5QTYyQkJGAA== marked as read
+2025-07-26 11:54:03,407 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJENThGNjMwRjU1MDMyQjgyMjAA",
+                "status": "sent",
+                "timestamp": "1753511027",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "1452e562561e56c97b13e286da0e94eb",
+                  "expiration_timestamp": "1753511027",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:54:03,408 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:54:03,408 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:54:03,411 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJENThGNjMwRjU1MDMyQjgyMjAA",
+                "status": "delivered",
+                "timestamp": "1753511028",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "1452e562561e56c97b13e286da0e94eb",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:54:03,412 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:54:03,412 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:54:04,247 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJENThGNjMwRjU1MDMyQjgyMjAA",
+                "status": "read",
+                "timestamp": "1753511028",
+                "recipient_id": "94701461095"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:54:04,247 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:54:04,247 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:54:04,683 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBI4OEI4MEM3NzZBOEQ4QjNFODAA",
+                "status": "delivered",
+                "timestamp": "1753511043",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "cc30d2273a4066d2ddfcc9435eee25fa",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:54:04,683 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:54:04,683 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:54:04,849 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBI4OEI4MEM3NzZBOEQ4QjNFODAA",
+                "status": "read",
+                "timestamp": "1753511043",
+                "recipient_id": "94701461095"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:54:04,850 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:54:04,850 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:54:04,883 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBI4OEI4MEM3NzZBOEQ4QjNFODAA",
+                "status": "sent",
+                "timestamp": "1753511043",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "cc30d2273a4066d2ddfcc9435eee25fa",
+                  "expiration_timestamp": "1753511043",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:54:04,883 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:54:04,883 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:54:11,118 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Srinath"
+                },
+                "wa_id": "94703284362"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94703284362",
+                "id": "wamid.HBgLOTQ3MDMyODQzNjIVAgASGBQzRkZCOUZBREVGMEJFMjRFMTI2RQA=",
+                "timestamp": "1753511049",
+                "text": {
+                  "body": "Srinath Priyankara srinathpriyankara@gmail.com Galle 0703284362"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:54:11,118 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94703284362: Srinath Priyankara srinathpriyankara@gmail.com Gal...
+2025-07-26 11:54:11,120 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94703284362
+2025-07-26 11:54:11,120 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94703284362: Srinath Priyankara srinathpriyankara@gmail.com Gal...
+2025-07-26 11:54:14,496 - agent.language_agent - INFO - [language_agent.py:211] - [LanguageAgent] Combined detection: english (rule: 0.50, llm: english)
+2025-07-26 11:54:14,496 - agent.agent - INFO - [agent.py:480] - [Language] Detected language: english (confidence: 0.70) for message: 'Srinath Priyankara srinathpriyankara@gmail.com Galle 0703284362'
+2025-07-26 11:54:14,496 - agent.agent - INFO - [agent.py:484] - [Optimized] Detected intent: general_inquiry for message: 'Srinath Priyankara srinathpriyankara@gmail.com Galle 0703284362' in 3.38s
+2025-07-26 11:54:32,211 - agent.agent - INFO - [agent.py:520] - [Optimized] Total processing time: 21.09s, Language: english
+2025-07-26 11:54:32,211 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94703284362: Your order for **Organic Eggs (12 pack)** has been...
+2025-07-26 11:54:33,853 - services.whatsapp_service - INFO - [whatsapp_service.py:143] - ✅ Message sent successfully. Message ID: wamid.HBgLOTQ3MDMyODQzNjIVAgARGBJFRjAzQzc1MEQzODkxOUFBQjMA
+2025-07-26 11:54:33,854 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:58] - ✅ Response sent to 94703284362: Your order for **Organic Eggs (12 pack)** has been...
+2025-07-26 11:54:34,986 - services.whatsapp_service - INFO - [whatsapp_service.py:344] - ✅ Message wamid.HBgLOTQ3MDMyODQzNjIVAgASGBQzRkZCOUZBREVGMEJFMjRFMTI2RQA= marked as read
+2025-07-26 11:54:35,591 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDMyODQzNjIVAgARGBJFRjAzQzc1MEQzODkxOUFBQjMA",
+                "status": "delivered",
+                "timestamp": "1753511074",
+                "recipient_id": "94703284362",
+                "conversation": {
+                  "id": "e62786545ff912d072e514620525415a",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:54:35,592 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:54:35,592 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:54:35,593 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDMyODQzNjIVAgARGBJFRjAzQzc1MEQzODkxOUFBQjMA",
+                "status": "delivered",
+                "timestamp": "1753511074",
+                "recipient_id": "94703284362",
+                "conversation": {
+                  "id": "e62786545ff912d072e514620525415a",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:54:35,594 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:54:35,594 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:54:35,695 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDMyODQzNjIVAgARGBJFRjAzQzc1MEQzODkxOUFBQjMA",
+                "status": "sent",
+                "timestamp": "1753511073",
+                "recipient_id": "94703284362",
+                "conversation": {
+                  "id": "e62786545ff912d072e514620525415a",
+                  "expiration_timestamp": "1753511073",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:54:35,695 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:54:35,696 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:54:35,697 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDMyODQzNjIVAgARGBJFRjAzQzc1MEQzODkxOUFBQjMA",
+                "status": "read",
+                "timestamp": "1753511074",
+                "recipient_id": "94703284362"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:54:35,697 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:54:35,697 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:55:11,185 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Dilshan Liyanage"
+                },
+                "wa_id": "94701461095"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94701461095",
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwQTc1OTE2MjkxQTI2NzczREMyAA==",
+                "timestamp": "1753511109",
+                "text": {
+                  "body": "How much stock is left for whole wheat bread"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:55:11,186 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94701461095: How much stock is left for whole wheat bread...
+2025-07-26 11:55:11,187 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94701461095
+2025-07-26 11:55:11,188 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94701461095: How much stock is left for whole wheat bread...
+2025-07-26 11:55:14,586 - agent.language_agent - INFO - [language_agent.py:211] - [LanguageAgent] Combined detection: english (rule: 0.61, llm: english)
+2025-07-26 11:55:14,587 - agent.agent - INFO - [agent.py:480] - [Language] Detected language: english (confidence: 0.81) for message: 'How much stock is left for whole wheat bread'
+2025-07-26 11:55:14,587 - agent.agent - INFO - [agent.py:484] - [Optimized] Detected intent: product_info for message: 'How much stock is left for whole wheat bread' in 3.40s
+2025-07-26 11:55:24,923 - agent.agent - INFO - [agent.py:520] - [Optimized] Total processing time: 13.73s, Language: english
+2025-07-26 11:55:24,924 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94701461095: The current stock for **Whole Wheat Bread** is **1...
+2025-07-26 11:55:26,294 - services.whatsapp_service - INFO - [whatsapp_service.py:143] - ✅ Message sent successfully. Message ID: wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJFNTM0MDAxRTREMkVFOUVCMzgA
+2025-07-26 11:55:26,295 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:58] - ✅ Response sent to 94701461095: The current stock for **Whole Wheat Bread** is **1...
+2025-07-26 11:55:27,173 - services.whatsapp_service - INFO - [whatsapp_service.py:344] - ✅ Message wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwQTc1OTE2MjkxQTI2NzczREMyAA== marked as read
+2025-07-26 11:55:28,241 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJFNTM0MDAxRTREMkVFOUVCMzgA",
+                "status": "sent",
+                "timestamp": "1753511126",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "195999a7a065b46373ef1d4844dcd27c",
+                  "expiration_timestamp": "1753511126",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:55:28,241 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:55:28,241 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:55:29,095 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJFNTM0MDAxRTREMkVFOUVCMzgA",
+                "status": "delivered",
+                "timestamp": "1753511127",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "195999a7a065b46373ef1d4844dcd27c",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:55:29,096 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:55:29,096 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:55:33,679 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJFNTM0MDAxRTREMkVFOUVCMzgA",
+                "status": "read",
+                "timestamp": "1753511132",
+                "recipient_id": "94701461095"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:55:33,680 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:55:33,680 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:55:56,667 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Dilshan Liyanage"
+                },
+                "wa_id": "94701461095"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94701461095",
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwMDkyN0Y0QTMzRDVDQTE2RTU2AA==",
+                "timestamp": "1753511155",
+                "text": {
+                  "body": "Can you tell me the total for whole wheat bread"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:55:56,668 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94701461095: Can you tell me the total for whole wheat bread...
+2025-07-26 11:55:56,670 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94701461095
+2025-07-26 11:55:56,671 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94701461095: Can you tell me the total for whole wheat bread...
+2025-07-26 11:56:00,416 - agent.language_agent - INFO - [language_agent.py:211] - [LanguageAgent] Combined detection: english (rule: 0.80, llm: english)
+2025-07-26 11:56:00,417 - agent.agent - INFO - [agent.py:480] - [Language] Detected language: english (confidence: 0.95) for message: 'Can you tell me the total for whole wheat bread'
+2025-07-26 11:56:00,417 - agent.agent - INFO - [agent.py:484] - [Optimized] Detected intent: general_inquiry for message: 'Can you tell me the total for whole wheat bread' in 3.75s
+2025-07-26 11:56:05,621 - agent.agent - INFO - [agent.py:520] - [Optimized] Total processing time: 8.95s, Language: english
+2025-07-26 11:56:05,621 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94701461095: The total price for **Whole Wheat Bread** is **LKR...
+2025-07-26 11:56:06,555 - services.whatsapp_service - INFO - [whatsapp_service.py:143] - ✅ Message sent successfully. Message ID: wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBIzNTE4OTA0QTlFRTY4QjU3NTIA
+2025-07-26 11:56:06,555 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:58] - ✅ Response sent to 94701461095: The total price for **Whole Wheat Bread** is **LKR...
+2025-07-26 11:56:07,458 - services.whatsapp_service - INFO - [whatsapp_service.py:344] - ✅ Message wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwMDkyN0Y0QTMzRDVDQTE2RTU2AA== marked as read
+2025-07-26 11:56:08,072 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Dilshan Liyanage"
+                },
+                "wa_id": "94701461095"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94701461095",
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwMzNBRjgxQTg2MEMyNERFOEEwAA==",
+                "timestamp": "1753511163",
+                "text": {
+                  "body": "for 2 items"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:56:08,072 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94701461095: for 2 items...
+2025-07-26 11:56:08,073 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94701461095
+2025-07-26 11:56:08,074 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94701461095: for 2 items...
+2025-07-26 11:56:12,084 - agent.language_agent - INFO - [language_agent.py:211] - [LanguageAgent] Combined detection: english (rule: 0.80, llm: english)
+2025-07-26 11:56:12,084 - agent.agent - INFO - [agent.py:480] - [Language] Detected language: english (confidence: 0.95) for message: 'for 2 items'
+2025-07-26 11:56:12,084 - agent.agent - INFO - [agent.py:484] - [Optimized] Detected intent: general_inquiry for message: 'for 2 items' in 4.01s
+2025-07-26 11:56:17,686 - agent.agent - INFO - [agent.py:520] - [Optimized] Total processing time: 9.61s, Language: english
+2025-07-26 11:56:17,686 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94701461095: The total price for **2 units of Whole Wheat Bread...
+2025-07-26 11:56:18,553 - services.whatsapp_service - INFO - [whatsapp_service.py:143] - ✅ Message sent successfully. Message ID: wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJGOUVGMkJEMUQ0MkI1NUI2RjAA
+2025-07-26 11:56:18,554 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:58] - ✅ Response sent to 94701461095: The total price for **2 units of Whole Wheat Bread...
+2025-07-26 11:56:19,265 - services.whatsapp_service - INFO - [whatsapp_service.py:344] - ✅ Message wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwMzNBRjgxQTg2MEMyNERFOEEwAA== marked as read
+2025-07-26 11:56:19,268 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Srinath"
+                },
+                "wa_id": "94703284362"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94703284362",
+                "id": "wamid.HBgLOTQ3MDMyODQzNjIVAgASGBQzRkZERDYwMjVDQURGRDg3MTUxOAA=",
+                "timestamp": "1753511162",
+                "text": {
+                  "body": "i want to add tea bags for this same order"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:56:19,269 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94703284362: i want to add tea bags for this same order...
+2025-07-26 11:56:19,271 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94703284362
+2025-07-26 11:56:19,271 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94703284362: i want to add tea bags for this same order...
+2025-07-26 11:56:23,217 - agent.language_agent - INFO - [language_agent.py:211] - [LanguageAgent] Combined detection: singlish (rule: 0.70, llm: english)
+2025-07-26 11:56:23,217 - agent.agent - INFO - [agent.py:480] - [Language] Detected language: english (confidence: 0.60) for message: 'i want to add tea bags for this same order'
+2025-07-26 11:56:23,217 - agent.agent - INFO - [agent.py:484] - [Optimized] Detected intent: order_tracking for message: 'i want to add tea bags for this same order' in 3.95s
+2025-07-26 11:56:34,308 - agent.agent - INFO - [agent.py:520] - [Optimized] Total processing time: 15.04s, Language: english
+2025-07-26 11:56:34,308 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94703284362: Your **Green Tea Bags** have been added to your or...
+2025-07-26 11:56:35,332 - services.whatsapp_service - INFO - [whatsapp_service.py:143] - ✅ Message sent successfully. Message ID: wamid.HBgLOTQ3MDMyODQzNjIVAgARGBI3MTgxM0I3MTkzMkMzMzlEMTYA
+2025-07-26 11:56:35,332 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:58] - ✅ Response sent to 94703284362: Your **Green Tea Bags** have been added to your or...
+2025-07-26 11:56:36,276 - services.whatsapp_service - INFO - [whatsapp_service.py:344] - ✅ Message wamid.HBgLOTQ3MDMyODQzNjIVAgASGBQzRkZERDYwMjVDQURGRDg3MTUxOAA= marked as read
+2025-07-26 11:56:36,277 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBIzNTE4OTA0QTlFRTY4QjU3NTIA",
+                "status": "sent",
+                "timestamp": "1753511167",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "5eb57cbc006eb20a857d2199253b5391",
+                  "expiration_timestamp": "1753511167",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:56:36,277 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:56:36,278 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:56:36,280 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBIzNTE4OTA0QTlFRTY4QjU3NTIA",
+                "status": "delivered",
+                "timestamp": "1753511168",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "5eb57cbc006eb20a857d2199253b5391",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:56:36,281 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:56:36,282 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:56:36,922 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJGOUVGMkJEMUQ0MkI1NUI2RjAA",
+                "status": "delivered",
+                "timestamp": "1753511179",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "d84f688f3c83af129d88d73dedf3327e",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:56:36,922 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:56:36,922 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:56:36,983 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBIzNTE4OTA0QTlFRTY4QjU3NTIA",
+                "status": "read",
+                "timestamp": "1753511193",
+                "recipient_id": "94701461095"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:56:36,983 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:56:36,983 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:56:37,080 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBIzNTE4OTA0QTlFRTY4QjU3NTIA",
+                "status": "sent",
+                "timestamp": "1753511167",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "5eb57cbc006eb20a857d2199253b5391",
+                  "expiration_timestamp": "1753511167",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:56:37,081 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:56:37,081 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:56:37,083 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJGOUVGMkJEMUQ0MkI1NUI2RjAA",
+                "status": "read",
+                "timestamp": "1753511193",
+                "recipient_id": "94701461095"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:56:37,083 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:56:37,083 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:56:37,085 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJGOUVGMkJEMUQ0MkI1NUI2RjAA",
+                "status": "sent",
+                "timestamp": "1753511179",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "d84f688f3c83af129d88d73dedf3327e",
+                  "expiration_timestamp": "1753511179",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:56:37,085 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:56:37,086 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:56:37,123 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDMyODQzNjIVAgARGBI3MTgxM0I3MTkzMkMzMzlEMTYA",
+                "status": "sent",
+                "timestamp": "1753511195",
+                "recipient_id": "94703284362",
+                "conversation": {
+                  "id": "b482698d5923596c9c2d627d245ba45a",
+                  "expiration_timestamp": "1753511195",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:56:37,123 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:56:37,123 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:56:37,522 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDMyODQzNjIVAgARGBI3MTgxM0I3MTkzMkMzMzlEMTYA",
+                "status": "delivered",
+                "timestamp": "1753511196",
+                "recipient_id": "94703284362",
+                "conversation": {
+                  "id": "b482698d5923596c9c2d627d245ba45a",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:56:37,523 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:56:37,523 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:56:37,631 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDMyODQzNjIVAgARGBI3MTgxM0I3MTkzMkMzMzlEMTYA",
+                "status": "read",
+                "timestamp": "1753511196",
+                "recipient_id": "94703284362"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:56:37,631 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:56:37,631 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:57:04,067 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Dilshan Liyanage"
+                },
+                "wa_id": "94701461095"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94701461095",
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwNTIwMThCMzIzNDZCQ0ZDNUVBAA==",
+                "timestamp": "1753511222",
+                "text": {
+                  "body": "I want to buy 2 bags of rice."
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:57:04,068 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94701461095: I want to buy 2 bags of rice....
+2025-07-26 11:57:04,069 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94701461095
+2025-07-26 11:57:04,070 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94701461095: I want to buy 2 bags of rice....
+2025-07-26 11:57:07,650 - agent.language_agent - INFO - [language_agent.py:211] - [LanguageAgent] Combined detection: english (rule: 0.50, llm: english)
+2025-07-26 11:57:07,650 - agent.agent - INFO - [agent.py:480] - [Language] Detected language: english (confidence: 0.70) for message: 'I want to buy 2 bags of rice.'
+2025-07-26 11:57:07,650 - agent.agent - INFO - [agent.py:484] - [Optimized] Detected intent: place_order for message: 'I want to buy 2 bags of rice.' in 3.58s
+2025-07-26 11:57:17,483 - agent.agent - INFO - [agent.py:520] - [Optimized] Total processing time: 13.41s, Language: english
+2025-07-26 11:57:17,484 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94701461095: It seems we currently don't have rice listed in ou...
+2025-07-26 11:57:18,810 - services.whatsapp_service - INFO - [whatsapp_service.py:143] - ✅ Message sent successfully. Message ID: wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBI5MUVGODAwQTNEMjk0RDg5MTcA
+2025-07-26 11:57:18,811 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:58] - ✅ Response sent to 94701461095: It seems we currently don't have rice listed in ou...
+2025-07-26 11:57:19,834 - services.whatsapp_service - INFO - [whatsapp_service.py:344] - ✅ Message wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwNTIwMThCMzIzNDZCQ0ZDNUVBAA== marked as read
+2025-07-26 11:57:20,451 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Srinath"
+                },
+                "wa_id": "94703284362"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94703284362",
+                "id": "wamid.HBgLOTQ3MDMyODQzNjIVAgASGBQzRkIxRURGQzMzRkFCQzlENjVCQgA=",
+                "timestamp": "1753511231",
+                "text": {
+                  "body": "no thanks"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:57:20,452 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94703284362: no thanks...
+2025-07-26 11:57:20,454 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94703284362
+2025-07-26 11:57:20,456 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94703284362: no thanks...
+2025-07-26 11:57:24,543 - agent.language_agent - INFO - [language_agent.py:211] - [LanguageAgent] Combined detection: english (rule: 0.80, llm: english)
+2025-07-26 11:57:24,543 - agent.agent - INFO - [agent.py:480] - [Language] Detected language: english (confidence: 0.95) for message: 'no thanks'
+2025-07-26 11:57:24,544 - agent.agent - INFO - [agent.py:484] - [Optimized] Detected intent: general_inquiry for message: 'no thanks' in 4.09s
+2025-07-26 11:57:29,477 - agent.agent - INFO - [agent.py:520] - [Optimized] Total processing time: 9.02s, Language: english
+2025-07-26 11:57:29,479 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94703284362: You're welcome! If you need anything else in the f...
+2025-07-26 11:57:30,587 - services.whatsapp_service - INFO - [whatsapp_service.py:143] - ✅ Message sent successfully. Message ID: wamid.HBgLOTQ3MDMyODQzNjIVAgARGBJCOTU3NzUxNDY0NUZBMzc3NDMA
+2025-07-26 11:57:30,587 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:58] - ✅ Response sent to 94703284362: You're welcome! If you need anything else in the f...
+2025-07-26 11:57:31,541 - services.whatsapp_service - INFO - [whatsapp_service.py:344] - ✅ Message wamid.HBgLOTQ3MDMyODQzNjIVAgASGBQzRkIxRURGQzMzRkFCQzlENjVCQgA= marked as read
+2025-07-26 11:57:31,545 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBI5MUVGODAwQTNEMjk0RDg5MTcA",
+                "status": "sent",
+                "timestamp": "1753511239",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "2e72656a8d54ebabf1caa0901e6bb462",
+                  "expiration_timestamp": "1753511239",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:57:31,547 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:57:31,547 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:57:31,549 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBI5MUVGODAwQTNEMjk0RDg5MTcA",
+                "status": "delivered",
+                "timestamp": "1753511239",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "2e72656a8d54ebabf1caa0901e6bb462",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:57:31,550 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:57:31,550 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:57:32,473 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBI5MUVGODAwQTNEMjk0RDg5MTcA",
+                "status": "read",
+                "timestamp": "1753511239",
+                "recipient_id": "94701461095"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:57:32,474 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:57:32,475 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:57:32,476 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDMyODQzNjIVAgARGBJCOTU3NzUxNDY0NUZBMzc3NDMA",
+                "status": "delivered",
+                "timestamp": "1753511251",
+                "recipient_id": "94703284362",
+                "conversation": {
+                  "id": "4be6644035de903e415c81eaa7dcffe6",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:57:32,478 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:57:32,478 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:57:32,479 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDMyODQzNjIVAgARGBJCOTU3NzUxNDY0NUZBMzc3NDMA",
+                "status": "sent",
+                "timestamp": "1753511250",
+                "recipient_id": "94703284362",
+                "conversation": {
+                  "id": "4be6644035de903e415c81eaa7dcffe6",
+                  "expiration_timestamp": "1753511250",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:57:32,481 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:57:32,482 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:57:34,782 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDMyODQzNjIVAgARGBJCOTU3NzUxNDY0NUZBMzc3NDMA",
+                "status": "read",
+                "timestamp": "1753511253",
+                "recipient_id": "94703284362"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:57:34,783 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:57:34,783 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:57:52,092 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Dilshan Liyanage"
+                },
+                "wa_id": "94701461095"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94701461095",
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwRTg1RjJGOTlCNDhCRTY3Q0Q4AA==",
+                "timestamp": "1753511270",
+                "text": {
+                  "body": "ok I want to buy 2 sunflower oil"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:57:52,092 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94701461095: ok I want to buy 2 sunflower oil...
+2025-07-26 11:57:52,093 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94701461095
+2025-07-26 11:57:52,094 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94701461095: ok I want to buy 2 sunflower oil...
+2025-07-26 11:57:56,391 - agent.language_agent - INFO - [language_agent.py:211] - [LanguageAgent] Combined detection: english (rule: 0.50, llm: english)
+2025-07-26 11:57:56,391 - agent.agent - INFO - [agent.py:480] - [Language] Detected language: english (confidence: 0.70) for message: 'ok I want to buy 2 sunflower oil'
+2025-07-26 11:57:56,391 - agent.agent - INFO - [agent.py:484] - [Optimized] Detected intent: place_order for message: 'ok I want to buy 2 sunflower oil' in 4.30s
+2025-07-26 11:58:07,816 - agent.agent - INFO - [agent.py:520] - [Optimized] Total processing time: 15.72s, Language: english
+2025-07-26 11:58:07,816 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94701461095: The **Sunflower Oil 1L** is available for **LKR 78...
+2025-07-26 11:58:08,975 - services.whatsapp_service - INFO - [whatsapp_service.py:143] - ✅ Message sent successfully. Message ID: wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJBN0FFQkJERUY2QkNCODQ3NDkA
+2025-07-26 11:58:08,976 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:58] - ✅ Response sent to 94701461095: The **Sunflower Oil 1L** is available for **LKR 78...
+2025-07-26 11:58:09,805 - services.whatsapp_service - INFO - [whatsapp_service.py:344] - ✅ Message wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwRTg1RjJGOTlCNDhCRTY3Q0Q4AA== marked as read
+2025-07-26 11:58:10,968 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJBN0FFQkJERUY2QkNCODQ3NDkA",
+                "status": "sent",
+                "timestamp": "1753511289",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "a334848ffa35faeb53942030748c9af1",
+                  "expiration_timestamp": "1753511289",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:58:10,969 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:58:10,969 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:58:11,547 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJBN0FFQkJERUY2QkNCODQ3NDkA",
+                "status": "delivered",
+                "timestamp": "1753511290",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "a334848ffa35faeb53942030748c9af1",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:58:11,548 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:58:11,548 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:58:11,672 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJBN0FFQkJERUY2QkNCODQ3NDkA",
+                "status": "read",
+                "timestamp": "1753511290",
+                "recipient_id": "94701461095"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:58:11,673 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:58:11,673 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:58:11,856 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJBN0FFQkJERUY2QkNCODQ3NDkA",
+                "status": "delivered",
+                "timestamp": "1753511289",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "a334848ffa35faeb53942030748c9af1",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:58:11,857 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:58:11,857 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:59:01,006 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Dilshan Liyanage"
+                },
+                "wa_id": "94701461095"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94701461095",
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwQUU0RTY1RDZDQjM2N0ZEMkJFAA==",
+                "timestamp": "1753511339",
+                "text": {
+                  "body": "Add organic egg pack to my order"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:59:01,006 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94701461095: Add organic egg pack to my order...
+2025-07-26 11:59:01,008 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94701461095
+2025-07-26 11:59:01,010 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94701461095: Add organic egg pack to my order...
+2025-07-26 11:59:04,593 - agent.language_agent - INFO - [language_agent.py:211] - [LanguageAgent] Combined detection: singlish (rule: 0.70, llm: english)
+2025-07-26 11:59:04,594 - agent.agent - INFO - [agent.py:480] - [Language] Detected language: english (confidence: 0.60) for message: 'Add organic egg pack to my order'
+2025-07-26 11:59:04,594 - agent.agent - INFO - [agent.py:484] - [Optimized] Detected intent: order_tracking for message: 'Add organic egg pack to my order' in 3.58s
+2025-07-26 11:59:13,195 - agent.agent - INFO - [agent.py:520] - [Optimized] Total processing time: 12.19s, Language: english
+2025-07-26 11:59:13,195 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94701461095: Before adding the **Organic Egg Pack** to your ord...
+2025-07-26 11:59:14,858 - services.whatsapp_service - INFO - [whatsapp_service.py:143] - ✅ Message sent successfully. Message ID: wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBIwOEEwNDdEODI5RDlCMjZENzUA
+2025-07-26 11:59:14,859 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:58] - ✅ Response sent to 94701461095: Before adding the **Organic Egg Pack** to your ord...
+2025-07-26 11:59:15,742 - services.whatsapp_service - INFO - [whatsapp_service.py:344] - ✅ Message wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwQUU0RTY1RDZDQjM2N0ZEMkJFAA== marked as read
+2025-07-26 11:59:16,385 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBIwOEEwNDdEODI5RDlCMjZENzUA",
+                "status": "sent",
+                "timestamp": "1753511355",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "63b9850f93c335eb4c4b0f037805582a",
+                  "expiration_timestamp": "1753511355",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:59:16,386 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:59:16,386 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:59:16,721 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBIwOEEwNDdEODI5RDlCMjZENzUA",
+                "status": "delivered",
+                "timestamp": "1753511355",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "63b9850f93c335eb4c4b0f037805582a",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:59:16,722 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:59:16,722 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:59:16,791 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBIwOEEwNDdEODI5RDlCMjZENzUA",
+                "status": "read",
+                "timestamp": "1753511355",
+                "recipient_id": "94701461095"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:59:16,792 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:59:16,793 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:59:32,851 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Dilshan Liyanage"
+                },
+                "wa_id": "94701461095"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94701461095",
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwNEJCRkRCMDNEMEMxRDk3NzEwAA==",
+                "timestamp": "1753511371",
+                "text": {
+                  "body": "confirm my order"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:59:32,852 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94701461095: confirm my order...
+2025-07-26 11:59:32,853 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94701461095
+2025-07-26 11:59:32,854 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94701461095: confirm my order...
+2025-07-26 11:59:32,854 - agent.language_agent - INFO - [language_agent.py:191] - [LanguageAgent] Rule-based detection: singlish (confidence: 0.90)
+2025-07-26 11:59:32,855 - agent.agent - INFO - [agent.py:480] - [Language] Detected language: singlish (confidence: 0.90) for message: 'confirm my order'
+2025-07-26 11:59:32,855 - agent.agent - INFO - [agent.py:484] - [Optimized] Detected intent: order_tracking for message: 'confirm my order' in 0.00s
+2025-07-26 11:59:46,267 - agent.agent - INFO - [agent.py:520] - [Optimized] Total processing time: 13.41s, Language: singlish
+2025-07-26 11:59:46,268 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94701461095: To confirm your order, I’ll need your details sinc...
+2025-07-26 11:59:48,208 - services.whatsapp_service - INFO - [whatsapp_service.py:143] - ✅ Message sent successfully. Message ID: wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJFQUVDODEwM0UxMjE2RjQxNkMA
+2025-07-26 11:59:48,209 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:58] - ✅ Response sent to 94701461095: To confirm your order, I’ll need your details sinc...
+2025-07-26 11:59:48,936 - services.whatsapp_service - INFO - [whatsapp_service.py:344] - ✅ Message wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwNEJCRkRCMDNEMEMxRDk3NzEwAA== marked as read
+2025-07-26 11:59:50,257 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJFQUVDODEwM0UxMjE2RjQxNkMA",
+                "status": "sent",
+                "timestamp": "1753511388",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "7b394d8d1fb63e096daeee9acb172186",
+                  "expiration_timestamp": "1753511388",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:59:50,258 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:59:50,258 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:59:50,668 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJFQUVDODEwM0UxMjE2RjQxNkMA",
+                "status": "read",
+                "timestamp": "1753511389",
+                "recipient_id": "94701461095"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:59:50,669 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:59:50,669 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 11:59:50,671 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJFQUVDODEwM0UxMjE2RjQxNkMA",
+                "status": "delivered",
+                "timestamp": "1753511389",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "7b394d8d1fb63e096daeee9acb172186",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 11:59:50,672 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 11:59:50,672 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 12:00:48,114 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Dilshan Liyanage"
+                },
+                "wa_id": "94701461095"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94701461095",
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwQkRCQTA4MEE2Qzg4OTc4RUQzAA==",
+                "timestamp": "1753511446",
+                "text": {
+                  "body": "dila vira,dilvira@gmail.com,neluwa,galle,0705555555"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:00:48,115 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94701461095: dila vira,dilvira@gmail.com,neluwa,galle,070555555...
+2025-07-26 12:00:48,117 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94701461095
+2025-07-26 12:00:48,118 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94701461095: dila vira,dilvira@gmail.com,neluwa,galle,070555555...
+2025-07-26 12:00:52,003 - agent.language_agent - INFO - [language_agent.py:211] - [LanguageAgent] Combined detection: english (rule: 0.50, llm: english)
+2025-07-26 12:00:52,004 - agent.agent - INFO - [agent.py:480] - [Language] Detected language: english (confidence: 0.70) for message: 'dila vira,dilvira@gmail.com,neluwa,galle,0705555555'
+2025-07-26 12:00:52,004 - agent.agent - INFO - [agent.py:484] - [Optimized] Detected intent: general_inquiry for message: 'dila vira,dilvira@gmail.com,neluwa,galle,0705555555' in 3.89s
+2025-07-26 12:01:11,828 - agent.agent - INFO - [agent.py:520] - [Optimized] Total processing time: 23.71s, Language: english
+2025-07-26 12:01:11,828 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94701461095: It seems the **Organic Egg Pack** is currently una...
+2025-07-26 12:01:13,101 - services.whatsapp_service - INFO - [whatsapp_service.py:143] - ✅ Message sent successfully. Message ID: wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJGNDQ0MzcwNDRGNEY5QTEzMEEA
+2025-07-26 12:01:13,101 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:58] - ✅ Response sent to 94701461095: It seems the **Organic Egg Pack** is currently una...
+2025-07-26 12:01:13,813 - services.whatsapp_service - INFO - [whatsapp_service.py:344] - ✅ Message wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwQkRCQTA4MEE2Qzg4OTc4RUQzAA== marked as read
+2025-07-26 12:01:15,059 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJGNDQ0MzcwNDRGNEY5QTEzMEEA",
+                "status": "delivered",
+                "timestamp": "1753511473",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "af884cef964072c302741a5f1d4bdc11",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:01:15,060 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 12:01:15,060 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 12:01:15,372 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJGNDQ0MzcwNDRGNEY5QTEzMEEA",
+                "status": "read",
+                "timestamp": "1753511473",
+                "recipient_id": "94701461095"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:01:15,373 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 12:01:15,373 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 12:01:15,658 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJGNDQ0MzcwNDRGNEY5QTEzMEEA",
+                "status": "sent",
+                "timestamp": "1753511473",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "af884cef964072c302741a5f1d4bdc11",
+                  "expiration_timestamp": "1753511473",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:01:15,658 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 12:01:15,659 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 12:01:52,316 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Dilshan Liyanage"
+                },
+                "wa_id": "94701461095"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94701461095",
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwRDYzQzJEMDJGMzQzOTRBRDMwAA==",
+                "timestamp": "1753511510",
+                "text": {
+                  "body": "How much stock is left for organic egg pack"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:01:52,317 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94701461095: How much stock is left for organic egg pack...
+2025-07-26 12:01:52,318 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94701461095
+2025-07-26 12:01:52,319 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94701461095: How much stock is left for organic egg pack...
+2025-07-26 12:01:56,309 - agent.language_agent - INFO - [language_agent.py:211] - [LanguageAgent] Combined detection: english (rule: 0.61, llm: english)
+2025-07-26 12:01:56,309 - agent.agent - INFO - [agent.py:480] - [Language] Detected language: english (confidence: 0.81) for message: 'How much stock is left for organic egg pack'
+2025-07-26 12:01:56,309 - agent.agent - INFO - [agent.py:484] - [Optimized] Detected intent: product_info for message: 'How much stock is left for organic egg pack' in 3.99s
+2025-07-26 12:02:36,285 - agent.agent - INFO - [agent.py:520] - [Optimized] Total processing time: 43.97s, Language: english
+2025-07-26 12:02:36,285 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94701461095: ...
+2025-07-26 12:02:36,813 - services.whatsapp_service - ERROR - [whatsapp_service.py:152] - ❌ Failed to send WhatsApp message: 400 Client Error: Bad Request for url: https://graph.facebook.com/v22.0/762208246965801/messages
+2025-07-26 12:02:36,814 - routes.whatsapp_routes - ERROR - [whatsapp_routes.py:62] - ❌ Failed to send response to 94701461095: 400 Client Error: Bad Request for url: https://graph.facebook.com/v22.0/762208246965801/messages
+2025-07-26 12:04:27,448 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Nipul Viduranga"
+                },
+                "wa_id": "94713966820"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94713966820",
+                "id": "wamid.HBgLOTQ3MTM5NjY4MjAVAgASGCBEMkI0NDhDMENGQUY3Qzc0Mzg3QTZBOTY0REFFMDgyNQA=",
+                "timestamp": "1753511665",
+                "text": {
+                  "body": "Hi"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:04:27,449 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94713966820: Hi...
+2025-07-26 12:04:27,450 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94713966820
+2025-07-26 12:04:27,451 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94713966820: Hi...
+2025-07-26 12:04:30,622 - agent.language_agent - INFO - [language_agent.py:211] - [LanguageAgent] Combined detection: english (rule: 0.50, llm: english)
+2025-07-26 12:04:30,623 - agent.agent - INFO - [agent.py:480] - [Language] Detected language: english (confidence: 0.70) for message: 'Hi'
+2025-07-26 12:04:30,623 - agent.agent - INFO - [agent.py:484] - [Optimized] Detected intent: general_inquiry for message: 'Hi' in 3.17s
+2025-07-26 12:04:37,290 - agent.agent - INFO - [agent.py:520] - [Optimized] Total processing time: 9.84s, Language: english
+2025-07-26 12:04:37,291 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94713966820: Hi there! How can I assist you today?  
+
+(හායි! අද...
+2025-07-26 12:04:38,726 - services.whatsapp_service - INFO - [whatsapp_service.py:143] - ✅ Message sent successfully. Message ID: wamid.HBgLOTQ3MTM5NjY4MjAVAgARGBJEMTk2MDYzMUU1QjI3RTFCNDgA
+2025-07-26 12:04:38,727 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:58] - ✅ Response sent to 94713966820: Hi there! How can I assist you today?  
+
+(හායි! අද...
+2025-07-26 12:04:39,751 - services.whatsapp_service - INFO - [whatsapp_service.py:344] - ✅ Message wamid.HBgLOTQ3MTM5NjY4MjAVAgASGCBEMkI0NDhDMENGQUY3Qzc0Mzg3QTZBOTY0REFFMDgyNQA= marked as read
+2025-07-26 12:04:40,863 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MTM5NjY4MjAVAgARGBJEMTk2MDYzMUU1QjI3RTFCNDgA",
+                "status": "sent",
+                "timestamp": "1753511679",
+                "recipient_id": "94713966820",
+                "conversation": {
+                  "id": "6aeeb5c1d9fa073aed1b86a50d3fc6fb",
+                  "expiration_timestamp": "1753511679",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:04:40,864 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 12:04:40,864 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 12:04:41,116 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MTM5NjY4MjAVAgARGBJEMTk2MDYzMUU1QjI3RTFCNDgA",
+                "status": "delivered",
+                "timestamp": "1753511679",
+                "recipient_id": "94713966820",
+                "conversation": {
+                  "id": "6aeeb5c1d9fa073aed1b86a50d3fc6fb",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:04:41,117 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 12:04:41,117 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 12:04:41,272 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MTM5NjY4MjAVAgARGBJEMTk2MDYzMUU1QjI3RTFCNDgA",
+                "status": "delivered",
+                "timestamp": "1753511679",
+                "recipient_id": "94713966820",
+                "conversation": {
+                  "id": "6aeeb5c1d9fa073aed1b86a50d3fc6fb",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:04:41,273 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 12:04:41,274 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 12:04:41,784 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MTM5NjY4MjAVAgARGBJEMTk2MDYzMUU1QjI3RTFCNDgA",
+                "status": "read",
+                "timestamp": "1753511680",
+                "recipient_id": "94713966820",
+                "conversation": {
+                  "id": "6aeeb5c1d9fa073aed1b86a50d3fc6fb",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:04:41,785 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 12:04:41,785 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 12:04:53,151 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Dilshan Liyanage"
+                },
+                "wa_id": "94701461095"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94701461095",
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwNzI4MzlFMjQ4NzhCQkMxNkMyAA==",
+                "timestamp": "1753511691",
+                "text": {
+                  "body": "I\u2019m ready to check out."
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:04:53,151 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94701461095: I’m ready to check out....
+2025-07-26 12:04:53,152 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94701461095
+2025-07-26 12:04:53,154 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94701461095: I’m ready to check out....
+2025-07-26 12:04:58,252 - agent.language_agent - INFO - [language_agent.py:211] - [LanguageAgent] Combined detection: english (rule: 0.50, llm: english)
+2025-07-26 12:04:58,252 - agent.agent - INFO - [agent.py:480] - [Language] Detected language: english (confidence: 0.70) for message: 'I’m ready to check out.'
+2025-07-26 12:04:58,252 - agent.agent - INFO - [agent.py:484] - [Optimized] Detected intent: general_inquiry for message: 'I’m ready to check out.' in 5.10s
+2025-07-26 12:05:09,080 - agent.agent - INFO - [agent.py:520] - [Optimized] Total processing time: 15.93s, Language: english
+2025-07-26 12:05:09,080 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94701461095: It seems the **Organic Egg Pack** is currently out...
+2025-07-26 12:05:10,651 - services.whatsapp_service - INFO - [whatsapp_service.py:143] - ✅ Message sent successfully. Message ID: wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJEQ0ExNkNDMjdEQzhBRDI4NkUA
+2025-07-26 12:05:10,653 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:58] - ✅ Response sent to 94701461095: It seems the **Organic Egg Pack** is currently out...
+2025-07-26 12:05:11,785 - services.whatsapp_service - INFO - [whatsapp_service.py:344] - ✅ Message wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwNzI4MzlFMjQ4NzhCQkMxNkMyAA== marked as read
+2025-07-26 12:05:12,607 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJEQ0ExNkNDMjdEQzhBRDI4NkUA",
+                "status": "sent",
+                "timestamp": "1753511711",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "43c9329432f582b633a7737f1acf6af3",
+                  "expiration_timestamp": "1753511711",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:05:12,608 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 12:05:12,608 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 12:05:13,132 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJEQ0ExNkNDMjdEQzhBRDI4NkUA",
+                "status": "delivered",
+                "timestamp": "1753511711",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "43c9329432f582b633a7737f1acf6af3",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:05:13,132 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 12:05:13,132 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 12:05:15,678 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJEQ0ExNkNDMjdEQzhBRDI4NkUA",
+                "status": "read",
+                "timestamp": "1753511714",
+                "recipient_id": "94701461095"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:05:15,679 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 12:05:15,679 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 12:06:01,054 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Dilshan Liyanage"
+                },
+                "wa_id": "94701461095"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94701461095",
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwREE5RDI3QUQ2NTlGM0RFNkEyAA==",
+                "timestamp": "1753511759",
+                "text": {
+                  "body": "no process with this items"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:06:01,055 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94701461095: no process with this items...
+2025-07-26 12:06:01,056 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94701461095
+2025-07-26 12:06:01,057 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94701461095: no process with this items...
+2025-07-26 12:06:04,725 - agent.language_agent - INFO - [language_agent.py:211] - [LanguageAgent] Combined detection: english (rule: 0.70, llm: english)
+2025-07-26 12:06:04,725 - agent.agent - INFO - [agent.py:480] - [Language] Detected language: english (confidence: 0.90) for message: 'no process with this items'
+2025-07-26 12:06:04,726 - agent.agent - INFO - [agent.py:484] - [Optimized] Detected intent: general_inquiry for message: 'no process with this items' in 3.67s
+2025-07-26 12:06:09,982 - agent.agent - INFO - [agent.py:520] - [Optimized] Total processing time: 8.92s, Language: english
+2025-07-26 12:06:09,982 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94701461095: Understood! Your order will not be processed with ...
+2025-07-26 12:06:11,012 - services.whatsapp_service - INFO - [whatsapp_service.py:143] - ✅ Message sent successfully. Message ID: wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJGNEFDRjcwOTY4NDI0RjVCNTMA
+2025-07-26 12:06:11,013 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:58] - ✅ Response sent to 94701461095: Understood! Your order will not be processed with ...
+2025-07-26 12:06:11,852 - services.whatsapp_service - INFO - [whatsapp_service.py:344] - ✅ Message wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwREE5RDI3QUQ2NTlGM0RFNkEyAA== marked as read
+2025-07-26 12:06:12,909 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJGNEFDRjcwOTY4NDI0RjVCNTMA",
+                "status": "sent",
+                "timestamp": "1753511771",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "5b741079ac4c8a3f0126437be27972f4",
+                  "expiration_timestamp": "1753511771",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:06:12,910 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 12:06:12,910 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 12:06:13,091 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJGNEFDRjcwOTY4NDI0RjVCNTMA",
+                "status": "read",
+                "timestamp": "1753511772",
+                "recipient_id": "94701461095"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:06:13,091 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 12:06:13,092 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 12:06:13,152 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJGNEFDRjcwOTY4NDI0RjVCNTMA",
+                "status": "delivered",
+                "timestamp": "1753511771",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "5b741079ac4c8a3f0126437be27972f4",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:06:13,153 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 12:06:13,153 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 12:06:13,212 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJGNEFDRjcwOTY4NDI0RjVCNTMA",
+                "status": "delivered",
+                "timestamp": "1753511772",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "5b741079ac4c8a3f0126437be27972f4",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:06:13,213 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 12:06:13,213 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 12:06:38,108 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Dilshan Liyanage"
+                },
+                "wa_id": "94701461095"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94701461095",
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwMzZDOEQ5MUZBNkUxQUE2NDEyAA==",
+                "timestamp": "1753511796",
+                "text": {
+                  "body": "i want to to checkout"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:06:38,109 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94701461095: i want to to checkout...
+2025-07-26 12:06:38,110 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94701461095
+2025-07-26 12:06:38,111 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94701461095: i want to to checkout...
+2025-07-26 12:06:41,337 - agent.language_agent - INFO - [language_agent.py:211] - [LanguageAgent] Combined detection: english (rule: 0.50, llm: english)
+2025-07-26 12:06:41,337 - agent.agent - INFO - [agent.py:480] - [Language] Detected language: english (confidence: 0.70) for message: 'i want to to checkout'
+2025-07-26 12:06:41,337 - agent.agent - INFO - [agent.py:484] - [Optimized] Detected intent: place_order for message: 'i want to to checkout' in 3.23s
+2025-07-26 12:07:21,426 - agent.agent - INFO - [agent.py:520] - [Optimized] Total processing time: 43.31s, Language: english
+2025-07-26 12:07:21,426 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94701461095: ...
+2025-07-26 12:07:22,640 - services.whatsapp_service - ERROR - [whatsapp_service.py:152] - ❌ Failed to send WhatsApp message: 400 Client Error: Bad Request for url: https://graph.facebook.com/v22.0/762208246965801/messages
+2025-07-26 12:07:22,641 - routes.whatsapp_routes - ERROR - [whatsapp_routes.py:62] - ❌ Failed to send response to 94701461095: 400 Client Error: Bad Request for url: https://graph.facebook.com/v22.0/762208246965801/messages
+2025-07-26 12:07:53,677 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Dilshan Liyanage"
+                },
+                "wa_id": "94701461095"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94701461095",
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwMzI4MTBCMzZFNUFERTg0QTQ0AA==",
+                "timestamp": "1753511872",
+                "text": {
+                  "body": "i want to buy 2 sunflower oil bottles"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:07:53,678 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94701461095: i want to buy 2 sunflower oil bottles...
+2025-07-26 12:07:53,679 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94701461095
+2025-07-26 12:07:53,679 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94701461095: i want to buy 2 sunflower oil bottles...
+2025-07-26 12:07:58,493 - agent.language_agent - INFO - [language_agent.py:211] - [LanguageAgent] Combined detection: english (rule: 0.50, llm: english)
+2025-07-26 12:07:58,494 - agent.agent - INFO - [agent.py:480] - [Language] Detected language: english (confidence: 0.70) for message: 'i want to buy 2 sunflower oil bottles'
+2025-07-26 12:07:58,494 - agent.agent - INFO - [agent.py:484] - [Optimized] Detected intent: place_order for message: 'i want to buy 2 sunflower oil bottles' in 4.81s
+2025-07-26 12:08:12,678 - agent.agent - INFO - [agent.py:520] - [Optimized] Total processing time: 19.00s, Language: english
+2025-07-26 12:08:12,678 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94701461095: Agent stopped due to max iterations....
+2025-07-26 12:08:13,853 - services.whatsapp_service - INFO - [whatsapp_service.py:143] - ✅ Message sent successfully. Message ID: wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBI0MzE3NTFDMDk2RjZFREI1NkIA
+2025-07-26 12:08:13,854 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:58] - ✅ Response sent to 94701461095: Agent stopped due to max iterations....
+2025-07-26 12:08:15,805 - services.whatsapp_service - INFO - [whatsapp_service.py:344] - ✅ Message wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwMzI4MTBCMzZFNUFERTg0QTQ0AA== marked as read
+2025-07-26 12:08:16,614 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBI0MzE3NTFDMDk2RjZFREI1NkIA",
+                "status": "delivered",
+                "timestamp": "1753511894",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "f1c8cdc3c87799c299f02b651a707c59",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:08:16,616 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 12:08:16,616 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 12:08:16,616 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBI0MzE3NTFDMDk2RjZFREI1NkIA",
+                "status": "sent",
+                "timestamp": "1753511894",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "f1c8cdc3c87799c299f02b651a707c59",
+                  "expiration_timestamp": "1753511894",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:08:16,617 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 12:08:16,617 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 12:08:16,688 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBI0MzE3NTFDMDk2RjZFREI1NkIA",
+                "status": "read",
+                "timestamp": "1753511894",
+                "recipient_id": "94701461095"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:08:16,689 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 12:08:16,689 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 12:09:25,869 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Dilshan Liyanage"
+                },
+                "wa_id": "94701461095"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94701461095",
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwRUYzRDhDMTIxRDMzQUVDRjc1AA==",
+                "timestamp": "1753511964",
+                "text": {
+                  "body": "i want to buy 2 sunflower oil bottles"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:09:25,870 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94701461095: i want to buy 2 sunflower oil bottles...
+2025-07-26 12:09:25,871 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94701461095
+2025-07-26 12:09:25,872 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94701461095: i want to buy 2 sunflower oil bottles...
+2025-07-26 12:09:25,872 - agent.agent - INFO - [agent.py:480] - [Language] Detected language: english (confidence: 0.70) for message: 'i want to buy 2 sunflower oil bottles'
+2025-07-26 12:09:25,872 - agent.agent - INFO - [agent.py:484] - [Optimized] Detected intent: place_order for message: 'i want to buy 2 sunflower oil bottles' in 0.00s
+2025-07-26 12:09:39,772 - agent.agent - INFO - [agent.py:520] - [Optimized] Total processing time: 13.90s, Language: english
+2025-07-26 12:09:39,773 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94701461095: Agent stopped due to max iterations....
+2025-07-26 12:09:41,060 - services.whatsapp_service - INFO - [whatsapp_service.py:143] - ✅ Message sent successfully. Message ID: wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJBQjYxOEFCQUEyNDE3NDlGQjcA
+2025-07-26 12:09:41,061 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:58] - ✅ Response sent to 94701461095: Agent stopped due to max iterations....
+2025-07-26 12:09:42,729 - services.whatsapp_service - INFO - [whatsapp_service.py:344] - ✅ Message wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwRUYzRDhDMTIxRDMzQUVDRjc1AA== marked as read
+2025-07-26 12:09:43,387 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJBQjYxOEFCQUEyNDE3NDlGQjcA",
+                "status": "sent",
+                "timestamp": "1753511981",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "61617f4c0c821af5cb4245f07ad56657",
+                  "expiration_timestamp": "1753511981",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:09:43,388 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 12:09:43,389 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 12:09:43,961 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJBQjYxOEFCQUEyNDE3NDlGQjcA",
+                "status": "delivered",
+                "timestamp": "1753511981",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "61617f4c0c821af5cb4245f07ad56657",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:09:43,962 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 12:09:43,962 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 12:09:52,656 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJBQjYxOEFCQUEyNDE3NDlGQjcA",
+                "status": "read",
+                "timestamp": "1753511990",
+                "recipient_id": "94701461095"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:09:52,656 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 12:09:52,657 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 12:10:01,977 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Dilshan Liyanage"
+                },
+                "wa_id": "94701461095"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94701461095",
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwNjlGMDc4MzVFMkM5OTI2MTM4AA==",
+                "timestamp": "1753512000",
+                "text": {
+                  "body": "why"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:10:01,978 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94701461095: why...
+2025-07-26 12:10:01,980 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94701461095
+2025-07-26 12:10:01,981 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94701461095: why...
+2025-07-26 12:10:06,418 - agent.language_agent - INFO - [language_agent.py:211] - [LanguageAgent] Combined detection: english (rule: 0.50, llm: english)
+2025-07-26 12:10:06,418 - agent.agent - INFO - [agent.py:480] - [Language] Detected language: english (confidence: 0.70) for message: 'why'
+2025-07-26 12:10:06,418 - agent.agent - INFO - [agent.py:484] - [Optimized] Detected intent: general_inquiry for message: 'why' in 4.44s
+2025-07-26 12:10:26,613 - agent.agent - INFO - [agent.py:520] - [Optimized] Total processing time: 24.63s, Language: english
+2025-07-26 12:10:26,614 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94701461095: Agent stopped due to max iterations....
+2025-07-26 12:10:27,886 - services.whatsapp_service - INFO - [whatsapp_service.py:143] - ✅ Message sent successfully. Message ID: wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJCNTM1QzE5NzExREM3QjQ5NjEA
+2025-07-26 12:10:27,887 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:58] - ✅ Response sent to 94701461095: Agent stopped due to max iterations....
+2025-07-26 12:10:28,911 - services.whatsapp_service - INFO - [whatsapp_service.py:344] - ✅ Message wamid.HBgLOTQ3MDE0NjEwOTUVAgASGBYzRUIwNjlGMDc4MzVFMkM5OTI2MTM4AA== marked as read
+2025-07-26 12:10:29,630 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJCNTM1QzE5NzExREM3QjQ5NjEA",
+                "status": "sent",
+                "timestamp": "1753512028",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "6d8a367e1d8a2e6b96d98b8b2a39e164",
+                  "expiration_timestamp": "1753512028",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:10:29,631 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 12:10:29,631 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 12:10:30,047 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJCNTM1QzE5NzExREM3QjQ5NjEA",
+                "status": "delivered",
+                "timestamp": "1753512028",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "6d8a367e1d8a2e6b96d98b8b2a39e164",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:10:30,047 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 12:10:30,047 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 12:10:30,188 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJCNTM1QzE5NzExREM3QjQ5NjEA",
+                "status": "read",
+                "timestamp": "1753512029",
+                "recipient_id": "94701461095"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:10:30,190 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 12:10:30,190 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 12:10:30,248 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MDE0NjEwOTUVAgARGBJCNTM1QzE5NzExREM3QjQ5NjEA",
+                "status": "delivered",
+                "timestamp": "1753512028",
+                "recipient_id": "94701461095",
+                "conversation": {
+                  "id": "6d8a367e1d8a2e6b96d98b8b2a39e164",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 12:10:30,249 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 12:10:30,249 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 14:46:24,468 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Nipul Viduranga"
+                },
+                "wa_id": "94713966820"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94713966820",
+                "id": "wamid.HBgLOTQ3MTM5NjY4MjAVAgASGCA5NDc4ODg5RTQyRkQ4MDM1MDUzNTk4RTZFQzIxRjdCOAA=",
+                "timestamp": "1753486070",
+                "text": {
+                  "body": "Hi"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 14:46:24,469 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94713966820: Hi...
+2025-07-26 14:46:24,471 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94713966820
+2025-07-26 14:46:24,472 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94713966820: Hi...
+2025-07-26 14:46:24,472 - agent.agent - INFO - [agent.py:480] - [Language] Detected language: english (confidence: 0.70) for message: 'Hi'
+2025-07-26 14:46:24,472 - agent.agent - INFO - [agent.py:484] - [Optimized] Detected intent: general_inquiry for message: 'Hi' in 0.00s
+2025-07-26 14:46:31,409 - agent.agent - INFO - [agent.py:520] - [Optimized] Total processing time: 6.94s, Language: english
+2025-07-26 14:46:31,409 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94713966820: Hi there! How can I assist you today?  
+
+(හායි! ඔබ...
+2025-07-26 14:46:32,196 - services.whatsapp_service - ERROR - [whatsapp_service.py:152] - ❌ Failed to send WhatsApp message: 401 Client Error: Unauthorized for url: https://graph.facebook.com/v22.0/762208246965801/messages
+2025-07-26 14:46:32,196 - routes.whatsapp_routes - ERROR - [whatsapp_routes.py:62] - ❌ Failed to send response to 94713966820: 401 Client Error: Unauthorized for url: https://graph.facebook.com/v22.0/762208246965801/messages
+2025-07-26 14:50:30,529 - main - INFO - [main.py:55] - 👋 Business Chat Assistant is shutting down...
+2025-07-26 14:50:36,018 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-26 14:50:44,574 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-26 14:50:44,803 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-26 14:50:44,847 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-26 14:51:06,180 - services.whatsapp_service - INFO - [whatsapp_service.py:52] - ⚠️ WhatsApp Service initialized without validation - call validate_config() before use
+2025-07-26 14:51:06,185 - main - INFO - [main.py:29] - 🚀 Business Chat Assistant starting up...
+2025-07-26 14:51:06,185 - main - INFO - [main.py:30] - ✅ CORS middleware configured
+2025-07-26 14:51:06,186 - main - INFO - [main.py:34] - ✅ Chat routes registered
+2025-07-26 14:51:06,188 - main - INFO - [main.py:38] - ✅ WhatsApp routes registered
+2025-07-26 14:51:06,189 - main - INFO - [main.py:49] - 🎉 Business Chat Assistant with WhatsApp Integration is ready to serve requests!
+2025-07-26 14:51:06,190 - main - INFO - [main.py:50] - 📱 WhatsApp webhook endpoint: /whatsapp/webhook
+2025-07-26 14:51:06,190 - main - INFO - [main.py:51] - 📊 WhatsApp status endpoint: /whatsapp/status
+2025-07-26 14:51:06,190 - main - INFO - [main.py:55] - 👋 Business Chat Assistant is shutting down...
+2025-07-26 14:51:07,653 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-26 14:51:11,207 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-26 14:51:11,297 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-26 14:51:11,302 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-26 14:51:19,514 - services.whatsapp_service - INFO - [whatsapp_service.py:52] - ⚠️ WhatsApp Service initialized without validation - call validate_config() before use
+2025-07-26 14:51:19,520 - main - INFO - [main.py:29] - 🚀 Business Chat Assistant starting up...
+2025-07-26 14:51:19,521 - main - INFO - [main.py:30] - ✅ CORS middleware configured
+2025-07-26 14:51:19,521 - main - INFO - [main.py:34] - ✅ Chat routes registered
+2025-07-26 14:51:19,523 - main - INFO - [main.py:38] - ✅ WhatsApp routes registered
+2025-07-26 14:51:19,524 - main - INFO - [main.py:49] - 🎉 Business Chat Assistant with WhatsApp Integration is ready to serve requests!
+2025-07-26 14:51:19,525 - main - INFO - [main.py:50] - 📱 WhatsApp webhook endpoint: /whatsapp/webhook
+2025-07-26 14:51:19,525 - main - INFO - [main.py:51] - 📊 WhatsApp status endpoint: /whatsapp/status
+2025-07-26 14:51:31,577 - main - INFO - [main.py:55] - 👋 Business Chat Assistant is shutting down...
+2025-07-26 14:51:33,363 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-26 14:51:38,325 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-26 14:51:38,481 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-26 14:51:38,491 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-26 14:51:49,153 - services.whatsapp_service - INFO - [whatsapp_service.py:52] - ⚠️ WhatsApp Service initialized without validation - call validate_config() before use
+2025-07-26 14:51:49,158 - main - INFO - [main.py:29] - 🚀 Business Chat Assistant starting up...
+2025-07-26 14:51:49,159 - main - INFO - [main.py:30] - ✅ CORS middleware configured
+2025-07-26 14:51:49,159 - main - INFO - [main.py:34] - ✅ Chat routes registered
+2025-07-26 14:51:49,161 - main - INFO - [main.py:38] - ✅ WhatsApp routes registered
+2025-07-26 14:51:49,162 - main - INFO - [main.py:49] - 🎉 Business Chat Assistant with WhatsApp Integration is ready to serve requests!
+2025-07-26 14:51:49,162 - main - INFO - [main.py:50] - 📱 WhatsApp webhook endpoint: /whatsapp/webhook
+2025-07-26 14:51:49,163 - main - INFO - [main.py:51] - 📊 WhatsApp status endpoint: /whatsapp/status
+2025-07-26 14:52:24,586 - main - INFO - [main.py:55] - 👋 Business Chat Assistant is shutting down...
+2025-07-26 14:52:26,132 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-26 14:52:29,076 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-26 14:52:29,166 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-26 14:52:29,171 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-26 14:52:36,757 - services.whatsapp_service - INFO - [whatsapp_service.py:52] - ⚠️ WhatsApp Service initialized without validation - call validate_config() before use
+2025-07-26 14:52:36,762 - main - INFO - [main.py:29] - 🚀 Business Chat Assistant starting up...
+2025-07-26 14:52:36,763 - main - INFO - [main.py:30] - ✅ CORS middleware configured
+2025-07-26 14:52:36,763 - main - INFO - [main.py:34] - ✅ Chat routes registered
+2025-07-26 14:52:36,766 - main - INFO - [main.py:38] - ✅ WhatsApp routes registered
+2025-07-26 14:52:36,767 - main - INFO - [main.py:49] - 🎉 Business Chat Assistant with WhatsApp Integration is ready to serve requests!
+2025-07-26 14:52:36,768 - main - INFO - [main.py:50] - 📱 WhatsApp webhook endpoint: /whatsapp/webhook
+2025-07-26 14:52:36,768 - main - INFO - [main.py:51] - 📊 WhatsApp status endpoint: /whatsapp/status

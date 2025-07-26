@@ -107,42 +107,42 @@ def get_unified_system_prompt(seller_id: str) -> str:
 
             Available tools: {', '.join(['get_product_info', 'track_order', 'place_order', 'get_user_info', 'save_user', 'check_user_exists', 'update_user_info', 'add_item_to_order', 'remove_item_from_order', 'update_item_quantity_in_order', 'replace_order_items', 'get_all_orders_for_customer', 'get_pending_orders'])}
 
-            CORE INSTRUCTIONS:
-            1. Product information: use get_product_info
-            2. Order tracking: use track_order  
-            3. Place orders: ALWAYS check_user_exists first, then place_order
+            CORE INSTRUCTIONS (Be direct and efficient):
+            1. Product information: use get_product_info immediately
+            2. Order tracking: use track_order immediately with order ID
+            3. Place orders: ALWAYS check_user_exists first, then proceed
             4. User management: use appropriate user tools
-            5. Order management: use new granular order editing tools
+            5. Order management: use granular order editing tools
             6. Be helpful and match the user's communication style
+            7. Execute tools directly - don't ask for confirmation unless user data is missing
 
-            CRITICAL ORDER WORKFLOW:
+            CRITICAL ORDER WORKFLOW (Must follow exactly):
             When user wants to place an order:
-            1. FIRST: Always use check_user_exists
+            1. FIRST: Execute check_user_exists (no confirmation needed)
             2. IF user does NOT exist:
-            - NEVER create fake user data
             - Ask for details in user's language:
                 * English: "To place your order, I need your details. Please provide your full name, email address, physical address, and phone number."
                 * Sinhala: "ඔබගේ ඇණවුම සිදු කිරීම සදහා ඔබගේ විස්තර අවශ්‍යයි. කරුණාකර ඔබගේ සම්පූර්ණ නම, ඊමේල් ලිපිනය, ගෘහ ලිපිනය සහ දුරකථන අංකය ලබා දෙන්න."
                 * Singlish: "ඔබගේ ඇණවුම සිදු කිරීම සදහා ඔබගේ විස්තර අවශ්‍යයි. කරුණාකර ඔබගේ සම්පූර්ණ නම, ඊමේල් ලිපිනය, ගෘහ ලිපිනය සහ දුරකථන අංකය ලබා දෙන්න."
-            3. IF user exists: Use get_user_info and confirm details
-            4. ONLY after confirmation: proceed with place_order
+            3. IF user exists: Use get_user_info and proceed with place_order
+            4. Execute place_order immediately after user confirmation
 
-            ORDER EDITING (New Granular Tools):
+            ORDER EDITING (Execute immediately when requested):
             - add_item_to_order: Add new item to existing pending order
             - remove_item_from_order: Remove specific item from pending order  
             - update_item_quantity_in_order: Change quantity of existing item
             - replace_order_items: Replace all items (like old edit_order)
             - get_pending_orders: View user's pending orders
             - get_all_orders_for_customer: View all user's orders
-            - Always request order ID and specific action needed
-            - Only editable if order status is 'pending'
+            - Always request order ID if not provided, then execute immediately
 
-            IMPORTANT RULES:
+            EFFICIENCY RULES:
+            - Execute tools immediately when you have required parameters
+            - Don't ask for confirmation unless absolutely necessary
             - NEVER generate fake user information
-            - NEVER use save_user without explicit user input
             - Extract parameters accurately from user input
-            - Execute tools directly, don't just describe actions
-            - Match user's language and tone"""
+            - If a tool fails, provide a clear explanation and alternative
+            - Keep responses concise and actionable"""
 
 # Fast intent detection using keywords instead of LLM
 def fast_intent_detection(user_input: str) -> str:
@@ -456,9 +456,11 @@ class OptimizedChatbot:
         return AgentExecutor(
             agent=agent, 
             tools=self.tools, 
-            verbose=True,  # Disable verbose for speed
-            max_iterations=3,  # Limit iterations
-            handle_parsing_errors=True
+            verbose=True,
+            max_iterations=10,  # Increased from 3 to 10 to handle complex workflows
+            early_stopping_method="generate",  # Allow agent to stop early if it has an answer
+            handle_parsing_errors=True,
+            return_intermediate_steps=False  # Don't return intermediate steps for cleaner output
         )
     
     def process_message(self, message: str, external_chat_history: List[Dict] = None) -> str:
@@ -497,14 +499,40 @@ class OptimizedChatbot:
             
             # Execute agent with unified prompt that includes examples
             # The prompt will automatically detect language and respond appropriately
-            result = self.agent.invoke({
-                "input": message,
-                "examples": "",
-                "intent": intent,
-                "chat_history": formatted_history
-            })
-            
-            response = result.get("output", "I couldn't process your request.")
+            try:
+                result = self.agent.invoke({
+                    "input": message,
+                    "examples": "",
+                    "intent": intent,
+                    "chat_history": formatted_history
+                })
+                
+                response = result.get("output", "I couldn't process your request.")
+                
+                # Check if the agent stopped due to max iterations
+                if "Agent stopped due to iteration limit or time limit" in str(result):
+                    logger.warning(f"[Agent] Hit max iterations for message: {message}")
+                    # Try to provide a helpful response based on intent
+                    if intent == "place_order":
+                        response = "I'm working on processing your order. Let me help you step by step. Could you please confirm what items you'd like to order?"
+                    elif intent == "order_tracking":
+                        response = "I can help you track your order. Please provide your order ID."
+                    elif intent == "product_info":
+                        response = "I can help you with product information. What product would you like to know about?"
+                    else:
+                        response = "I'm here to help! Could you please rephrase your request or be more specific about what you need?"
+                        
+            except Exception as agent_error:
+                logger.error(f"[Agent] Execution error: {str(agent_error)}")
+                # Fallback response based on detected language
+                language_agent = get_language_agent()
+                error_language = language_agent.detect_language_simple(message)
+                if error_language == 'sinhala':
+                    response = "මට ඔබේ ඉල්ලීම සම්පූර්ණ කිරීමට අපහසුයි. කරුණාකර සරල වචන වලින් නැවත උත්සාහ කරන්න."
+                elif error_language == 'singlish':
+                    response = "මට ඔබේ ඉල්ලීම සම්පූර්ණ කිරීමට අපහසුයි. කරුණාකර සරල වචන වලින් නැවත උත්සාහ කරන්න."
+                else:
+                    response = "I'm having trouble completing your request. Please try rephrasing it in simpler terms."
             
             # Add assistant response
             self.chat_history.append({"role": "assistant", "content": response})
