@@ -87,7 +87,7 @@ def main():
     config = {
         "app": "main:app",
         "host": os.getenv("HOST", "0.0.0.0"),
-        "port": int(os.getenv("PORT", 8000)),
+        "port": int(os.getenv("PORT", 8080)),
         "reload": os.getenv("ENVIRONMENT", "development") != "production",
         "workers": 1,  # Single worker for development, increase for production
         "access_log": True,  # Always show access logs

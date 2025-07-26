@@ -4,6 +4,9 @@
 # FastAPI for building APIs
 fastapi
 
+# ASGI server for FastAPI
+uvicorn[standard]
+
 # Pydantic for data validation
 pydantic
 

@@ -1,0 +1,49 @@
+2025-07-25 12:09:24,403 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-25 12:09:24,407 - services.whatsapp_service - ERROR - [whatsapp_service.py:62] - Missing required environment variables: WHATSAPP_ACCESS_TOKEN, WHATSAPP_PHONE_NUMBER_ID, WHATSAPP_VERIFY_TOKEN
+2025-07-25 12:12:12,581 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-25 12:12:12,586 - services.whatsapp_service - ERROR - [whatsapp_service.py:62] - Missing required environment variables: WHATSAPP_ACCESS_TOKEN, WHATSAPP_PHONE_NUMBER_ID, WHATSAPP_VERIFY_TOKEN
+2025-07-25 13:35:00,129 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-25 13:35:00,132 - services.whatsapp_service - INFO - [whatsapp_service.py:52] - ⚠️ WhatsApp Service initialized without validation - call validate_config() before use
+2025-07-25 13:35:00,227 - services.whatsapp_service - WARNING - [whatsapp_service.py:314] - ❌ Webhook verification failed - invalid token
+2025-07-25 13:57:01,448 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-25 13:57:03,467 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-25 13:57:04,135 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-25 13:57:04,193 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-25 13:58:27,241 - vector_store.vector_store - INFO - [vector_store.py:38] - [FastVectorStore] Loading embeddings...
+2025-07-25 13:58:28,338 - vector_store.vector_store - INFO - [vector_store.py:48] - [FastVectorStore] Loaded 53744 Bitext documents
+2025-07-25 13:58:28,426 - vector_store.vector_store - INFO - [vector_store.py:79] - [FastVectorStore] Built FAISS index with 53744 vectors
+2025-07-25 13:58:28,427 - vector_store.vector_store - INFO - [vector_store.py:82] - [FastVectorStore] Loading embedding model all-MiniLM-L6-v2...
+2025-07-25 13:58:28,436 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:219] - Use pytorch device_name: cpu
+2025-07-25 13:58:28,436 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:227] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-25 13:58:28,442 - sentence_transformers.SentenceTransformer - WARNING - [SentenceTransformer.py:2047] - No sentence-transformers model found with name sentence-transformers/all-MiniLM-L6-v2. Creating a new one with mean pooling.
+2025-07-25 13:58:28,451 - vector_store.vector_store - ERROR - [vector_store.py:87] - [FastVectorStore] Error loading embedding model: Missing dependencies for SOCKS support.
+2025-07-25 13:58:28,452 - vector_store.vector_store - ERROR - [vector_store.py:95] - [FastVectorStore] Error loading embeddings: Failed to load embedding model: Missing dependencies for SOCKS support.
+2025-07-25 13:58:28,762 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-25 13:58:56,260 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-25 13:58:56,365 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-25 13:58:56,371 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-25 14:01:39,411 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-25 14:01:43,821 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-25 14:01:43,915 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-25 14:01:43,920 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-25 14:04:16,539 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-25 14:04:20,149 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-25 14:04:20,246 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-25 14:04:20,251 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-25 14:05:06,996 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-25 14:05:07,087 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-25 14:05:07,107 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-25 14:05:07,112 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-25 14:05:13,986 - vector_store.vector_store - INFO - [vector_store.py:38] - [FastVectorStore] Loading embeddings...
+2025-07-25 14:05:14,113 - vector_store.vector_store - INFO - [vector_store.py:48] - [FastVectorStore] Loaded 53744 Bitext documents
+2025-07-25 14:05:14,146 - vector_store.vector_store - INFO - [vector_store.py:79] - [FastVectorStore] Built FAISS index with 53744 vectors
+2025-07-25 14:05:14,146 - vector_store.vector_store - INFO - [vector_store.py:82] - [FastVectorStore] Loading embedding model all-MiniLM-L6-v2...
+2025-07-25 14:05:14,148 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:219] - Use pytorch device_name: cpu
+2025-07-25 14:05:14,148 - sentence_transformers.SentenceTransformer - INFO - [SentenceTransformer.py:227] - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-25 14:05:14,152 - sentence_transformers.SentenceTransformer - WARNING - [SentenceTransformer.py:2047] - No sentence-transformers model found with name sentence-transformers/all-MiniLM-L6-v2. Creating a new one with mean pooling.
+2025-07-25 14:05:14,155 - vector_store.vector_store - ERROR - [vector_store.py:87] - [FastVectorStore] Error loading embedding model: Missing dependencies for SOCKS support.
+2025-07-25 14:05:14,155 - vector_store.vector_store - ERROR - [vector_store.py:95] - [FastVectorStore] Error loading embeddings: Failed to load embedding model: Missing dependencies for SOCKS support.
+2025-07-25 14:05:14,463 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-25 14:05:17,523 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-25 14:05:17,609 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-25 14:05:17,616 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.

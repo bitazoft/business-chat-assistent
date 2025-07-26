@@ -1,5 +1,5 @@
 from db.database import SessionLocal
-from models.schemas import Product, Order, ChatLog, OrderItem, Customers
+from models.schemas import Product, Order, ChatLog, OrderItem, Customers, SellerProfile
 from vector_store.vector_store import vector_store
 import os
 import numpy as np
@@ -13,7 +13,7 @@ from collections import defaultdict
 def get_product_info(product_name: str, seller_id: str) -> str:
     db = SessionLocal()
     try:
-        product = db.query(Product).filter(Product.name.ilike(f"%{product_name}%"), Product.sellerId == int(seller_id)).first()
+        product = db.query(Product).filter(Product.name.ilike(f"%{product_name}%"), Product.seller_id == int(seller_id)).first()
         if product:
             return f"Product: {product.name}, Description: {product.description}, Price: ${product.price}, Stock: {product.stock}"
         return "Product not found"
@@ -23,7 +23,7 @@ def get_product_info(product_name: str, seller_id: str) -> str:
 def get_all_products(seller_id: str) -> List[str]:
     db = SessionLocal()
     try:
-        products = db.query(Product).filter(Product.sellerId == int(seller_id)).all()
+        products = db.query(Product).filter(Product.seller_id == int(seller_id)).all()
         if products:
             return [f"Product: {p.name}, Price: ${p.price}, Stock: {p.stock}" for p in products]
         return ["No products found for this seller"]
@@ -44,7 +44,7 @@ def place_order(seller_id: str, user_id: str, items: List[dict]) -> str:
     db = SessionLocal()
     try:
         total_amount = 0
-        order = Order(sellerId=int(seller_id), customerId=user_id, status="pending", total_amount=0)
+        order = Order(seller_id=int(seller_id), customer_id=user_id, status="pending", total_amount=0)
         db.add(order)
         db.flush()  # Get order.id before committing
         for item in items:
@@ -55,10 +55,10 @@ def place_order(seller_id: str, user_id: str, items: List[dict]) -> str:
             
             if str(product_identifier).isdigit():
                 # Look up by product ID
-                product = db.query(Product).filter(Product.id == int(product_identifier), Product.sellerId == int(seller_id)).first()
+                product = db.query(Product).filter(Product.id == int(product_identifier), Product.seller_id == int(seller_id)).first()
             else:
                 # Look up by product name
-                product = db.query(Product).filter(Product.name.ilike(f"%{product_identifier}%"), Product.sellerId == int(seller_id)).first()
+                product = db.query(Product).filter(Product.name.ilike(f"%{product_identifier}%"), Product.seller_id == int(seller_id)).first()
             
             if not product:
                 db.rollback()
@@ -153,8 +153,8 @@ def log_query(query: str, intent: str, entities: str, response: str, seller_id: 
             intent=intent,
             entities=entities,
             response=response,
-            sellerId=int(seller_id),
-            customerId=user_id
+            seller_id=int(seller_id),
+            customer_id=user_id
         )
         db.add(chat_log)
         db.commit()
@@ -178,7 +178,7 @@ def add_item_to_order(customer_id: str, order_id: str, product_identifier: str, 
     db = SessionLocal()
     try:
         # Validate order exists and belongs to customer
-        order = db.query(Order).filter(Order.id == int(order_id), Order.customerId == customer_id).first()
+        order = db.query(Order).filter(Order.id == int(order_id), Order.customer_id == customer_id).first()
         if not order:
             return "Order not found or doesn't belong to this customer"
         if order.status != "pending":
@@ -187,9 +187,9 @@ def add_item_to_order(customer_id: str, order_id: str, product_identifier: str, 
         # Find the product
         product = None
         if str(product_identifier).isdigit():
-            product = db.query(Product).filter(Product.id == int(product_identifier), Product.sellerId == order.sellerId).first()
+            product = db.query(Product).filter(Product.id == int(product_identifier), Product.seller_id == order.seller_id).first()
         else:
-            product = db.query(Product).filter(Product.name.ilike(f"%{product_identifier}%"), Product.sellerId == order.sellerId).first()
+            product = db.query(Product).filter(Product.name.ilike(f"%{product_identifier}%"), Product.seller_id == order.seller_id).first()
         
         if not product:
             return f"Product '{product_identifier}' not found for this seller"
@@ -240,7 +240,7 @@ def remove_item_from_order(customer_id: str, order_id: str, product_identifier: 
     db = SessionLocal()
     try:
         # Validate order exists and belongs to customer
-        order = db.query(Order).filter(Order.id == int(order_id), Order.customerId == customer_id).first()
+        order = db.query(Order).filter(Order.id == int(order_id), Order.customer_id == customer_id).first()
         if not order:
             return "Order not found or doesn't belong to this customer"
         if order.status != "pending":
@@ -249,9 +249,9 @@ def remove_item_from_order(customer_id: str, order_id: str, product_identifier: 
         # Find the product
         product = None
         if str(product_identifier).isdigit():
-            product = db.query(Product).filter(Product.id == int(product_identifier), Product.sellerId == order.sellerId).first()
+            product = db.query(Product).filter(Product.id == int(product_identifier), Product.seller_id == order.seller_id).first()
         else:
-            product = db.query(Product).filter(Product.name.ilike(f"%{product_identifier}%"), Product.sellerId == order.sellerId).first()
+            product = db.query(Product).filter(Product.name.ilike(f"%{product_identifier}%"), Product.seller_id == order.seller_id).first()
         
         if not product:
             return f"Product '{product_identifier}' not found for this seller"
@@ -285,7 +285,7 @@ def update_item_quantity_in_order(customer_id: str, order_id: str, product_ident
     db = SessionLocal()
     try:
         # Validate order exists and belongs to customer
-        order = db.query(Order).filter(Order.id == int(order_id), Order.customerId == customer_id).first()
+        order = db.query(Order).filter(Order.id == int(order_id), Order.customer_id == customer_id).first()
         if not order:
             return "Order not found or doesn't belong to this customer"
         if order.status != "pending":
@@ -294,9 +294,9 @@ def update_item_quantity_in_order(customer_id: str, order_id: str, product_ident
         # Find the product
         product = None
         if str(product_identifier).isdigit():
-            product = db.query(Product).filter(Product.id == int(product_identifier), Product.sellerId == order.sellerId).first()
+            product = db.query(Product).filter(Product.id == int(product_identifier), Product.seller_id == order.seller_id).first()
         else:
-            product = db.query(Product).filter(Product.name.ilike(f"%{product_identifier}%"), Product.sellerId == order.sellerId).first()
+            product = db.query(Product).filter(Product.name.ilike(f"%{product_identifier}%"), Product.seller_id == order.seller_id).first()
         
         if not product:
             return f"Product '{product_identifier}' not found for this seller"
@@ -341,7 +341,7 @@ def replace_order_items(customer_id: str, order_id: str, new_items: List[dict]) 
     db = SessionLocal()
     try:
         # Validate order exists and belongs to customer
-        order = db.query(Order).filter(Order.id == int(order_id), Order.customerId == customer_id).first()
+        order = db.query(Order).filter(Order.id == int(order_id), Order.customer_id == customer_id).first()
         if not order:
             return "Order not found or doesn't belong to this customer"
         if order.status != "pending":
@@ -364,9 +364,9 @@ def replace_order_items(customer_id: str, order_id: str, new_items: List[dict]) 
             identifier = item["product_id"]
             
             if str(identifier).isdigit():
-                product = db.query(Product).filter(Product.id == int(identifier), Product.sellerId == order.sellerId).first()
+                product = db.query(Product).filter(Product.id == int(identifier), Product.seller_id == order.seller_id).first()
             else:
-                product = db.query(Product).filter(Product.name.ilike(f"%{identifier}%"), Product.sellerId == order.sellerId).first()
+                product = db.query(Product).filter(Product.name.ilike(f"%{identifier}%"), Product.seller_id == order.seller_id).first()
             
             if not product:
                 db.rollback()
@@ -409,7 +409,7 @@ def get_all_orders_for_customer(customer_id: str) -> list:
             FROM orders o
             JOIN order_items oi ON oi.order_id = o.id
             JOIN products p ON p.id = oi.product_id
-            WHERE o."customerId" = :customer_id
+            WHERE o."customer_id" = :customer_id
             ORDER BY o.created_at DESC
         """)
 
@@ -468,7 +468,7 @@ def get_pending_orders(customer_id: str) -> list:
             FROM orders o
             JOIN order_items oi ON oi.order_id = o.id
             JOIN products p ON p.id = oi.product_id
-            WHERE o."customerId" = :customer_id
+            WHERE o."customer_id" = :customer_id
               AND o.status = 'pending'
             ORDER BY o.created_at DESC
         """)
@@ -515,7 +515,7 @@ def get_order_details(order_id: int) -> dict:
         sql = text("""
             SELECT 
                 o.id AS order_id,
-                o."customerId",
+                o."customer_id",
                 o.status,
                 o.total_amount,
                 o.created_at,
@@ -537,7 +537,7 @@ def get_order_details(order_id: int) -> dict:
         order_info = rows[0]
         order_data = {
             "order_id": order_info["order_id"],
-            "customer_id": order_info["customerId"],
+            "customer_id": order_info["customer_id"],
             "status": order_info["status"],
             "total_amount": order_info["total_amount"],
             "created_at": str(order_info["created_at"]),
@@ -580,7 +580,7 @@ def edit_order_with_stock_update(order_id: int, customer_id: str, new_items: lis
 
         if not order:
             return {"success": False, "error": "Order not found"}
-        if order.customerId != customer_id:
+        if order.customer_id != customer_id:
             return {"success": False, "error": "Order does not belong to this customer"}
         if order.status != "pending":
             return {"success": False, "error": "Only pending orders can be edited"}
@@ -625,5 +625,18 @@ def edit_order_with_stock_update(order_id: int, customer_id: str, new_items: lis
     except Exception as e:
         db.rollback()
         return {"success": False, "error": str(e)}
+    finally:
+        db.close()
+
+def get_seller_id_by_whatsapp_number(whatsapp_number_id: str) -> str:
+    """Get seller ID based on WhatsApp number"""
+    db = SessionLocal()
+    try:
+        # Assuming you have a mapping of WhatsApp numbers to seller IDs
+        # This is a placeholder logic, replace with actual implementation
+        seller = db.query(SellerProfile).filter(SellerProfile.whatsapp_number_id == whatsapp_number_id).first()
+        if seller:
+            return str(seller.id)
+        return "default_seller"  # Fallback if no specific seller found
     finally:
         db.close()
