@@ -628,7 +628,7 @@ def edit_order_with_stock_update(order_id: int, customer_id: str, new_items: lis
     finally:
         db.close()
 
-def get_seller_id_by_whatsapp_number(whatsapp_number_id: str) -> str:
+def get_seller_id_by_whatsapp_number_id(whatsapp_number_id: str) -> str:
     """Get seller ID based on WhatsApp number"""
     db = SessionLocal()
     try:

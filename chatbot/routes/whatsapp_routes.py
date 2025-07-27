@@ -8,7 +8,7 @@ from typing import Dict, Any
 import json
 from utils.logger import get_logger
 from services.whatsapp_service import whatsapp_service
-from repositories.tools import get_seller_id_by_whatsapp_number
+from repositories.tools import get_seller_id_by_whatsapp_number_id
 from agent.agent import create_optimized_chatbot
 import asyncio
 from datetime import datetime
@@ -52,7 +52,7 @@ async def process_whatsapp_message_async(phone_number: str, message_content: str
         response = chatbot.process_message(message_content)
         
         # Send response back to WhatsApp
-        result = whatsapp_service.send_text_message(phone_number, response)
+        result = whatsapp_service.send_text_message(phone_number, response, seller_id)
         
         if result["success"]:
             logger.info(f"✅ Response sent to {phone_number}: {response[:50]}...")
@@ -110,7 +110,7 @@ async def handle_webhook(request: Request, background_tasks: BackgroundTasks):
         if whatsapp_message and whatsapp_message.content:
             # Extract seller_id from webhook or use default
             # You can modify this logic based on how you identify different sellers
-            seller_id = get_seller_id_by_whatsapp_number(whatsapp_message.to_number)
+            seller_id = get_seller_id_by_whatsapp_number_id(whatsapp_message.to_number)
 
             # Process message in background to respond quickly
             background_tasks.add_task(
@@ -121,7 +121,7 @@ async def handle_webhook(request: Request, background_tasks: BackgroundTasks):
                 seller_id
             )
             
-            logger.info(f"✅ Message queued for processing from {whatsapp_message.from_number}")
+            logger.info(f"✅ Message queued for processing from {whatsapp_message.from_number} , to {whatsapp_message.to_number}")
         else:
             logger.info("📝 Webhook received but no message to process (might be status update)")
         

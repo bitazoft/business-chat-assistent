@@ -8638,3 +8638,295 @@ Number: 0713966820' in 6.06s
 2025-07-26 14:52:36,767 - main - INFO - [main.py:49] - 🎉 Business Chat Assistant with WhatsApp Integration is ready to serve requests!
 2025-07-26 14:52:36,768 - main - INFO - [main.py:50] - 📱 WhatsApp webhook endpoint: /whatsapp/webhook
 2025-07-26 14:52:36,768 - main - INFO - [main.py:51] - 📊 WhatsApp status endpoint: /whatsapp/status
+2025-07-26 14:55:44,044 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Nipul Viduranga"
+                },
+                "wa_id": "94713966820"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94713966820",
+                "id": "wamid.HBgLOTQ3MTM5NjY4MjAVAgASGCAyNkNFOTQzOUREQzYyQThCQTQ3NkQ3RUUzOUQwNDhBMgA=",
+                "timestamp": "1753514975",
+                "text": {
+                  "body": "Hi"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 14:55:44,045 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94713966820: Hi...
+2025-07-26 14:55:44,109 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94713966820
+2025-07-26 14:55:44,110 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94713966820: Hi...
+2025-07-26 14:55:44,110 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:30] - Creating new chatbot session for 94713966820
+2025-07-26 14:55:48,472 - agent.language_agent - INFO - [language_agent.py:211] - [LanguageAgent] Combined detection: english (rule: 0.50, llm: english)
+2025-07-26 14:55:48,472 - agent.agent - INFO - [agent.py:482] - [Language] Detected language: english (confidence: 0.70) for message: 'Hi'
+2025-07-26 14:55:48,473 - agent.agent - INFO - [agent.py:486] - [Optimized] Detected intent: general_inquiry for message: 'Hi' in 4.30s
+2025-07-26 14:55:55,002 - agent.agent - INFO - [agent.py:548] - [Optimized] Total processing time: 10.83s, Language: english
+2025-07-26 14:55:55,003 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94713966820: Hello! How can I assist you today?...
+2025-07-26 14:55:55,830 - services.whatsapp_service - ERROR - [whatsapp_service.py:152] - ❌ Failed to send WhatsApp message: 401 Client Error: Unauthorized for url: https://graph.facebook.com/v22.0/762208246965801/messages
+2025-07-26 14:55:55,831 - routes.whatsapp_routes - ERROR - [whatsapp_routes.py:62] - ❌ Failed to send response to 94713966820: 401 Client Error: Unauthorized for url: https://graph.facebook.com/v22.0/762208246965801/messages
+2025-07-26 15:33:30,411 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "statuses": [
+              {
+                "id": "wamid.HBgLOTQ3MTI0ODE2MDMVAgARGBI4NUNGM0Y3NzVFODQyMkZGQjQA",
+                "status": "delivered",
+                "timestamp": "1753513360",
+                "recipient_id": "94712481603",
+                "conversation": {
+                  "id": "1d551548328dde05bf53cf7afdbcf188",
+                  "origin": {
+                    "type": "service"
+                  }
+                },
+                "pricing": {
+                  "billable": false,
+                  "pricing_model": "PMP",
+                  "category": "service",
+                  "type": "free_customer_service"
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 15:33:30,412 - services.whatsapp_service - INFO - [whatsapp_service.py:255] - No messages found in webhook - might be status update
+2025-07-26 15:33:30,412 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:126] - 📝 Webhook received but no message to process (might be status update)
+2025-07-26 16:00:47,443 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "haz1ru"
+                },
+                "wa_id": "94712481603"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94712481603",
+                "id": "wamid.HBgLOTQ3MTI0ODE2MDMVAgASGCAxNDdDMzAyODZCM0U3RDYxNjA1NDMwMkNGMkI5OERDMQA=",
+                "timestamp": "1753525844",
+                "text": {
+                  "body": "Hi"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 16:00:47,443 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94712481603: Hi...
+2025-07-26 16:00:47,471 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94712481603
+2025-07-26 16:00:47,472 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94712481603: Hi...
+2025-07-26 16:00:47,473 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:30] - Creating new chatbot session for 94712481603
+2025-07-26 16:00:47,569 - agent.agent - INFO - [agent.py:482] - [Language] Detected language: english (confidence: 0.70) for message: 'Hi'
+2025-07-26 16:00:47,569 - agent.agent - INFO - [agent.py:486] - [Optimized] Detected intent: general_inquiry for message: 'Hi' in 0.00s
+2025-07-26 16:00:51,500 - agent.agent - INFO - [agent.py:548] - [Optimized] Total processing time: 3.93s, Language: english
+2025-07-26 16:00:51,500 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94712481603: Hello! How can I assist you today?...
+2025-07-26 16:00:52,150 - services.whatsapp_service - ERROR - [whatsapp_service.py:152] - ❌ Failed to send WhatsApp message: 401 Client Error: Unauthorized for url: https://graph.facebook.com/v22.0/762208246965801/messages
+2025-07-26 16:00:52,151 - routes.whatsapp_routes - ERROR - [whatsapp_routes.py:62] - ❌ Failed to send response to 94712481603: 401 Client Error: Unauthorized for url: https://graph.facebook.com/v22.0/762208246965801/messages
+2025-07-26 16:00:55,119 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "haz1ru"
+                },
+                "wa_id": "94712481603"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94712481603",
+                "id": "wamid.HBgLOTQ3MTI0ODE2MDMVAgASGCBGRkZBMDMwN0E3OTBFNTRGMUY5Qzg5QkFFNDhFNDM4RgA=",
+                "timestamp": "1753525853",
+                "text": {
+                  "body": "Henloo"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 16:00:55,120 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94712481603: Henloo...
+2025-07-26 16:00:55,122 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94712481603
+2025-07-26 16:00:55,122 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94712481603: Henloo...
+2025-07-26 16:00:58,601 - agent.language_agent - INFO - [language_agent.py:211] - [LanguageAgent] Combined detection: english (rule: 0.50, llm: english)
+2025-07-26 16:00:58,602 - agent.agent - INFO - [agent.py:482] - [Language] Detected language: english (confidence: 0.70) for message: 'Henloo'
+2025-07-26 16:00:58,602 - agent.agent - INFO - [agent.py:486] - [Optimized] Detected intent: general_inquiry for message: 'Henloo' in 3.48s
+2025-07-26 16:01:03,211 - agent.agent - INFO - [agent.py:548] - [Optimized] Total processing time: 8.09s, Language: english
+2025-07-26 16:01:03,211 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94712481603: Henloo! How can I help you today? 😊...
+2025-07-26 16:01:04,028 - services.whatsapp_service - ERROR - [whatsapp_service.py:152] - ❌ Failed to send WhatsApp message: 401 Client Error: Unauthorized for url: https://graph.facebook.com/v22.0/762208246965801/messages
+2025-07-26 16:01:04,028 - routes.whatsapp_routes - ERROR - [whatsapp_routes.py:62] - ❌ Failed to send response to 94712481603: 401 Client Error: Unauthorized for url: https://graph.facebook.com/v22.0/762208246965801/messages
+2025-07-26 16:01:04,646 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "haz1ru"
+                },
+                "wa_id": "94712481603"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94712481603",
+                "id": "wamid.HBgLOTQ3MTI0ODE2MDMVAgASGCBDOTY1RkI1MDdDRDRDMThGMjNFQTI2NDk0OEQ5Nzk1RQA=",
+                "timestamp": "1753525858",
+                "type": "sticker",
+                "sticker": {
+                  "mime_type": "image/webp",
+                  "sha256": "uONyDUNvr7hni8QW7lU+JQs0GQ2vsrniy47ZODrv7AM=",
+                  "id": "726023493379459",
+                  "animated": false
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 16:01:04,646 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94712481603: [sticker message]...
+2025-07-26 16:01:04,647 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94712481603
+2025-07-26 16:01:04,649 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94712481603: [sticker message]...
+2025-07-26 16:01:09,455 - agent.language_agent - INFO - [language_agent.py:211] - [LanguageAgent] Combined detection: english (rule: 0.50, llm: english)
+2025-07-26 16:01:09,455 - agent.agent - INFO - [agent.py:482] - [Language] Detected language: english (confidence: 0.70) for message: '[sticker message]'
+2025-07-26 16:01:09,455 - agent.agent - INFO - [agent.py:486] - [Optimized] Detected intent: general_inquiry for message: '[sticker message]' in 4.81s
+2025-07-26 16:01:16,660 - agent.agent - INFO - [agent.py:548] - [Optimized] Total processing time: 12.01s, Language: english
+2025-07-26 16:01:16,660 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94712481603: It seems like you've sent some stickers! 😊 How can...
+2025-07-26 16:01:17,236 - services.whatsapp_service - ERROR - [whatsapp_service.py:152] - ❌ Failed to send WhatsApp message: 401 Client Error: Unauthorized for url: https://graph.facebook.com/v22.0/762208246965801/messages
+2025-07-26 16:01:17,237 - routes.whatsapp_routes - ERROR - [whatsapp_routes.py:62] - ❌ Failed to send response to 94712481603: 401 Client Error: Unauthorized for url: https://graph.facebook.com/v22.0/762208246965801/messages
+2025-07-26 17:25:57,833 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:105] - 📨 Received webhook data: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1471168067581781",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "94721302992",
+              "phone_number_id": "762208246965801"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "haz1ru"
+                },
+                "wa_id": "94712481603"
+              }
+            ],
+            "messages": [
+              {
+                "from": "94712481603",
+                "id": "wamid.HBgLOTQ3MTI0ODE2MDMVAgASGCA4RTY1QUVGNzlBNUFGQ0IxMDNFMEU2NEJDOTczODcwQgA=",
+                "timestamp": "1753513398",
+                "text": {
+                  "body": "Bittara thiyeda"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}...
+2025-07-26 17:25:57,834 - services.whatsapp_service - INFO - [whatsapp_service.py:284] - 📨 Received WhatsApp message from 94712481603: Bittara thiyeda...
+2025-07-26 17:25:57,836 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:124] - ✅ Message queued for processing from 94712481603
+2025-07-26 17:25:57,836 - routes.whatsapp_routes - INFO - [whatsapp_routes.py:46] - 🤖 Processing message from 94712481603: Bittara thiyeda...
+2025-07-26 17:26:01,713 - agent.language_agent - INFO - [language_agent.py:211] - [LanguageAgent] Combined detection: english (rule: 0.50, llm: singlish)
+2025-07-26 17:26:01,713 - agent.agent - INFO - [agent.py:482] - [Language] Detected language: singlish (confidence: 0.60) for message: 'Bittara thiyeda'
+2025-07-26 17:26:01,714 - agent.agent - INFO - [agent.py:486] - [Optimized] Detected intent: general_inquiry for message: 'Bittara thiyeda' in 3.88s
+2025-07-26 17:26:07,923 - agent.agent - INFO - [agent.py:548] - [Optimized] Total processing time: 10.09s, Language: singlish
+2025-07-26 17:26:07,923 - services.whatsapp_service - INFO - [whatsapp_service.py:137] - Sending WhatsApp message to 94712481603: Bittara thiyeda! 😊 මම ඔබට උදව් කරන්න කැමතියි. ඔබට ...
+2025-07-26 17:26:08,547 - services.whatsapp_service - ERROR - [whatsapp_service.py:152] - ❌ Failed to send WhatsApp message: 401 Client Error: Unauthorized for url: https://graph.facebook.com/v22.0/762208246965801/messages
+2025-07-26 17:26:08,548 - routes.whatsapp_routes - ERROR - [whatsapp_routes.py:62] - ❌ Failed to send response to 94712481603: 401 Client Error: Unauthorized for url: https://graph.facebook.com/v22.0/762208246965801/messages
+2025-07-27 09:38:07,016 - main - INFO - [main.py:55] - 👋 Business Chat Assistant is shutting down...
