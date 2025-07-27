@@ -2,10 +2,41 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function createUser(data) {
+  const {
+    name,
+    email,
+    phone,
+    password,
+    role,
+    address,
+    shop_name,
+    whatsapp_number_id,
+  } = data;
+
   return await prisma.users.create({
-    data,
+    data: {
+      name,
+      email,
+      phone,
+      password,
+      role,
+      address,
+
+      ...(role === "seller" && {
+        seller_profile: {
+          create: {
+            shop_name,
+            whatsapp_number_id,
+          },
+        },
+      }),
+    },
+    include: {
+      seller_profile: true,
+    },
   });
 }
+
 
 async function getUserByEmail(email) {
   return await prisma.users.findUnique({
