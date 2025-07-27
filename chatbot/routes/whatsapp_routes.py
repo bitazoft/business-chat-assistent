@@ -58,7 +58,7 @@ async def process_whatsapp_message_async(phone_number: str, message_content: str
         if result["success"]:
             logger.info(f"✅ Response sent to {phone_number}: {response[:50]}...")
             # Mark original message as read
-            whatsapp_service.mark_message_as_read(message_id)
+            whatsapp_service.mark_message_as_read(message_id,whatsapp_number_id)
         else:
             logger.error(f"❌ Failed to send response to {phone_number}: {result.get('error')}")
             
