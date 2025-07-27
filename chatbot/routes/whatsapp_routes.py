@@ -40,11 +40,12 @@ def get_or_create_chatbot(phone_number: str, seller_id: str = "default_seller"):
     
     return active_sessions[session_key]["chatbot"]
 
-async def process_whatsapp_message_async(phone_number: str, message_content: str, message_id: str, seller_id: str = "default_seller"):
+async def process_whatsapp_message_async(phone_number: str, message_content: str, message_id: str, whatsapp_number_id: str = "default_seller"):
     """Process WhatsApp message asynchronously"""
     try:
         logger.info(f"🤖 Processing message from {phone_number}: {message_content[:50]}...")
         
+        seller_id = get_seller_id_by_whatsapp_number_id(whatsapp_number_id)
         # Get or create chatbot for this user
         chatbot = get_or_create_chatbot(phone_number, seller_id)
         
@@ -52,7 +53,7 @@ async def process_whatsapp_message_async(phone_number: str, message_content: str
         response = chatbot.process_message(message_content)
         
         # Send response back to WhatsApp
-        result = whatsapp_service.send_text_message(phone_number, response, seller_id)
+        result = whatsapp_service.send_text_message(phone_number, response, whatsapp_number_id)
         
         if result["success"]:
             logger.info(f"✅ Response sent to {phone_number}: {response[:50]}...")
@@ -110,7 +111,7 @@ async def handle_webhook(request: Request, background_tasks: BackgroundTasks):
         if whatsapp_message and whatsapp_message.content:
             # Extract seller_id from webhook or use default
             # You can modify this logic based on how you identify different sellers
-            seller_id = get_seller_id_by_whatsapp_number_id(whatsapp_message.to_number)
+        
 
             # Process message in background to respond quickly
             background_tasks.add_task(
@@ -118,7 +119,7 @@ async def handle_webhook(request: Request, background_tasks: BackgroundTasks):
                 whatsapp_message.from_number,
                 whatsapp_message.content,
                 whatsapp_message.message_id,
-                seller_id
+                whatsapp_message.to_number
             )
             
             logger.info(f"✅ Message queued for processing from {whatsapp_message.from_number} , to {whatsapp_message.to_number}")
