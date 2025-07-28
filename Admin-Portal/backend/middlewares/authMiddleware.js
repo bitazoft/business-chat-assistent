@@ -1,16 +1,19 @@
-import jwt from "jsonwebtoken"
+import verifyToken from "../utils/verifyToken.js";
 
-const verifyToken = (token) => {
-    if (!token) {
-      throw new Error("No token provided");
-    }
-  
-    try {
-        console.log(token)
-      return jwt.verify(token, process.env.JWT_SECRET);
-    } catch (err) {
-      throw new Error("Invalid or expired token");
-    }
-  };
+const authenticate = (req, res, next) => {
+  const token = req.cookies.access_token;
 
-export default verifyToken;
+  if (!token) {
+    return res.status(401).json({ error: "Unauthorized: No token provided" });
+  }
+
+  try {
+    const decoded = verifyToken(token);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    return res.status(403).json({ error: err.message });
+  }
+};
+
+export default authenticate;
