@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { AddProductModal } from "@/components/add-product-modal"
 import { EditProductModal } from "@/components/edit-product-modal"
 import { getCurrentUser } from "@/lib/auth"
+import { toast } from "sonner"
 
 export interface Product {
   id: number
@@ -25,9 +26,13 @@ export function ProductManagement() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const user = getCurrentUser()
 
   useEffect(() => {
-    const user = getCurrentUser()
+    fetchProducts()
+  }, []);
+
+  const fetchProducts = async () => {
     fetch(`http://localhost:7001/api/products/getAll/${user?.id}`,{
       method: "GET",
       credentials: "include",
@@ -41,9 +46,9 @@ export function ProductManagement() {
         setProducts(data.products || []);
       })
       .catch((err) => {
-        console.error("Failed to fetch products", err);
+        toast.error("Failed to fetch products", err);
       });
-  }, []);
+  }
 
   const filteredProducts = products.filter((product) => product.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
@@ -69,71 +74,96 @@ export function ProductManagement() {
     setIsEditModalOpen(true)
   }
 
-  const handleDeleteProduct = (productId: number) => {
-    // TODO: Implement delete logic here
-    console.log("Delete product with ID:", productId)
+  const handleDeleteProduct = async (productId: number) => {
+    try {
+      await fetch(`http://localhost:7001/api/products/delete/${productId}`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+      
+      fetchProducts()
 
-    // For now, just remove from local state
-    setProducts(products.filter((product) => product.id !== productId))
+      toast.success("Product deleted successfully!",{
+        style: {
+          background: "#0f0f23",
+          color: "#fff",
+        }
+      });
+    } catch (error) {
+      toast.error((error as Error).toString());
+    }
   }
 
   // Empty function for add product - you can implement your logic here
-  const onAddProduct = (productData: {
+  const onAddProduct = async (productData: {
     name: string
     price: string
     description: string
     stock: number
   }) => {
-    // TODO: Implement your add product logic here
-    // This could include API calls, validation, etc.
-    console.log("Add product data:", productData)
+    try {
+      await fetch(`http://localhost:7001/api/products/add`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: productData.name,
+          price: productData.price,
+          description: productData.description,
+          stock: productData.stock,
+          seller_id: user?.id
+        }),
+      });
 
-    // For demo purposes, add to local state
-    const newProduct: Product = {
-      id: Math.max(...products.map((p) => p.id)) + 1,
-      name: productData.name,
-      price: productData.price,
-      stock: productData.stock,
-      category: "General", // You can add category selection later
-      status: productData.stock > 0 ? "Active" : "Out of Stock",
-      description: productData.description,
+      fetchProducts()
+      setIsAddModalOpen(false)
+
+      toast.success("Product saved successfully !!",{
+        style: {
+          background: "#0f0f23",
+          color: "#fff",
+        }
+      });
+    } catch (error) {
+      toast.error((error as Error).toString());
     }
-
-    setProducts([...products, newProduct])
-    setIsAddModalOpen(false)
   }
 
   // Empty function for update product - you can implement your logic here
-  const onUpdateProduct = (productData: {
+  const onUpdateProduct = async (productData: {
     name: string
     price: string
     description: string
     stock: number
   }) => {
-    // TODO: Implement your update product logic here
-    // This could include API calls, validation, etc.
-    console.log("Update product data:", productData)
-    console.log("Selected product ID:", selectedProduct?.id)
+    try {
+      await fetch(`http://localhost:7001/api/products/update/${selectedProduct?.id}`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: productData.name,
+          price: productData.price,
+          description: productData.description,
+          stock: productData.stock,
+          seller_id: user?.id
+        }),
+      });
 
-    // For demo purposes, update local state
-    if (selectedProduct) {
-      const updatedProducts = products.map((product) =>
-        product.id === selectedProduct.id
-          ? {
-              ...product,
-              name: productData.name,
-              price: productData.price,
-              stock: productData.stock,
-              description: productData.description,
-              status: productData.stock > 0 ? "Active" : "Out of Stock",
-            }
-          : product,
-      )
-      setProducts(updatedProducts)
+      fetchProducts()
+      setIsEditModalOpen(false)
+      setSelectedProduct(null)
+
+      toast.success("Product details updated successfully!",{
+        style: {
+          background: "#0f0f23",
+          color: "#fff",
+        }
+      });
+    } catch (error) {
+      toast.error((error as Error).toString());
     }
-
-    setIsEditModalOpen(false)
-    setSelectedProduct(null)
   }
 
   return (
