@@ -108,8 +108,12 @@ export function EditProductModal({ isOpen, onClose, onUpdateProduct, product }: 
       newErrors.name = "Product name is required"
     }
 
-    if (!formData.price.trim()) {
+    if (!formData.price) {
       newErrors.price = "Price is required"
+    }
+
+    if (parseFloat(formData.price) < 0) {
+      newErrors.price = "Price cannot be negative"
     }
 
     if (!formData.description.trim()) {
