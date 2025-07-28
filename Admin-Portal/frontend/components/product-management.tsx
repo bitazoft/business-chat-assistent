@@ -1,12 +1,13 @@
 "use client"
 
-import { useState } from "react"
-import { Plus, Edit, Trash2, Search } from "lucide-react"
+import { useEffect, useState } from "react"
+import { Plus, Edit, Trash2, Search, Package } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { AddProductModal } from "@/components/add-product-modal"
 import { EditProductModal } from "@/components/edit-product-modal"
+import { getCurrentUser } from "@/lib/auth"
 
 export interface Product {
   id: number
@@ -18,60 +19,31 @@ export interface Product {
   description?: string
 }
 
-const initialProducts: Product[] = [
-  {
-    id: 1,
-    name: "iPhone 15 Pro",
-    price: "$999",
-    stock: 25,
-    category: "Electronics",
-    status: "Active",
-    description: "Latest iPhone with advanced camera system and titanium design",
-  },
-  {
-    id: 2,
-    name: "Samsung Galaxy S24",
-    price: "$799",
-    stock: 18,
-    category: "Electronics",
-    status: "Active",
-    description: "Flagship Android phone with AI-powered features",
-  },
-  {
-    id: 3,
-    name: "MacBook Air M3",
-    price: "$1,199",
-    stock: 12,
-    category: "Computers",
-    status: "Active",
-    description: "Ultra-thin laptop with M3 chip for exceptional performance",
-  },
-  {
-    id: 4,
-    name: "AirPods Pro",
-    price: "$249",
-    stock: 45,
-    category: "Accessories",
-    status: "Low Stock",
-    description: "Wireless earbuds with active noise cancellation",
-  },
-  {
-    id: 5,
-    name: "iPad Air",
-    price: "$599",
-    stock: 0,
-    category: "Tablets",
-    status: "Out of Stock",
-    description: "Versatile tablet perfect for work and creativity",
-  },
-]
-
 export function ProductManagement() {
-  const [products, setProducts] = useState<Product[]>(initialProducts)
+  const [products, setProducts] = useState<Product[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+
+  useEffect(() => {
+    const user = getCurrentUser()
+    fetch(`http://localhost:7001/api/products/getAll/${user?.id}`,{
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Fetched products", data);
+        setProducts(data.products || []);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch products", err);
+      });
+  }, []);
 
   const filteredProducts = products.filter((product) => product.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
@@ -197,6 +169,29 @@ export function ProductManagement() {
           <CardTitle className="text-white">Products ({filteredProducts.length})</CardTitle>
         </CardHeader>
         <CardContent>
+          {filteredProducts.length === 0 ? (
+            // No products message
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <Package className="w-16 h-16 text-gray-600 mb-4" />
+              <h3 className="text-xl font-semibold text-gray-400 mb-2">
+                {searchTerm ? "No products found" : "No products available"}
+              </h3>
+              <p className="text-gray-500 mb-6 max-w-md">
+                {searchTerm
+                  ? `No products match your search for "${searchTerm}". Try adjusting your search terms.`
+                  : "You haven't added any products yet. Start by adding your first product to get started."}
+              </p>
+              {!searchTerm && (
+                <Button
+                  onClick={handleAddProduct}
+                  className="bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white shadow-lg hover:shadow-violet-500/25 transition-all duration-300"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Your First Product
+                </Button>
+              )}
+            </div>
+          ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -219,10 +214,10 @@ export function ProductManagement() {
                     <td className="py-3 px-4 text-white font-medium">{product.name}</td>
                     <td className="py-3 px-4 text-emerald-400 font-semibold">{product.price}</td>
                     <td className="py-3 px-4 text-gray-300">{product.stock}</td>
-                    <td className="py-3 px-4 text-gray-300">{product.category}</td>
+                    <td className="py-3 px-4 text-gray-300">{product.category || "General"}</td>
                     <td className="py-3 px-4">
-                      <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(product.status)}`}>
-                        {product.status}
+                      <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(product.stock > 20 ? "Active":product.stock < 20 && product.stock != 0 ? "Low Stock":"Out of Stock" )}`}>
+                        {product.stock > 20 ? "Active":product.stock < 20 && product.stock != 0 ? "Low Stock":"Out of Stock" }
                       </span>
                     </td>
                     <td className="py-3 px-4">
@@ -250,6 +245,7 @@ export function ProductManagement() {
               </tbody>
             </table>
           </div>
+          )}
         </CardContent>
       </Card>
 
