@@ -8,6 +8,8 @@ import { ProductManagement } from "@/components/product-management"
 import { OrdersPage } from "@/components/orders-page"
 import { AnalyticsPage } from "@/components/analytics-page"
 import { SettingsPage } from "@/components/settings-page"
+import { TrackingDashboard } from "@/components/tracking-dashboard"
+
 
 interface DashboardProps {
   user: { businessName: string; email: string }
@@ -30,6 +32,8 @@ export function Dashboard({ user, onLogout }: DashboardProps) {
         return <AnalyticsPage />
       case "settings":
         return <SettingsPage />
+      case "tracking":
+        return <TrackingDashboard/> 
       default:
         return <DashboardOverview />
     }
