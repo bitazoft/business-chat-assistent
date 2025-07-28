@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import userService from "../services/userService.js";
-import verifyToken from "../middlewares/authMiddleware.js";
+import verifyToken from "../utils/verifyToken.js";
 import { error } from "console";
 
 const register = async (req, res) => {
