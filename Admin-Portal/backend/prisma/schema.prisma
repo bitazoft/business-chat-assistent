@@ -8,48 +8,38 @@ datasource db {
 }
 
 model users {
-  id            Int            @id @default(autoincrement())
-  name          String
-  email         String         @unique
-  phone         String
-  password      String
-  role          UserRole       @default(customer)
-  address       String?
-  createdAt     DateTime       @default(now())
-  sellerProfile SellerProfile?
-  orders        orders[]
-  products      products[]
-}
-
-model SellerProfile {
-  id        Int     @id @default(autoincrement())
-  userId    Int     @unique
-  shopName  String
-  gstNumber String?
-  user      users   @relation(fields: [userId], references: [id])
+  id             Int             @id @default(autoincrement())
+  name           String
+  email          String          @unique
+  phone          String
+  password       String
+  role           UserRole        @default(customer)
+  address        String?
+  created_at     DateTime        @default(now())
+  seller_profile seller_profile?
 }
 
 model chat_logs {
   id         Int      @id @default(autoincrement())
-  customerId String?  @db.VarChar
   user_query String   @db.VarChar
   intent     String?  @db.VarChar
   entities   String?  @db.VarChar
   response   String   @db.VarChar
   timestamp  DateTime @default(now()) @db.Timestamp(6)
+  customerId String?  @db.VarChar
   sellerId   Int
 }
 
 model orders {
-  id           Int           @id @default(autoincrement())
-  sellerId     Int
-  status       String        @db.VarChar
-  total_amount Float
-  created_at   DateTime?     @default(now()) @db.Timestamp(6)
-  customerId   String?       @db.VarChar
-  order_items  order_items[]
-  customers    customers?    @relation(fields: [customerId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orders_customers_fk")
-  user         users         @relation(fields: [sellerId], references: [id], map: "orders_userId_fkey")
+  id             Int            @id @default(autoincrement())
+  status         String         @db.VarChar
+  total_amount   Float
+  created_at     DateTime?      @default(now()) @db.Timestamp(6)
+  customerId     String?        @db.VarChar
+  seller_id      Int
+  order_items    order_items[]
+  customers      customers?     @relation(fields: [customerId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orders_customers_fk")
+  seller_profile seller_profile @relation(fields: [seller_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orders_seller_profile_fk")
 }
 
 model order_items {
@@ -63,18 +53,18 @@ model order_items {
 }
 
 model products {
-  id          Int           @id @default(autoincrement())
-  sellerId    Int
-  name        String        @db.VarChar
-  description String?       @db.VarChar
-  price       Float
-  stock       Int
-  order_items order_items[]
-  user        users         @relation(fields: [sellerId], references: [id], map: "products_userId_fkey")
+  id             Int            @id @default(autoincrement())
+  name           String         @db.VarChar
+  description    String?        @db.VarChar
+  price          Float
+  stock          Int
+  seller_id      Int
+  order_items    order_items[]
+  seller_profile seller_profile @relation(fields: [seller_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "products_seller_profile_fk")
 }
 
 model customers {
-  id         String    @id() @db.VarChar
+  id         String    @id @db.VarChar
   name       String    @db.VarChar
   address    String    @db.VarChar
   number1    String    @db.VarChar
@@ -82,6 +72,16 @@ model customers {
   created_at DateTime? @default(now()) @db.Timestamp(6)
   email      String?   @db.VarChar
   orders     orders[]
+}
+
+model seller_profile {
+  id                 Int        @id(map: "SellerProfile_pkey") @default(autoincrement())
+  user_id            Int        @unique(map: "SellerProfile_userId_key")
+  shop_name          String
+  whatsapp_number_id String?    @db.VarChar
+  orders             orders[]
+  products           products[]
+  users              users      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "seller_profile_users_fk")
 }
 
 enum UserRole {

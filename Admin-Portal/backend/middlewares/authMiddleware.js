@@ -1,26 +1,19 @@
-import jwt from "jsonwebtoken"
+import verifyToken from "../utils/verifyToken.js";
 
-const verifyToken = (req, res, next) => {
-    let token;
-    const authHeader = req.headers.Authorization || req.headers.authorization;
-    if (authHeader && authHeader.startsWith("Bearer")) {
-        token = authHeader.split(" ")[1];
-        
-        if (!token) {
-            return res.status(401).json({message: "No token, authorization denied.."})
-        }
+const authenticate = (req, res, next) => {
+  const token = req.cookies.access_token;
 
-        try {
-            const decode = jwt.verify(token,process.env.JWT_SECRET);
-            req.user = decode;
-            console.log("The decode user is ", req.user);
-            next();
-        } catch (err) {
-            return res.status(400).json({message: "Token is not valid."})
-        }
-    }else {
-        return res.status(401).json({message: "No token, authorization denied.."});
-    }
-}
+  if (!token) {
+    return res.status(401).json({ error: "Unauthorized: No token provided" });
+  }
 
-export default verifyToken;
+  try {
+    const decoded = verifyToken(token);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    return res.status(403).json({ error: err.message });
+  }
+};
+
+export default authenticate;
