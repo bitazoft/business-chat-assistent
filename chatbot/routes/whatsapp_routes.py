@@ -1,11 +1,9 @@
-"""
-WhatsApp Router - FastAPI endpoints for WhatsApp webhook handling
-"""
-
 from fastapi import APIRouter, Request, HTTPException, Query, BackgroundTasks
 from fastapi.responses import PlainTextResponse
 from typing import Dict, Any
 import json
+from concurrent.futures import ThreadPoolExecutor
+import threading
 from utils.logger import get_logger
 from services.whatsapp_service import whatsapp_service
 from repositories.tools import get_seller_id_by_whatsapp_number_id
@@ -20,28 +18,33 @@ router = APIRouter(prefix="/whatsapp", tags=["WhatsApp"])
 
 # Store active chatbot sessions
 active_sessions: Dict[str, Any] = {}
-
+# Thread pool configuration
+MAX_THREADS = 10  # Configurable maximum number of concurrent threads
+thread_pool = ThreadPoolExecutor(max_workers=MAX_THREADS)
+# Lock for thread-safe session management
+sessions_lock = threading.Lock()
 
 def get_or_create_chatbot(phone_number: str, seller_id: str = "default_seller"):
     """Get existing chatbot session or create new one"""
     session_key = f"{seller_id}_{phone_number}"
     
-    if session_key not in active_sessions:
-        logger.info(f"Creating new chatbot session for {phone_number}")
-        active_sessions[session_key] = {
-            "chatbot": create_optimized_chatbot(seller_id=seller_id, user_id=phone_number),
-            "last_activity": datetime.now(),
-            "message_count": 0
-        }
-    else:
-        # Update last activity
-        active_sessions[session_key]["last_activity"] = datetime.now()
-        active_sessions[session_key]["message_count"] += 1
+    with sessions_lock:
+        if session_key not in active_sessions:
+            logger.info(f"Creating new chatbot session for {phone_number}")
+            active_sessions[session_key] = {
+                "chatbot": create_optimized_chatbot(seller_id=seller_id, user_id=phone_number),
+                "last_activity": datetime.now(),
+                "message_count": 0
+            }
+        else:
+            # Update last activity
+            active_sessions[session_key]["last_activity"] = datetime.now()
+            active_sessions[session_key]["message_count"] += 1
     
     return active_sessions[session_key]["chatbot"]
 
-async def process_whatsapp_message_async(phone_number: str, message_content: str, message_id: str, whatsapp_number_id: str = "default_seller"):
-    """Process WhatsApp message asynchronously"""
+def process_whatsapp_message(phone_number: str, message_content: str, message_id: str, whatsapp_number_id: str = "default_seller"):
+    """Process WhatsApp message in a separate thread"""
     try:
         logger.info(f"🤖 Processing message from {phone_number}: {message_content[:50]}...")
         
@@ -58,7 +61,7 @@ async def process_whatsapp_message_async(phone_number: str, message_content: str
         if result["success"]:
             logger.info(f"✅ Response sent to {phone_number}: {response[:50]}...")
             # Mark original message as read
-            whatsapp_service.mark_message_as_read(message_id,whatsapp_number_id)
+            whatsapp_service.mark_message_as_read(message_id, whatsapp_number_id)
         else:
             logger.error(f"❌ Failed to send response to {phone_number}: {result.get('error')}")
             
@@ -67,6 +70,19 @@ async def process_whatsapp_message_async(phone_number: str, message_content: str
         # Send error message to user
         error_message = "I'm experiencing technical difficulties. Please try again in a moment."
         whatsapp_service.send_text_message(phone_number, error_message)
+
+async def process_whatsapp_message_async(phone_number: str, message_content: str, message_id: str, whatsapp_number_id: str = "default_seller"):
+    """Submit message processing to thread pool"""
+    # Run the synchronous processing in thread pool
+    loop = asyncio.get_event_loop()
+    await loop.run_in_executor(
+        thread_pool,
+        process_whatsapp_message,
+        phone_number,
+        message_content,
+        message_id,
+        whatsapp_number_id
+    )
 
 @router.get("/")
 async def verify_webhook(
@@ -109,10 +125,6 @@ async def handle_webhook(request: Request, background_tasks: BackgroundTasks):
         whatsapp_message = whatsapp_service.parse_webhook_message(webhook_data)
         
         if whatsapp_message and whatsapp_message.content:
-            # Extract seller_id from webhook or use default
-            # You can modify this logic based on how you identify different sellers
-        
-
             # Process message in background to respond quickly
             background_tasks.add_task(
                 process_whatsapp_message_async,
@@ -179,17 +191,20 @@ async def get_status():
     """
     Get service status and active sessions
     """
-    return {
-        "status": "active",
-        "active_sessions": len(active_sessions),
-        "sessions": {
-            session_key: {
-                "last_activity": session_data["last_activity"].isoformat(),
-                "message_count": session_data["message_count"]
+    with sessions_lock:
+        return {
+            "status": "active",
+            "active_sessions": len(active_sessions),
+            "active_threads": thread_pool._work_queue.qsize(),
+            "max_threads": MAX_THREADS,
+            "sessions": {
+                session_key: {
+                    "last_activity": session_data["last_activity"].isoformat(),
+                    "message_count": session_data["message_count"]
+                }
+                for session_key, session_data in active_sessions.items()
             }
-            for session_key, session_data in active_sessions.items()
         }
-    }
 
 @router.delete("/sessions/{phone_number}")
 async def clear_session(phone_number: str, seller_id: str = "default_seller"):
@@ -197,12 +212,13 @@ async def clear_session(phone_number: str, seller_id: str = "default_seller"):
     Clear a specific user session
     """
     session_key = f"{seller_id}_{phone_number}"
-    if session_key in active_sessions:
-        del active_sessions[session_key]
-        logger.info(f"🗑️ Cleared session for {phone_number}")
-        return {"status": "session_cleared", "phone_number": phone_number}
-    else:
-        raise HTTPException(status_code=404, detail="Session not found")
+    with sessions_lock:
+        if session_key in active_sessions:
+            del active_sessions[session_key]
+            logger.info(f"🗑️ Cleared session for {phone_number}")
+            return {"status": "session_cleared", "phone_number": phone_number}
+        else:
+            raise HTTPException(status_code=404, detail="Session not found")
 
 @router.delete("/sessions")
 async def clear_all_sessions():
@@ -210,10 +226,11 @@ async def clear_all_sessions():
     Clear all active sessions
     """
     global active_sessions
-    session_count = len(active_sessions)
-    active_sessions.clear()
-    logger.info(f"🗑️ Cleared {session_count} sessions")
-    return {"status": "all_sessions_cleared", "cleared_count": session_count}
+    with sessions_lock:
+        session_count = len(active_sessions)
+        active_sessions.clear()
+        logger.info(f"🗑️ Cleared {session_count} sessions")
+        return {"status": "all_sessions_cleared", "cleared_count": session_count}
 
 @router.get("/profile/{phone_number}")
 async def get_profile(phone_number: str):

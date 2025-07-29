@@ -456,7 +456,7 @@ class OptimizedChatbot:
         return AgentExecutor(
             agent=agent, 
             tools=self.tools, 
-            verbose=True,
+            verbose=False,
             max_iterations=10,  # Increased from 3 to 10 to handle complex workflows
             early_stopping_method="generate",  # Allow agent to stop early if it has an answer
             handle_parsing_errors=True,
