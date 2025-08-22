@@ -13,7 +13,7 @@ class Seller(Base):
 class Product(Base):
     __tablename__ = "products"
     id = Column(Integer, primary_key=True)
-    sellerId = Column(Integer, ForeignKey("users.id"), nullable=False)
+    seller_id = Column(Integer, ForeignKey("seller_profiles.id"), nullable=False)
     name = Column(String, nullable=False)
     description = Column(String)
     price = Column(Float, nullable=False)
@@ -32,8 +32,8 @@ class Customers(Base):
 class Order(Base):
     __tablename__ = "orders"
     id = Column(Integer, primary_key=True)
-    sellerId = Column(Integer, ForeignKey("users.id"), nullable=False)
-    customerId = Column(String,ForeignKey("customers.id"), nullable=False)
+    seller_id = Column(Integer, ForeignKey("seller_profiles.id"), nullable=False)
+    customer_id = Column(String,ForeignKey("customers.id"), nullable=False)
     status = Column(String, nullable=False)
     total_amount = Column(Float, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -49,10 +49,19 @@ class OrderItem(Base):
 class ChatLog(Base):
     __tablename__ = "chat_logs"
     id = Column(Integer, primary_key=True)
-    sellerId = Column(Integer, ForeignKey("users.id"), nullable=False)
-    customerId = Column(String, ForeignKey("customers.id"), nullable=False)
+    seller_id = Column(Integer, ForeignKey("seller_profiles.id"), nullable=False)
+    customer_id = Column(String, ForeignKey("customers.id"), nullable=False)
     user_query = Column(String, nullable=False)
     intent = Column(String)
     entities = Column(String)
     response = Column(String, nullable=False)
     timestamp = Column(DateTime, default=datetime.utcnow)
+
+class SellerProfile(Base):
+    __tablename__ = "seller_profiles"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    shop_name = Column(String, nullable=True)
+    gst_number = Column(String, nullable=True)
+    whatsapp_number_id = Column(String, nullable=True)
+ 

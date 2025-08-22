@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 interface TopBarProps {
-  user: { businessName: string; email: string }
+  user: { id: number; name: string; email: string; role: string}
   onLogout: () => void
 }
 
@@ -13,7 +13,7 @@ export function TopBar({ user, onLogout }: TopBarProps) {
   return (
     <header className="h-16 bg-gradient-to-r from-[#1a1a2e] to-[#16213e] border-b border-gray-700 flex items-center justify-between px-6">
       <div>
-        <h1 className="text-xl font-semibold text-white">{user.businessName}</h1>
+        <h1 className="text-xl font-semibold text-white">{user.name}</h1>
         <p className="text-sm text-gray-400">Welcome back!</p>
       </div>
 

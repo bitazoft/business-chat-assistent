@@ -4,6 +4,9 @@
 # FastAPI for building APIs
 fastapi
 
+# ASGI server for FastAPI
+uvicorn[standard]
+
 # Pydantic for data validation
 pydantic
 
@@ -36,3 +39,10 @@ python-dotenv
 # Optional: FAISS or Chroma for vector database (only if used)
 faiss-cpu
 # chromadb
+
+pandas
+
+# Sentence Transformers for embeddings
+sentence-transformers
+
+langchain-community

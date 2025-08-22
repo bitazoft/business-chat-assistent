@@ -1,8 +1,5 @@
 "use client"
 
-import { useState } from "react"
-import { Sidebar } from "@/components/sidebar"
-import { TopBar } from "@/components/top-bar"
 import { DashboardOverview } from "@/components/dashboard-overview"
 import { ProductManagement } from "@/components/product-management"
 import { OrdersPage } from "@/components/orders-page"
@@ -12,7 +9,7 @@ import { TrackingDashboard } from "@/components/tracking-dashboard"
 
 
 interface DashboardProps {
-  user: { businessName: string; email: string }
+  user: { id: number; name: string; email: string; role: string}
   onLogout: () => void
 }
 

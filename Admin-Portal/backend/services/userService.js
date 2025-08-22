@@ -2,25 +2,72 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function createUser(data) {
-  return await prisma.users.create({
-    data,
-  });
+  const {
+    name,
+    email,
+    phone,
+    password,
+    role,
+    address,
+    shop_name,
+    whatsapp_number_id,
+  } = data;
+
+  try {
+    return await prisma.users.create({
+      data: {
+        name,
+        email,
+        phone,
+        password,
+        role,
+        address,
+  
+        ...(role === "seller" && {
+          seller_profile: {
+            create: {
+              shop_name,
+              whatsapp_number_id,
+            },
+          },
+        }),
+      },
+      include: {
+        seller_profile: true,
+      },
+    });
+  } catch (error) {
+    throw new Error(`Error creating user: ${error.message}`);
+  }
 }
 
+
 async function getUserByEmail(email) {
-  return await prisma.users.findUnique({
-    where: { email },
-  });
+  try {
+    return await prisma.users.findUnique({
+      where: { email },
+    });
+  } catch (error) {
+    throw new Error(`Error fetching user by email: ${error.message}`);
+  }
 }
 
 async function getAllUsers() {
-  return await prisma.users.findMany();
+  try {
+    return await prisma.users.findMany();
+  } catch (error) {
+    throw new Error(`Error fetching all users: ${error.message}`);
+  }
 }
 
 async function deleteUser(id) {
-  return await prisma.users.delete({
-    where: { id },
-  });
+  try {
+    return await prisma.users.delete({
+      where: { id },
+    });
+  } catch (error) {
+    throw new Error(`Error deleting user: ${error.message}`);
+  }
 }
 
 export default {
@@ -29,4 +76,3 @@ export default {
   getAllUsers,
   deleteUser,
 };
-

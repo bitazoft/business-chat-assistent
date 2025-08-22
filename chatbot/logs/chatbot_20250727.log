@@ -1,0 +1,82 @@
+2025-07-27 09:39:00,982 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-27 09:40:04,343 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-27 09:40:05,842 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-27 09:40:05,946 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-27 09:41:42,226 - services.whatsapp_service - INFO - [whatsapp_service.py:467] - ⚠️ WhatsApp Service initialized without validation - call validate_configs() before use
+2025-07-27 09:41:42,232 - main - INFO - [main.py:29] - 🚀 Business Chat Assistant starting up...
+2025-07-27 09:41:42,232 - main - INFO - [main.py:30] - ✅ CORS middleware configured
+2025-07-27 09:41:42,234 - main - INFO - [main.py:34] - ✅ Chat routes registered
+2025-07-27 09:41:42,237 - main - INFO - [main.py:38] - ✅ WhatsApp routes registered
+2025-07-27 09:41:42,238 - main - INFO - [main.py:49] - 🎉 Business Chat Assistant with WhatsApp Integration is ready to serve requests!
+2025-07-27 09:41:42,238 - main - INFO - [main.py:50] - 📱 WhatsApp webhook endpoint: /whatsapp/webhook
+2025-07-27 09:41:42,238 - main - INFO - [main.py:51] - 📊 WhatsApp status endpoint: /whatsapp/status
+2025-07-27 09:43:10,443 - main - INFO - [main.py:55] - 👋 Business Chat Assistant is shutting down...
+2025-07-27 09:43:12,737 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-27 09:43:16,708 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-27 09:43:16,807 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-27 09:43:16,813 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-27 09:43:26,124 - services.whatsapp_service - INFO - [whatsapp_service.py:467] - ⚠️ WhatsApp Service initialized without validation - call validate_configs() before use
+2025-07-27 09:44:38,325 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-27 09:44:41,471 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-27 09:44:41,563 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-27 09:44:41,568 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-27 09:44:50,971 - services.whatsapp_service - INFO - [whatsapp_service.py:467] - ⚠️ WhatsApp Service initialized without validation - call validate_configs() before use
+2025-07-27 09:44:50,977 - main - INFO - [main.py:29] - 🚀 Business Chat Assistant starting up...
+2025-07-27 09:44:50,977 - main - INFO - [main.py:30] - ✅ CORS middleware configured
+2025-07-27 09:44:50,978 - main - INFO - [main.py:34] - ✅ Chat routes registered
+2025-07-27 09:44:50,981 - main - INFO - [main.py:38] - ✅ WhatsApp routes registered
+2025-07-27 09:44:50,982 - main - INFO - [main.py:49] - 🎉 Business Chat Assistant with WhatsApp Integration is ready to serve requests!
+2025-07-27 09:44:50,983 - main - INFO - [main.py:50] - 📱 WhatsApp webhook endpoint: /whatsapp/webhook
+2025-07-27 09:44:50,983 - main - INFO - [main.py:51] - 📊 WhatsApp status endpoint: /whatsapp/status
+2025-07-27 09:51:34,752 - main - INFO - [main.py:55] - 👋 Business Chat Assistant is shutting down...
+2025-07-27 09:51:36,632 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-27 09:51:40,320 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-27 09:51:40,422 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-27 09:51:40,429 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-27 09:51:50,773 - services.whatsapp_service - INFO - [whatsapp_service.py:467] - ⚠️ WhatsApp Service initialized without validation - call validate_configs() before use
+2025-07-27 09:51:50,779 - main - INFO - [main.py:29] - 🚀 Business Chat Assistant starting up...
+2025-07-27 09:51:50,780 - main - INFO - [main.py:30] - ✅ CORS middleware configured
+2025-07-27 09:51:50,782 - main - INFO - [main.py:34] - ✅ Chat routes registered
+2025-07-27 09:51:50,784 - main - INFO - [main.py:38] - ✅ WhatsApp routes registered
+2025-07-27 09:51:50,786 - main - INFO - [main.py:49] - 🎉 Business Chat Assistant with WhatsApp Integration is ready to serve requests!
+2025-07-27 09:51:50,786 - main - INFO - [main.py:50] - 📱 WhatsApp webhook endpoint: /whatsapp/webhook
+2025-07-27 09:51:50,786 - main - INFO - [main.py:51] - 📊 WhatsApp status endpoint: /whatsapp/status
+2025-07-27 10:07:19,894 - main - INFO - [main.py:55] - 👋 Business Chat Assistant is shutting down...
+2025-07-27 10:07:23,478 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-27 10:07:33,594 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-27 10:07:33,839 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-27 10:07:33,911 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-27 10:07:58,452 - services.whatsapp_service - INFO - [whatsapp_service.py:467] - ⚠️ WhatsApp Service initialized without validation - call validate_configs() before use
+2025-07-27 10:07:58,459 - main - INFO - [main.py:29] - 🚀 Business Chat Assistant starting up...
+2025-07-27 10:07:58,459 - main - INFO - [main.py:30] - ✅ CORS middleware configured
+2025-07-27 10:07:58,460 - main - INFO - [main.py:34] - ✅ Chat routes registered
+2025-07-27 10:07:58,463 - main - INFO - [main.py:38] - ✅ WhatsApp routes registered
+2025-07-27 10:07:58,463 - main - INFO - [main.py:49] - 🎉 Business Chat Assistant with WhatsApp Integration is ready to serve requests!
+2025-07-27 10:07:58,464 - main - INFO - [main.py:50] - 📱 WhatsApp webhook endpoint: /whatsapp/webhook
+2025-07-27 10:07:58,464 - main - INFO - [main.py:51] - 📊 WhatsApp status endpoint: /whatsapp/status
+2025-07-27 10:11:43,324 - main - INFO - [main.py:55] - 👋 Business Chat Assistant is shutting down...
+2025-07-27 10:11:45,002 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-27 10:11:48,247 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-27 10:11:48,345 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-27 10:11:48,350 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-27 10:11:57,220 - services.whatsapp_service - INFO - [whatsapp_service.py:467] - ⚠️ WhatsApp Service initialized without validation - call validate_configs() before use
+2025-07-27 10:11:57,226 - main - INFO - [main.py:29] - 🚀 Business Chat Assistant starting up...
+2025-07-27 10:11:57,227 - main - INFO - [main.py:30] - ✅ CORS middleware configured
+2025-07-27 10:11:57,227 - main - INFO - [main.py:34] - ✅ Chat routes registered
+2025-07-27 10:11:57,230 - main - INFO - [main.py:38] - ✅ WhatsApp routes registered
+2025-07-27 10:11:57,232 - main - INFO - [main.py:49] - 🎉 Business Chat Assistant with WhatsApp Integration is ready to serve requests!
+2025-07-27 10:11:57,232 - main - INFO - [main.py:50] - 📱 WhatsApp webhook endpoint: /whatsapp/webhook
+2025-07-27 10:11:57,232 - main - INFO - [main.py:51] - 📊 WhatsApp status endpoint: /whatsapp/status
+2025-07-27 10:12:11,503 - main - INFO - [main.py:55] - 👋 Business Chat Assistant is shutting down...
+2025-07-27 10:12:13,384 - utils.logger - INFO - [logger.py:59] - Global logging configured - Level: INFO, Debug Mode: False
+2025-07-27 10:12:16,626 - faiss.loader - INFO - [loader.py:125] - Loading faiss with AVX2 support.
+2025-07-27 10:12:16,720 - faiss.loader - INFO - [loader.py:127] - Successfully loaded faiss with AVX2 support.
+2025-07-27 10:12:16,726 - faiss - INFO - [__init__.py:186] - Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+2025-07-27 10:12:26,210 - services.whatsapp_service - INFO - [whatsapp_service.py:467] - ⚠️ WhatsApp Service initialized without validation - call validate_configs() before use
+2025-07-27 10:12:26,217 - main - INFO - [main.py:29] - 🚀 Business Chat Assistant starting up...
+2025-07-27 10:12:26,217 - main - INFO - [main.py:30] - ✅ CORS middleware configured
+2025-07-27 10:12:26,219 - main - INFO - [main.py:34] - ✅ Chat routes registered
+2025-07-27 10:12:26,221 - main - INFO - [main.py:38] - ✅ WhatsApp routes registered
+2025-07-27 10:12:26,223 - main - INFO - [main.py:49] - 🎉 Business Chat Assistant with WhatsApp Integration is ready to serve requests!
+2025-07-27 10:12:26,223 - main - INFO - [main.py:50] - 📱 WhatsApp webhook endpoint: /whatsapp/webhook
+2025-07-27 10:12:26,224 - main - INFO - [main.py:51] - 📊 WhatsApp status endpoint: /whatsapp/status
