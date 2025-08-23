@@ -76,7 +76,7 @@ def process_whatsapp_message(phone_number: str, message_content: str, message_id
         logger.error(f"❌ Error processing WhatsApp message: {str(e)}")
         # Send error message to user
         error_message = "I'm experiencing technical difficulties. Please try again in a moment."
-        whatsapp_service.send_text_message(phone_number, error_message)
+        whatsapp_service.send_text_message(phone_number, error_message, whatsapp_number_id)
 
 async def process_whatsapp_message_async(phone_number: str, message_content: str, message_id: str, whatsapp_number_id: str = "default_seller"):
     """Submit message processing to thread pool"""
