@@ -476,16 +476,18 @@ class OptimizedChatbot:
             self.chat_history.append({"role": "user", "content": message})
             
             # Detect language from user message using language agent
-            # language_result = detect_language(message)
-            # logger.info(f"[Language] Detected language: {language_result} ")
+            # language_agent = get_language_agent()
+            # language_result = detect_language_detailed(message)
+            detected_language = detect_language(message)
+            logger.info(f"[Language] Detected language: {detected_language}")
             
             # Fast intent detection (skip LLM call)
             intent = fast_intent_detection(message)
-            logger.info(f"Detected intent: {intent} for message: '{message}' in {time.time() - start_time:.2f}s")
+            logger.info(f"[Optimized] Detected intent: {intent} for message: '{message}' in {time.time() - start_time:.2f}s")
             
             # # Get minimal RAG examples
             examples = get_cached_rag_examples(message, self.seller_id, k=3)
-            logger.info(f"Retrieved RAG examples: {examples}... for intent: {intent}")
+            logger.info(f"[Optimized] Retrieved RAG examples: {examples}... for intent: {intent}")
             
             # Format chat history for agent
             formatted_history = []

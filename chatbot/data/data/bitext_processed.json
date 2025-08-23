@@ -1,0 +1,194 @@
+[
+  {
+    "page_content": "How can I cancel my order?",
+    "metadata": {
+      "response": "I can help you cancel your order. Please provide your order number and I'll process the cancellation for you.",
+      "category": "ORDER",
+      "intent": "cancel_order",
+      "flags": "B",
+      "source": "bitext_customer_service",
+      "doc_id": "bitext_0",
+      "use_case": "customer_service"
+    }
+  },
+  {
+    "page_content": "I can help you cancel your order. Please provide your order number and I'll process the cancellation for you.",
+    "metadata": {
+      "original_instruction": "How can I cancel my order?",
+      "category": "ORDER",
+      "intent": "cancel_order",
+      "flags": "B",
+      "source": "bitext_customer_service_response",
+      "doc_id": "bitext_response_0",
+      "use_case": "response_pattern"
+    }
+  },
+  {
+    "page_content": "I want to change my shipping address",
+    "metadata": {
+      "response": "I can help you update your shipping address. Please provide your order number and the new address details.",
+      "category": "SHIPPING_ADDRESS",
+      "intent": "change_shipping_address",
+      "flags": "B",
+      "source": "bitext_customer_service",
+      "doc_id": "bitext_1",
+      "use_case": "customer_service"
+    }
+  },
+  {
+    "page_content": "I can help you update your shipping address. Please provide your order number and the new address details.",
+    "metadata": {
+      "original_instruction": "I want to change my shipping address",
+      "category": "SHIPPING_ADDRESS",
+      "intent": "change_shipping_address",
+      "flags": "B",
+      "source": "bitext_customer_service_response",
+      "doc_id": "bitext_response_1",
+      "use_case": "response_pattern"
+    }
+  },
+  {
+    "page_content": "What payment methods do you accept?",
+    "metadata": {
+      "response": "We accept major credit cards (Visa, MasterCard, American Express), PayPal, and bank transfers.",
+      "category": "PAYMENT",
+      "intent": "check_payment_methods",
+      "flags": "B",
+      "source": "bitext_customer_service",
+      "doc_id": "bitext_2",
+      "use_case": "customer_service"
+    }
+  },
+  {
+    "page_content": "We accept major credit cards (Visa, MasterCard, American Express), PayPal, and bank transfers.",
+    "metadata": {
+      "original_instruction": "What payment methods do you accept?",
+      "category": "PAYMENT",
+      "intent": "check_payment_methods",
+      "flags": "B",
+      "source": "bitext_customer_service_response",
+      "doc_id": "bitext_response_2",
+      "use_case": "response_pattern"
+    }
+  },
+  {
+    "page_content": "How do I create an account?",
+    "metadata": {
+      "response": "To create an account, click on 'Sign Up' and fill in your email, password, and basic information.",
+      "category": "ACCOUNT",
+      "intent": "create_account",
+      "flags": "B",
+      "source": "bitext_customer_service",
+      "doc_id": "bitext_3",
+      "use_case": "customer_service"
+    }
+  },
+  {
+    "page_content": "To create an account, click on 'Sign Up' and fill in your email, password, and basic information.",
+    "metadata": {
+      "original_instruction": "How do I create an account?",
+      "category": "ACCOUNT",
+      "intent": "create_account",
+      "flags": "B",
+      "source": "bitext_customer_service_response",
+      "doc_id": "bitext_response_3",
+      "use_case": "response_pattern"
+    }
+  },
+  {
+    "page_content": "I need to track my refund",
+    "metadata": {
+      "response": "I can help you track your refund status. Please provide your order number or refund reference.",
+      "category": "REFUND",
+      "intent": "track_refund",
+      "flags": "B",
+      "source": "bitext_customer_service",
+      "doc_id": "bitext_4",
+      "use_case": "customer_service"
+    }
+  },
+  {
+    "page_content": "I can help you track your refund status. Please provide your order number or refund reference.",
+    "metadata": {
+      "original_instruction": "I need to track my refund",
+      "category": "REFUND",
+      "intent": "track_refund",
+      "flags": "B",
+      "source": "bitext_customer_service_response",
+      "doc_id": "bitext_response_4",
+      "use_case": "response_pattern"
+    }
+  },
+  {
+    "page_content": "can u help me with my order?",
+    "metadata": {
+      "response": "Of course! I'd be happy to help you with your order. What specific assistance do you need?",
+      "category": "ORDER",
+      "intent": "general_order_inquiry",
+      "flags": "Q",
+      "source": "bitext_customer_service",
+      "doc_id": "bitext_5",
+      "use_case": "customer_service"
+    }
+  },
+  {
+    "page_content": "Of course! I'd be happy to help you with your order. What specific assistance do you need?",
+    "metadata": {
+      "original_instruction": "can u help me with my order?",
+      "category": "ORDER",
+      "intent": "general_order_inquiry",
+      "flags": "Q",
+      "source": "bitext_customer_service_response",
+      "doc_id": "bitext_response_5",
+      "use_case": "response_pattern"
+    }
+  },
+  {
+    "page_content": "I forgot my password",
+    "metadata": {
+      "response": "I can help you reset your password. Please click on 'Forgot Password' on the login page.",
+      "category": "ACCOUNT",
+      "intent": "recover_password",
+      "flags": "B",
+      "source": "bitext_customer_service",
+      "doc_id": "bitext_6",
+      "use_case": "customer_service"
+    }
+  },
+  {
+    "page_content": "I can help you reset your password. Please click on 'Forgot Password' on the login page.",
+    "metadata": {
+      "original_instruction": "I forgot my password",
+      "category": "ACCOUNT",
+      "intent": "recover_password",
+      "flags": "B",
+      "source": "bitext_customer_service_response",
+      "doc_id": "bitext_response_6",
+      "use_case": "response_pattern"
+    }
+  },
+  {
+    "page_content": "Where is my delivery?",
+    "metadata": {
+      "response": "Let me help you track your delivery. Please provide your order number so I can check the status.",
+      "category": "DELIVERY",
+      "intent": "track_delivery",
+      "flags": "B",
+      "source": "bitext_customer_service",
+      "doc_id": "bitext_7",
+      "use_case": "customer_service"
+    }
+  },
+  {
+    "page_content": "Let me help you track your delivery. Please provide your order number so I can check the status.",
+    "metadata": {
+      "original_instruction": "Where is my delivery?",
+      "category": "DELIVERY",
+      "intent": "track_delivery",
+      "flags": "B",
+      "source": "bitext_customer_service_response",
+      "doc_id": "bitext_response_7",
+      "use_case": "response_pattern"
+    }
+  }
+]

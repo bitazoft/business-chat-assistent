@@ -46,7 +46,21 @@ VECTOR_STORE_CONFIG = {
     "lazy_loading": True,        # Load embeddings only when needed
     "batch_size": 100,          # Process in smaller batches
     "max_search_results": 5,    # Limit search results
-    "enable_caching": True      # Enable result caching
+    "enable_caching": True,     # Enable result caching
+    "model_cache_enabled": True, # Enable model caching
+    "model_cache_hours": 24,    # Cache models for 24 hours
+    "preload_on_startup": True  # Preload models during startup
+}
+
+# Model Caching Settings
+MODEL_CACHE_CONFIG = {
+    "enabled": True,
+    "cache_dir": "cache/models",
+    "max_age_hours": 24,        # Cache models for 24 hours
+    "preload_models": [         # Models to preload on startup
+        "all-MiniLM-L6-v2"
+    ],
+    "compression": True         # Compress cached models
 }
 
 # Logging Settings (for production)
