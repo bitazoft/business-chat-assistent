@@ -6,6 +6,9 @@ import { OrdersPage } from "@/components/orders-page"
 import { AnalyticsPage } from "@/components/analytics-page"
 import { SettingsPage } from "@/components/settings-page"
 import { TrackingDashboard } from "@/components/tracking-dashboard"
+import { useState } from "react"
+import { TopBar } from "./top-bar"
+import { Sidebar } from "./sidebar"
 
 
 interface DashboardProps {
