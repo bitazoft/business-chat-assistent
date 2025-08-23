@@ -25,6 +25,48 @@ thread_pool = ThreadPoolExecutor(max_workers=MAX_THREADS)
 # Lock for thread-safe session management
 sessions_lock = threading.Lock()
 
+def remove_urls_from_message(message: str) -> str:
+    """Clean and format message for WhatsApp - remove URLs, markdown, and improve readability"""
+    # Remove URLs (http, https)
+    cleaned_message = re.sub(r'https?://[^\s,\n]+', '', message)
+    
+    # Remove the entire Images section (multi-line format)
+    cleaned_message = re.sub(r'\*Images:\*.*?(?=\n\n|\Z)', '', cleaned_message, flags=re.DOTALL | re.IGNORECASE)
+    
+    # Remove any remaining standalone "Images:" text
+    cleaned_message = re.sub(r'\bImages:\s*', '', cleaned_message, flags=re.IGNORECASE)
+    
+    # Remove markdown bold formatting (*text*)
+    cleaned_message = re.sub(r'\*([^*]+)\*', r'\1', cleaned_message)
+    
+    # Convert single-line dash format to readable format
+    # Replace " - " with line breaks for better readability
+    if ' - ' in cleaned_message and '\n' not in cleaned_message:
+        # Split by dashes and format nicely
+        parts = cleaned_message.split(' - ')
+        if len(parts) > 1:
+            # First part is usually the product name
+            product_name = parts[0].strip()
+            formatted_parts = [product_name]
+            
+            for part in parts[1:]:
+                part = part.strip()
+                if part:
+                    # Add line break before each detail
+                    formatted_parts.append(part)
+            
+            cleaned_message = '\n'.join(formatted_parts)
+    
+    # Remove empty bullet points and lines with just dashes or bullets
+    cleaned_message = re.sub(r'^\s*[-*•]\s*$', '', cleaned_message, flags=re.MULTILINE)
+    
+    # Clean up extra whitespace
+    cleaned_message = re.sub(r'\n\s*\n\s*\n', '\n\n', cleaned_message)  # Multiple empty lines -> double
+    cleaned_message = re.sub(r'[ \t]+', ' ', cleaned_message)  # Multiple spaces/tabs -> single space
+    cleaned_message = cleaned_message.strip()
+    
+    return cleaned_message
+
 def get_or_create_chatbot(phone_number: str, seller_id: str = "default_seller"):
     """Get existing chatbot session or create new one"""
     session_key = f"{seller_id}_{phone_number}"
@@ -55,12 +97,17 @@ def process_whatsapp_message(phone_number: str, message_content: str, message_id
         
         # Process the message through the chatbot
         response = chatbot.process_message(message_content)
-       
+        logger.info(response)
         # send images
-        urls = re.findall(r'https?://[^\s,]+', response)
-        print(urls[1])
-        no_images = response.split("Images:")[0].rstrip(", ")
-        
+        if 'Images' in response:
+            urls = re.findall(r'https?://[^\s,]+', response)
+            if urls:
+                print(urls)
+                # Remove URLs from response for text message
+                response = remove_urls_from_message(response)
+                # Send each image
+                for url in urls:
+                    whatsapp_service.send_image_message(phone_number, url, "", whatsapp_number_id)
 
         # Send response back to WhatsApp
         result = whatsapp_service.send_text_message(phone_number, response, whatsapp_number_id)

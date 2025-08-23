@@ -45,7 +45,7 @@ from repositories.tools import (
 )
 from vector_store.vector_store import fast_vector_store as vector_store
 from agent.customer_service_rag import customer_service_rag
-from agent.language_agent import get_language_agent, detect_language_detailed
+from agent.language_agent import get_language_agent, detect_language_detailed,detect_language
 import os
 import re
 
@@ -108,7 +108,7 @@ def get_unified_system_prompt(seller_id: str) -> str:
             Available tools: {', '.join(['get_product_info', 'track_order', 'place_order', 'get_user_info', 'save_user', 'check_user_exists', 'update_user_info', 'add_item_to_order', 'remove_item_from_order', 'update_item_quantity_in_order', 'replace_order_items', 'get_all_orders_for_customer', 'get_pending_orders'])}
 
             CORE INSTRUCTIONS (Be direct and efficient):
-            1. Product information: use get_product_info immediately
+            1. Product information: use get_product_info with image urls
             2. Order tracking: use track_order immediately with order ID
             3. Place orders: ALWAYS check_user_exists first, then proceed
             4. User management: use appropriate user tools
@@ -476,18 +476,16 @@ class OptimizedChatbot:
             self.chat_history.append({"role": "user", "content": message})
             
             # Detect language from user message using language agent
-            language_agent = get_language_agent()
-            language_result = detect_language_detailed(message)
-            detected_language = language_result.language
-            logger.info(f"[Language] Detected language: {detected_language} (confidence: {language_result.confidence:.2f}) for message: '{message}'")
+            # language_result = detect_language(message)
+            # logger.info(f"[Language] Detected language: {language_result} ")
             
             # Fast intent detection (skip LLM call)
             intent = fast_intent_detection(message)
-            logger.info(f"[Optimized] Detected intent: {intent} for message: '{message}' in {time.time() - start_time:.2f}s")
+            logger.info(f"Detected intent: {intent} for message: '{message}' in {time.time() - start_time:.2f}s")
             
             # # Get minimal RAG examples
-            examples = get_cached_rag_examples(message, self.seller_id, k=1)
-            logger.info(f"[Optimized] Retrieved RAG examples: {examples}... for intent: {intent}")
+            examples = get_cached_rag_examples(message, self.seller_id, k=3)
+            logger.info(f"Retrieved RAG examples: {examples}... for intent: {intent}")
             
             # Format chat history for agent
             formatted_history = []
