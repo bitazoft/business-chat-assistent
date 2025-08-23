@@ -16,8 +16,9 @@ const menuItems = [
   { id: "products", label: "Products", icon: Package },
   { id: "orders", label: "Orders", icon: ShoppingCart },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
+  { id: "tracking", label: "Tracking", icon: MessageCircle },
   { id: "settings", label: "Settings", icon: Settings },
-]
+  ]
 
 export function Sidebar({ activeSection, onSectionChange, collapsed, onToggleCollapse }: SidebarProps) {
   return (

@@ -1,6 +1,15 @@
 "use client"
 
 import { DashboardOverview } from "@/components/dashboard-overview"
+import { ProductManagement } from "@/components/product-management"
+import { OrdersPage } from "@/components/orders-page"
+import { AnalyticsPage } from "@/components/analytics-page"
+import { SettingsPage } from "@/components/settings-page"
+import { TrackingDashboard } from "@/components/tracking-dashboard"
+import { useState } from "react"
+import { TopBar } from "./top-bar"
+import { Sidebar } from "./sidebar"
+
 
 interface DashboardProps {
   user: { id: number; name: string; email: string; role: string}
@@ -8,5 +17,42 @@ interface DashboardProps {
 }
 
 export function Dashboard({ user, onLogout }: DashboardProps) {
-  return <DashboardOverview />
+  const [activeSection, setActiveSection] = useState("dashboard")
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+
+  const renderContent = () => {
+    switch (activeSection) {
+      case "dashboard":
+        return <DashboardOverview />
+      case "products":
+        return <ProductManagement />
+      case "orders":
+        return <OrdersPage />
+      case "analytics":
+        return <AnalyticsPage />
+      case "settings":
+        return <SettingsPage />
+      case "tracking":
+        return <TrackingDashboard/> 
+      default:
+        return <DashboardOverview />
+    }
+  }
+
+  return (
+    <div className="flex h-screen bg-[#0f0f23]">
+      <Sidebar
+        activeSection={activeSection}
+        onSectionChange={setActiveSection}
+        collapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+      />
+      <div className="flex-1 flex flex-col transition-all duration-300">
+        <TopBar user={user} onLogout={onLogout} />
+        <main className="flex-1 overflow-auto p-6">
+          <div className="transition-all duration-500 ease-in-out transform">{renderContent()}</div>
+        </main>
+      </div>
+    </div>
+  )
 }
