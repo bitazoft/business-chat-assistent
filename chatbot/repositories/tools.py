@@ -1,5 +1,5 @@
 from db.database import SessionLocal
-from models.schemas import Product, Order, ChatLog, OrderItem, Customers, SellerProfile
+from models.schemas import Product, Order, ChatLog, OrderItem, Customers, SellerProfile, ProductImage
 from vector_store.vector_store import vector_store
 import os
 import numpy as np
@@ -15,7 +15,8 @@ def get_product_info(product_name: str, seller_id: str) -> str:
     try:
         product = db.query(Product).filter(Product.name.ilike(f"%{product_name}%"), Product.seller_id == int(seller_id)).first()
         if product:
-            return f"Product: {product.name}, Description: {product.description}, Price: ${product.price}, Stock: {product.stock}"
+            imgs = get_product_images(product.id)
+            return f"Product: {product.name}, Description: {product.description}, Price: ${product.price}, Stock: {product.stock}, Images: {', '.join(imgs)}"
         return "Product not found"
     finally:
         db.close()
@@ -638,5 +639,15 @@ def get_seller_id_by_whatsapp_number_id(whatsapp_number_id: str) -> str:
         if seller:
             return str(seller.id)
         return "default_seller"  # Fallback if no specific seller found
+    finally:
+        db.close()
+
+def get_product_images(product_id: int) -> str:
+    """Get image URL for a product by its ID"""
+    db = SessionLocal()
+    try:
+        images = db.query(ProductImage).filter(ProductImage.product_id == product_id).all()
+        urls = [img.image for img in images if img.image]
+        return urls if urls else ["https://www.shutterstock.com/image-photo/person-using-smartphone-interact-friendly-600nw-2482428287.jpg"]
     finally:
         db.close()

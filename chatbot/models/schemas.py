@@ -64,4 +64,9 @@ class SellerProfile(Base):
     shop_name = Column(String, nullable=True)
     gst_number = Column(String, nullable=True)
     whatsapp_number_id = Column(String, nullable=True)
- 
+
+class ProductImage(Base):
+    __tablename__ = "item_img"
+    id = Column(Integer, primary_key=True)
+    product_id = Column(Integer, ForeignKey("products.id"), nullable=False)
+    image = Column(String, nullable=False)

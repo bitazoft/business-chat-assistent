@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
-from services.chat import router as chat_router 
+from routes.chat import router as chat_router 
 from routes.whatsapp_routes import router as whatsapp_router
 
 # Load environment variables

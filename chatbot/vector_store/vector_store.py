@@ -142,7 +142,7 @@ class FastVectorStore:
                 logger.info(f"[FastVectorStore] Found match at index {idx} with distance {dist:.4f}")
                 if idx < len(self._documents) and dist <= threshold:  # Apply threshold filter
                     metadata = self._metadata[idx] if idx < len(self._metadata) else {}
-                    matches.append(type('Document', (), {
+                    matches.apped(type('Document', (), {
                         'page_content': str(self._documents[idx]),
                         'metadata': metadata,
                         'similarity_score': dist

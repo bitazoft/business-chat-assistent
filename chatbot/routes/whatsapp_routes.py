@@ -10,6 +10,7 @@ from repositories.tools import get_seller_id_by_whatsapp_number_id
 from agent.agent import create_optimized_chatbot
 import asyncio
 from datetime import datetime
+import re
 
 logger = get_logger(__name__)
 
@@ -54,7 +55,13 @@ def process_whatsapp_message(phone_number: str, message_content: str, message_id
         
         # Process the message through the chatbot
         response = chatbot.process_message(message_content)
+       
+        # send images
+        urls = re.findall(r'https?://[^\s,]+', response)
+        print(urls[1])
+        no_images = response.split("Images:")[0].rstrip(", ")
         
+
         # Send response back to WhatsApp
         result = whatsapp_service.send_text_message(phone_number, response, whatsapp_number_id)
         

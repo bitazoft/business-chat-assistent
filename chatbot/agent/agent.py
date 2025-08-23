@@ -486,8 +486,8 @@ class OptimizedChatbot:
             logger.info(f"[Optimized] Detected intent: {intent} for message: '{message}' in {time.time() - start_time:.2f}s")
             
             # # Get minimal RAG examples
-            # examples = get_cached_rag_examples(message, self.seller_id, k=1)
-            # logger.info(f"[Optimized] Retrieved RAG examples: {examples}... for intent: {intent}")
+            examples = get_cached_rag_examples(message, self.seller_id, k=1)
+            logger.info(f"[Optimized] Retrieved RAG examples: {examples}... for intent: {intent}")
             
             # Format chat history for agent
             formatted_history = []
