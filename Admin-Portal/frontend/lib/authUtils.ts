@@ -4,7 +4,7 @@ export const saveAuth = (token: string, user: any) => {
 };
 
 export const getAuth = () => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("access_token");
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   return { token, user };
 };

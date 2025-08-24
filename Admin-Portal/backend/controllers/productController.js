@@ -3,6 +3,7 @@ import productService from "../services/productService.js";
 const addProduct = async (req, res) => {
     try {
         const { name, price, stock, description, seller_id } = req.body;
+        console.log(req.body);
         const product = await productService.createProduct({
             name,
             price: parseFloat(price),
@@ -10,7 +11,6 @@ const addProduct = async (req, res) => {
             description,
             seller_id
           });
-
           res.status(201).json({
             message: `${product.name} successfully created !!`,
             product: product

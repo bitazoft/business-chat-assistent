@@ -11,7 +11,7 @@ import router from "next/router"
 
 interface AuthPageProps {
   mode: "login" | "register"
-  onLogin: (userData: { id: number; name: string; email: string; role: string}) => void
+  onLogin: (userData: { id: number; name: string; email: string; role: string; sellerId: number | null}) => void
   onBack: () => void
   onSwitchMode: (mode: "login" | "register") => void
 }

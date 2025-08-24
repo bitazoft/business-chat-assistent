@@ -51,7 +51,7 @@ export function ProductManagement() {
   }, [searchTerm]);
 
   const fetchProducts = async () => {
-    fetch(`http://localhost:7001/api/products/getAll/${user?.id}`, {
+    fetch(`http://localhost:7001/api/products/getAll/${user?.sellerId}`, {
       method: "GET",
       credentials: "include",
       headers: {
@@ -147,7 +147,7 @@ export function ProductManagement() {
           price: productData.price,
           description: productData.description,
           stock: productData.stock,
-          seller_id: user?.id,
+          seller_id: user?.sellerId,
         }),
       });
 
@@ -184,7 +184,7 @@ export function ProductManagement() {
             price: productData.price,
             description: productData.description,
             stock: productData.stock,
-            seller_id: user?.id,
+            seller_id: user?.sellerId,
           }),
         }
       );

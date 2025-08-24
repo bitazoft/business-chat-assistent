@@ -40,6 +40,7 @@ const register = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        sellerId: user.seller_profiles.id || null,
       },
     });
   } catch (error) {
@@ -52,7 +53,7 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await userService.getUserByEmail(email);
-
+    // console.log("User found:", user);
     if (!user) {
       return res
         .status(404)
@@ -77,7 +78,7 @@ const login = async (req, res) => {
       sameSite: "strict",
       maxAge:  1 * 3600000, // 24 hour in milliseconds
     });
-
+    console.log("User logged in:", user.email,user.seller_profiles.id);
     res.status(200).json({
       message: "Login successful",
       user: {
@@ -85,6 +86,7 @@ const login = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        sellerId: user.seller_profiles.id || null,
       },
     });
   } catch (err) {

@@ -24,7 +24,7 @@ async function createUser(data) {
         address,
   
         ...(role === "seller" && {
-          seller_profile: {
+          seller_profiles: {
             create: {
               shop_name,
               whatsapp_number_id,
@@ -33,7 +33,7 @@ async function createUser(data) {
         }),
       },
       include: {
-        seller_profile: true,
+        seller_profiles: true,
       },
     });
   } catch (error) {
@@ -46,6 +46,9 @@ async function getUserByEmail(email) {
   try {
     return await prisma.users.findUnique({
       where: { email },
+      include: {
+        seller_profiles: true,
+      },
     });
   } catch (error) {
     throw new Error(`Error fetching user by email: ${error.message}`);

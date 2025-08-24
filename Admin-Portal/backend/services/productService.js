@@ -16,6 +16,7 @@ async function createProduct(data) {
       },
     });
   } catch (error) {
+    console.error("Error creating product:", error);
     throw new ProductServiceError("Error creating product", error.message);
   }
 }

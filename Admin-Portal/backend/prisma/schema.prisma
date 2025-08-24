@@ -8,38 +8,43 @@ datasource db {
 }
 
 model users {
-  id             Int             @id @default(autoincrement())
-  name           String
-  email          String          @unique
-  phone          String
-  password       String
-  role           UserRole        @default(customer)
-  address        String?
-  created_at     DateTime        @default(now())
-  seller_profile seller_profile?
+  id              Int              @id @default(autoincrement())
+  name            String
+  email           String           @unique
+  phone           String
+  password        String
+  role            UserRole         @default(customer)
+  address         String?
+  created_at      DateTime         @default(now())
+  seller_profiles seller_profiles?
 }
 
 model chat_logs {
-  id         Int      @id @default(autoincrement())
-  user_query String   @db.VarChar
-  intent     String?  @db.VarChar
-  entities   String?  @db.VarChar
-  response   String   @db.VarChar
-  timestamp  DateTime @default(now()) @db.Timestamp(6)
-  customerId String?  @db.VarChar
-  sellerId   Int
+  id          Int      @id @default(autoincrement())
+  user_query  String   @db.VarChar
+  intent      String?  @db.VarChar
+  entities    String?  @db.VarChar
+  response    String   @db.VarChar
+  timestamp   DateTime @default(now()) @db.Timestamp(6)
+  customer_id String?  @db.VarChar
+  seller_id   Int
 }
 
 model orders {
-  id             Int            @id @default(autoincrement())
-  status         String         @db.VarChar
+  id             Int             @id @default(autoincrement())
+  status         String          @db.VarChar
   total_amount   Float
-  created_at     DateTime?      @default(now()) @db.Timestamp(6)
-  customerId     String?        @db.VarChar
+  created_at     DateTime?       @default(now()) @db.Timestamp(6)
+  customer_id    String?         @db.VarChar
   seller_id      Int
+  payment_method String?         @db.VarChar
+  payment_status String?         @db.VarChar
+  payment_proof  String?         @db.VarChar
+  shipping_cost  String?         @db.VarChar
+  notes          String?         @db.VarChar
   order_items    order_items[]
-  customers      customers?     @relation(fields: [customerId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orders_customers_fk")
-  seller_profile seller_profile @relation(fields: [seller_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orders_seller_profile_fk")
+  customers      customers?      @relation(fields: [customer_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orders_customers_fk")
+  seller_profile seller_profiles @relation(fields: [seller_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orders_seller_profile_fk")
 }
 
 model order_items {
@@ -53,14 +58,15 @@ model order_items {
 }
 
 model products {
-  id             Int            @id @default(autoincrement())
-  name           String         @db.VarChar
-  description    String?        @db.VarChar
+  id             Int             @id @default(autoincrement())
+  name           String          @db.VarChar
+  description    String?         @db.VarChar
   price          Float
   stock          Int
   seller_id      Int
+  item_img       item_img[]      @ignore
   order_items    order_items[]
-  seller_profile seller_profile @relation(fields: [seller_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "products_seller_profile_fk")
+  seller_profile seller_profiles @relation(fields: [seller_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "products_seller_profile_fk")
 }
 
 model customers {
@@ -74,10 +80,20 @@ model customers {
   orders     orders[]
 }
 
-model seller_profile {
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model item_img {
+  product_id Int      @default(autoincrement())
+  image      String   @db.VarChar
+  products   products @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "item_img_products_fk")
+
+  @@ignore
+}
+
+model seller_profiles {
   id                 Int        @id(map: "SellerProfile_pkey") @default(autoincrement())
   user_id            Int        @unique(map: "SellerProfile_userId_key")
   shop_name          String
+  gst_number         String?
   whatsapp_number_id String?    @db.VarChar
   orders             orders[]
   products           products[]

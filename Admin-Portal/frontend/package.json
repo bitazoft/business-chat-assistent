@@ -61,6 +61,8 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@next/swc-wasm-nodejs": "^15.5.0",
+    "@next/swc-win32-x64-msvc": "^15.5.0",
     "@types/node": "^22",
     "@types/react": "^18",
     "@types/react-dom": "^18",

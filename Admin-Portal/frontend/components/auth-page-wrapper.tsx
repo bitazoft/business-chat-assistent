@@ -17,7 +17,7 @@ export function AuthPageWrapper() {
     }
   }, [searchParams])
 
-  const handleLogin = (userData: { id: number; name: string; email: string; role: string}) => {
+  const handleLogin = (userData: { id: number; name: string; email: string; role: string; sellerId: number | null}) => {
     try {
       // Set session using the helper function
       setUserSession(userData)
