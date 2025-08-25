@@ -12,40 +12,24 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { getCurrentUser } from "@/lib/auth"
 import { getAuth } from "@/lib/authUtils"
 import { toast } from "sonner"
+import { 
+  fetchOrders, 
+  fetchProducts, 
+  updateOrderStatus, 
+  updatePaymentStatus, 
+  updateOrder,
+  addProductToOrder as addProductToOrderService,
+  removeOrderItem as removeOrderItemService,
+  copyToClipboard,
+  type Order as ServiceOrder,
+  type OrderItem as ServiceOrderItem,
+  type Product as ServiceProduct
+} from "@/services/orderService"
 
-interface OrderItem {
-  id: string
-  name: string
-  productId: string
-  quantity: number
-  price: number
-  total: number
-}
-
-interface Product {
-  id: string
-  name: string
-  price: number
-  stock: number
-  description?: string
-}
-
-interface Order {
-  id: string
-  customer: string
-  phone: string
-  address: string
-  email: string
-  netValue: number
-  date: string
-  status: string,
-  shippingCost: number,
-  orderItems: OrderItem[]
-  notes?: string
-  paymentStatus?: string
-  paymentMethod?: string
-  paymentProofUrl?: string
-}
+// Use types from the service
+type OrderItem = ServiceOrderItem
+type Product = ServiceProduct  
+type Order = ServiceOrder
 
 export function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([])
@@ -61,11 +45,11 @@ export function OrdersPage() {
   const user = getCurrentUser()
 
   useEffect(() => {
-    fetchOrders()
-    fetchProducts()
+    loadOrders()
+    loadProducts()
   }, [])
 
-  const fetchOrders = async () => {
+  const loadOrders = async () => {
     if (!user?.sellerId) {
       toast.error("User not authenticated")
       setLoading(false)
@@ -73,113 +57,32 @@ export function OrdersPage() {
     }
 
     try {
-  
-
-      const response = await fetch(`http://localhost:7001/api/orders/${user.sellerId}`, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json"
-      
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const data = await response.json()
-      console.log('Raw backend data:', data) // Debug log
-      
-      // Transform backend data to match frontend interface
-      const transformedOrders = (data.orders || []).map((order: any) => {
-        console.log('Processing order:', order) // Debug log
-        
-        // Transform order items to match frontend interface
-        const transformedOrderItems = (order.order_items || []).map((item: any) => ({
-          id: item.id?.toString() || '',
-          name: item.products?.name || item.product_name || item.name || 'Unknown Product',
-          productId: item.product_id?.toString() || '',
-          quantity: item.quantity || 0,
-          price: item.price || 0,
-          total: item.total || (item.quantity * item.price) || 0
-        }))
-        
-        return {
-          id: order.id?.toString() || '',
-          customer: order.customers.name || 'Unknown Customer',
-          phone: order.customers.number1 || '',
-          address: order.customers.address || '',
-          netValue: order.total_amount || 0,
-          shippingCost: order.shipping_cost || 0,
-          email: order.customers.email || '',
-          date: order.created_at ? new Date(order.created_at).toISOString().split('T')[0] : '',
-          status: order.status === 'pending' ? 'Pending' : 
-                 order.status === 'completed' ? 'Completed' :
-                 order.status === 'processing' ? 'Processing' :
-                 order.status === 'shipped' ? 'Shipped' :
-                 order.status === 'cancelled' ? 'Cancelled' :
-                 'Pending', // default to Pending
-          orderItems: transformedOrderItems,
-          notes: order.notes || '',
-          paymentStatus: order.payment_status || 'Pending',
-          paymentMethod: order.payment_method || 'Unknown',
-          paymentProofUrl: order.payment_proof || ''
-        }
-      })
-      
-      console.log('Transformed orders:', transformedOrders) // Debug log
-      setOrders(transformedOrders)
+      const ordersData = await fetchOrders(user.sellerId.toString())
+      setOrders(ordersData)
     } catch (error) {
-      console.error("Error fetching orders:", error)
-      toast.error("Failed to fetch orders")
+      // Error handling is already done in the service
     } finally {
       setLoading(false)
     }
   }
 
-  const fetchProducts = async () => {
-    if (!user || !user.sellerId) {
+  const loadProducts = async () => {
+    if (!user?.sellerId) {
       console.error("No user or sellerId found")
       return
     }
 
     try {
-      const response = await fetch(`http://localhost:7001/api/products/getAll/${user.sellerId}`, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json"
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const data = await response.json()
-      console.log('Raw products data:', data)
-      
-      // Transform backend data to match frontend interface
-      const transformedProducts = (data.products || []).map((product: any) => ({
-        id: product.id?.toString() || '',
-        name: product.name || 'Unknown Product',
-        price: parseFloat(product.price) || 0,
-        stock: product.stock || 0,
-        description: product.description || ''
-      }))
-      
-      console.log('Transformed products:', transformedProducts)
-      setProducts(transformedProducts)
+      const productsData = await fetchProducts(user.sellerId.toString())
+      setProducts(productsData)
     } catch (error) {
-      console.error("Error fetching products:", error)
-      toast.error("Failed to fetch products")
+      // Error handling is already done in the service
     }
   }
 
   const refreshOrders = () => {
     setLoading(true)
-    fetchOrders()
+    loadOrders()
   }
 
   const filteredOrders = orders.filter((order) => {
@@ -251,73 +154,35 @@ export function OrdersPage() {
     setShowEditModal(true)
   }
 
-  const updateOrderStatus = async (orderId: string, newStatus: string) => {
+  const handleUpdateOrderStatus = async (orderId: string, newStatus: string) => {
     try {
-      const response = await fetch(`http://localhost:7001/api/orders/${orderId}`, {
-        method: "PUT",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ status: newStatus.toLowerCase() }),
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
+      await updateOrderStatus(orderId, newStatus)
+      
       // Refresh orders to get the updated data
-      await fetchOrders()
+      await loadOrders()
 
       // Update selected order if it's the same one being updated
       if (selectedOrder && selectedOrder.id === orderId) {
         setSelectedOrder({...selectedOrder, status: newStatus})
       }
-
-      toast.success(`Order status updated to ${newStatus}`)
     } catch (error) {
-      console.error("Error updating order status:", error)
-      toast.error("Failed to update order status")
+      // Error handling is already done in the service
     }
   }
 
-  const updatePaymentStatus = async (orderId: string, newPaymentStatus: string) => {
+  const handleUpdatePaymentStatus = async (orderId: string, newPaymentStatus: string) => {
     try {
-      const response = await fetch(`http://localhost:7001/api/orders/${orderId}`, {
-        method: "PUT",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ payment_status: newPaymentStatus.toLowerCase() }),
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
+      await updatePaymentStatus(orderId, newPaymentStatus)
+      
       // Refresh orders to get the updated data
-      await fetchOrders()
+      await loadOrders()
 
       // Update selected order if it's the same one being updated
       if (selectedOrder && selectedOrder.id === orderId) {
         setSelectedOrder({...selectedOrder, paymentStatus: newPaymentStatus})
       }
-
-      toast.success(`Payment status updated to ${newPaymentStatus}`)
     } catch (error) {
-      console.error("Error updating payment status:", error)
-      toast.error("Failed to update payment status")
-    }
-  }
-
-  const copyToClipboard = async (text: string, type: string) => {
-    try {
-      await navigator.clipboard.writeText(text)
-      toast.success(`${type} copied to clipboard`)
-    } catch (error) {
-      console.error("Failed to copy to clipboard:", error)
-      toast.error("Failed to copy to clipboard")
+      // Error handling is already done in the service
     }
   }
 
@@ -325,54 +190,10 @@ export function OrdersPage() {
     if (!editingOrder) return
 
     try {
-      // Get JWT token from localStorage
-      const { token } = getAuth()
+      await updateOrder(editingOrder)
       
-    
-
-      // Calculate new net value based on order items
-      console.log("Editing Order:", editingOrder)
-      const subtotal = editingOrder.orderItems.reduce((sum, item) => sum + item.price, 0)
-      // const tax = subtotal * 0.08
-      const shipping = 15
-      const newNetValue = subtotal + shipping
-
-      const updatedOrder = {
-        customer_name: editingOrder.customer,
-        number1: editingOrder.phone,
-        address: editingOrder.address,
-        status: editingOrder.status.toLowerCase(),
-        shipping_cost: editingOrder.shippingCost,
-        email: editingOrder.email ,
-        total_amount: calculateSubtotal(editingOrder.orderItems),
-        notes: editingOrder.notes || '',
-        payment_status: editingOrder.paymentStatus || 'Pending',
-        payment_method: editingOrder.paymentMethod || 'Unknown',
-        payment_proof: editingOrder.paymentProofUrl || '',
-        order_items: editingOrder.orderItems.map(item => ({
-          id: item.id,
-          quantity: item.quantity,
-          product_id: item.productId,
-          price: item.price,
-          total: item.total
-        }))
-      }
-
-      const response = await fetch(`http://localhost:7001/api/orders/${editingOrder.id}`, {
-        method: "PUT",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(updatedOrder),
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
       // Refresh orders to get the updated data
-      await fetchOrders()
+      await loadOrders()
 
       // Update selected order if it's the same one being edited
       if (selectedOrder && selectedOrder.id === editingOrder.id) {
@@ -381,10 +202,8 @@ export function OrdersPage() {
 
       setShowEditModal(false)
       setEditingOrder(null)
-      toast.success("Order updated successfully")
     } catch (error) {
-      console.error("Error updating order:", error)
-      toast.error("Failed to update order")
+      // Error handling is already done in the service
     }
   }
 
@@ -431,25 +250,12 @@ export function OrdersPage() {
     if (!editingOrder) return
 
     try {
-      const response = await fetch(`http://localhost:7001/api/orders/${editingOrder.id}/items`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          productId: product.id,
-          quantity: quantity,
-          price: product.price
-        }),
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
-      }
-
-      const data = await response.json()
+      const data = await addProductToOrderService(
+        editingOrder.id, 
+        product.id, 
+        quantity, 
+        product.price
+      )
       
       // Transform the updated order data
       const transformedOrder = {
@@ -472,12 +278,11 @@ export function OrdersPage() {
       }
 
       setShowProductModal(false)
-      toast.success(`${product.name} added to order`)
       
       // Refresh orders to get updated data
-      await fetchOrders()
+      await loadOrders()
     } catch (error) {
-      console.error("Error adding product to order:", error)
+      // Error handling is already done in the service
     }
   }
 
@@ -488,7 +293,7 @@ export function OrdersPage() {
       // Don't try to remove items that haven't been saved yet (temporary items)
       if (itemId.startsWith('temp_') || itemId === '-1') {
         // Just remove from local state for temporary items
-        const updatedItems = editingOrder.orderItems.filter(item => item.id !== itemId)
+        const updatedItems = editingOrder.orderItems.filter((item: OrderItem) => item.id !== itemId)
         
         setEditingOrder({
           ...editingOrder,
@@ -499,20 +304,7 @@ export function OrdersPage() {
         return
       }
 
-      const response = await fetch(`http://localhost:7001/api/orders/${editingOrder.id}/items/${itemId}`, {
-        method: "DELETE",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json"
-        },
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
-      }
-
-      const data = await response.json()
+      const data = await removeOrderItemService(editingOrder.id, itemId)
       
       // Transform the updated order data
       const transformedOrder = {
@@ -533,13 +325,11 @@ export function OrdersPage() {
       if (selectedOrder && selectedOrder.id === editingOrder.id) {
         setSelectedOrder(transformedOrder)
       }
-
-      toast.success("Item removed from order")
       
       // Refresh orders to get updated data
-      await fetchOrders()
+      await loadOrders()
     } catch (error) {
-      console.error("Error removing order item:", error)
+      // Error handling is already done in the service
     }
   }
 
@@ -614,31 +404,31 @@ export function OrdersPage() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="bg-[#1a1a2e] border-gray-600 text-white">
                   <DropdownMenuItem 
-                    onClick={() => updatePaymentStatus(selectedOrder.id, "Paid")}
+                    onClick={() => handleUpdatePaymentStatus(selectedOrder.id, "Paid")}
                     className="hover:bg-gray-800 cursor-pointer"
                   >
                     Mark as Paid
                   </DropdownMenuItem>
                   <DropdownMenuItem 
-                    onClick={() => updatePaymentStatus(selectedOrder.id, "Pending")}
+                    onClick={() => handleUpdatePaymentStatus(selectedOrder.id, "Pending")}
                     className="hover:bg-gray-800 cursor-pointer"
                   >
                     Mark as Pending
                   </DropdownMenuItem>
                   <DropdownMenuItem 
-                    onClick={() => updatePaymentStatus(selectedOrder.id, "Processing")}
+                    onClick={() => handleUpdatePaymentStatus(selectedOrder.id, "Processing")}
                     className="hover:bg-gray-800 cursor-pointer"
                   >
                     Mark as Processing
                   </DropdownMenuItem>
                   <DropdownMenuItem 
-                    onClick={() => updatePaymentStatus(selectedOrder.id, "Failed")}
+                    onClick={() => handleUpdatePaymentStatus(selectedOrder.id, "Failed")}
                     className="hover:bg-gray-800 cursor-pointer"
                   >
                     Mark as Failed
                   </DropdownMenuItem>
                   <DropdownMenuItem 
-                    onClick={() => updatePaymentStatus(selectedOrder.id, "Rejected")}
+                    onClick={() => handleUpdatePaymentStatus(selectedOrder.id, "Rejected")}
                     className="hover:bg-gray-800 cursor-pointer"
                   >
                     Mark as Rejected
@@ -659,31 +449,31 @@ export function OrdersPage() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="bg-[#1a1a2e] border-gray-600 text-white">
                   <DropdownMenuItem 
-                    onClick={() => updateOrderStatus(selectedOrder.id, "Pending")}
+                    onClick={() => handleUpdateOrderStatus(selectedOrder.id, "Pending")}
                     className="hover:bg-gray-800 cursor-pointer"
                   >
                     Mark as Pending
                   </DropdownMenuItem>
                   <DropdownMenuItem 
-                    onClick={() => updateOrderStatus(selectedOrder.id, "Processing")}
+                    onClick={() => handleUpdateOrderStatus(selectedOrder.id, "Processing")}
                     className="hover:bg-gray-800 cursor-pointer"
                   >
                     Mark as Processing
                   </DropdownMenuItem>
                   <DropdownMenuItem 
-                    onClick={() => updateOrderStatus(selectedOrder.id, "Shipped")}
+                    onClick={() => handleUpdateOrderStatus(selectedOrder.id, "Shipped")}
                     className="hover:bg-gray-800 cursor-pointer"
                   >
                     Mark as Shipped
                   </DropdownMenuItem>
                   <DropdownMenuItem 
-                    onClick={() => updateOrderStatus(selectedOrder.id, "Completed")}
+                    onClick={() => handleUpdateOrderStatus(selectedOrder.id, "Completed")}
                     className="hover:bg-gray-800 cursor-pointer"
                   >
                     Mark as Completed
                   </DropdownMenuItem>
                   <DropdownMenuItem 
-                    onClick={() => updateOrderStatus(selectedOrder.id, "Cancelled")}
+                    onClick={() => handleUpdateOrderStatus(selectedOrder.id, "Cancelled")}
                     className="hover:bg-gray-800 cursor-pointer"
                   >
                     Mark as Cancelled
@@ -752,31 +542,31 @@ export function OrdersPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="bg-[#1a1a2e] border-gray-600 text-white">
                         <DropdownMenuItem 
-                          onClick={() => updateOrderStatus(selectedOrder.id, "Pending")}
+                          onClick={() => handleUpdateOrderStatus(selectedOrder.id, "Pending")}
                           className="hover:bg-gray-800 cursor-pointer text-xs"
                         >
                           Pending
                         </DropdownMenuItem>
                         <DropdownMenuItem 
-                          onClick={() => updateOrderStatus(selectedOrder.id, "Processing")}
+                          onClick={() => handleUpdateOrderStatus(selectedOrder.id, "Processing")}
                           className="hover:bg-gray-800 cursor-pointer text-xs"
                         >
                           Processing
                         </DropdownMenuItem>
                         <DropdownMenuItem 
-                          onClick={() => updateOrderStatus(selectedOrder.id, "Shipped")}
+                          onClick={() => handleUpdateOrderStatus(selectedOrder.id, "Shipped")}
                           className="hover:bg-gray-800 cursor-pointer text-xs"
                         >
                           Shipped
                         </DropdownMenuItem>
                         <DropdownMenuItem 
-                          onClick={() => updateOrderStatus(selectedOrder.id, "Completed")}
+                          onClick={() => handleUpdateOrderStatus(selectedOrder.id, "Completed")}
                           className="hover:bg-gray-800 cursor-pointer text-xs"
                         >
                           Completed
                         </DropdownMenuItem>
                         <DropdownMenuItem 
-                          onClick={() => updateOrderStatus(selectedOrder.id, "Cancelled")}
+                          onClick={() => handleUpdateOrderStatus(selectedOrder.id, "Cancelled")}
                           className="hover:bg-gray-800 cursor-pointer text-xs"
                         >
                           Cancelled
@@ -868,31 +658,31 @@ export function OrdersPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="bg-[#1a1a2e] border-gray-600 text-white">
                         <DropdownMenuItem 
-                          onClick={() => updatePaymentStatus(selectedOrder.id, "Paid")}
+                          onClick={() => handleUpdatePaymentStatus(selectedOrder.id, "Paid")}
                           className="hover:bg-gray-800 cursor-pointer text-xs"
                         >
                           Paid
                         </DropdownMenuItem>
                         <DropdownMenuItem 
-                          onClick={() => updatePaymentStatus(selectedOrder.id, "Pending")}
+                          onClick={() => handleUpdatePaymentStatus(selectedOrder.id, "Pending")}
                           className="hover:bg-gray-800 cursor-pointer text-xs"
                         >
                           Pending
                         </DropdownMenuItem>
                         <DropdownMenuItem 
-                          onClick={() => updatePaymentStatus(selectedOrder.id, "Processing")}
+                          onClick={() => handleUpdatePaymentStatus(selectedOrder.id, "Processing")}
                           className="hover:bg-gray-800 cursor-pointer text-xs"
                         >
                           Processing
                         </DropdownMenuItem>
                         <DropdownMenuItem 
-                          onClick={() => updatePaymentStatus(selectedOrder.id, "Failed")}
+                          onClick={() => handleUpdatePaymentStatus(selectedOrder.id, "Failed")}
                           className="hover:bg-gray-800 cursor-pointer text-xs"
                         >
                           Failed
                         </DropdownMenuItem>
                         <DropdownMenuItem 
-                          onClick={() => updatePaymentStatus(selectedOrder.id, "Rejected")}
+                          onClick={() => handleUpdatePaymentStatus(selectedOrder.id, "Rejected")}
                           className="hover:bg-gray-800 cursor-pointer text-xs"
                         >
                           Rejected
