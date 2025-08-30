@@ -2,13 +2,13 @@ import productService from "../services/productService.js";
 
 const addProduct = async (req, res) => {
     try {
-        const { name, price, stock, description, seller_id } = req.body;
-        console.log(req.body);
+        const { name, price, stock, description, image_url, seller_id } = req.body;
         const product = await productService.createProduct({
             name,
             price: parseFloat(price),
             stock: parseInt(stock),
             description,
+            image_url,
             seller_id
           });
           res.status(201).json({
@@ -64,13 +64,14 @@ const getProductById = async (req, res) => {
 
 const updateProduct = async (req, res) => {
     try {
-        const { name, price, stock, description, seller_id } = req.body;
+        const { name, price, stock, description, image_url, seller_id } = req.body;
         const productId = parseInt(req.params.id);
         const product = await productService.updateProduct(productId,{
             name,
             price: parseFloat(price),
             stock: parseInt(stock),
             description,
+            image_url,
             seller_id
           });
 

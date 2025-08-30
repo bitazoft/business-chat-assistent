@@ -64,7 +64,7 @@ model products {
   price          Float
   stock          Int
   seller_id      Int
-  item_img       item_img[]      @ignore
+  image_url      String?         @db.VarChar
   order_items    order_items[]
   seller_profile seller_profiles @relation(fields: [seller_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "products_seller_profile_fk")
 }
@@ -82,9 +82,8 @@ model customers {
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model item_img {
-  product_id Int      @default(autoincrement())
-  image      String   @db.VarChar
-  products   products @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "item_img_products_fk")
+  product_id Int    @default(autoincrement())
+  image      String @db.VarChar
 
   @@ignore
 }

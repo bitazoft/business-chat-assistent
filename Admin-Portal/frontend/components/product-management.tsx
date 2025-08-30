@@ -24,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { json } from "stream/consumers";
 
 export interface Product {
   id: number;
@@ -33,6 +34,7 @@ export interface Product {
   category: string;
   status: string;
   description?: string;
+  image_url: string;
 }
 
 export function ProductManagement() {
@@ -60,7 +62,6 @@ export function ProductManagement() {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log("Fetched products", data);
         setProducts(data.products || []);
       })
       .catch((err) => {
@@ -130,14 +131,57 @@ export function ProductManagement() {
     }
   };
 
+  const uploadImage = async (file: File) => {
+    try {
+      const res = await fetch(`http://localhost:7001/api/uploads/image`,{
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fileName: file.name,
+          fileType: file.type,
+          fileSize: file.size,
+          folder: "products"        
+        })
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Failed to get upload URL");
+      }
+  
+      const { uploadUrl, fileUrl } = await res.json();
+      
+      const resUpload = await fetch(uploadUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Type": file.type,
+        },
+        body: file,
+      });
+
+      if (!resUpload.ok) {
+        const err = await resUpload.json();
+        throw new Error(err.error || "Failed to upload image");
+      }
+
+      return fileUrl;
+    } catch (err) {
+      throw err;
+    }
+  }
+
   // Empty function for add product - you can implement your logic here
   const onAddProduct = async (productData: {
     name: string;
     price: string;
     description: string;
     stock: number;
+    file: File | null
   }) => {
     try {
+      const imageUrl = await uploadImage(productData.file!);
+
       await fetch(`http://localhost:7001/api/products/add`, {
         method: "POST",
         credentials: "include",
@@ -147,6 +191,7 @@ export function ProductManagement() {
           price: productData.price,
           description: productData.description,
           stock: productData.stock,
+          image_url: imageUrl,
           seller_id: user?.sellerId,
         }),
       });
@@ -154,9 +199,9 @@ export function ProductManagement() {
       fetchProducts();
       setIsAddModalOpen(false);
 
-      toast.success("Product saved successfully !!", {
+      toast.success("Product added successfully !!", {
         style: {
-          background: "#0f0f23",
+          background: "rgba(0, 128, 0, 0.3)",
           color: "#fff",
         },
       });
@@ -171,8 +216,15 @@ export function ProductManagement() {
     price: string;
     description: string;
     stock: number;
+    file: File | null
+    existingImageUrl?: string
   }) => {
     try {
+      let imageUrl;
+      if (productData.file != null) {
+        imageUrl = await uploadImage(productData.file)
+      }
+
       await fetch(
         `http://localhost:7001/api/products/update/${selectedProduct?.id}`,
         {
@@ -184,6 +236,7 @@ export function ProductManagement() {
             price: productData.price,
             description: productData.description,
             stock: productData.stock,
+            image_url: imageUrl ? imageUrl : productData.existingImageUrl,
             seller_id: user?.sellerId,
           }),
         }
@@ -195,7 +248,7 @@ export function ProductManagement() {
 
       toast.success("Product details updated successfully!", {
         style: {
-          background: "#0f0f23",
+          background: "rgba(0, 128, 0, 0.3)",
           color: "#fff",
         },
       });
@@ -308,6 +361,7 @@ export function ProductManagement() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-gray-700">
+                      <th className="text-left py-3 px-4 text-violet-400 font-semibold">Image</th>
                       <th className="text-left py-3 px-4 text-violet-400 font-semibold">
                         Product Name
                       </th>
@@ -335,6 +389,20 @@ export function ProductManagement() {
                         className="border-b border-gray-800 hover:bg-gray-800/30 transition-all duration-200 animate-in slide-in-from-left"
                         style={{ animationDelay: `${index * 50}ms` }}
                       >
+                      <td className="py-3 px-4">
+                        <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-800 flex items-center justify-center">
+                          {product.image_url ? (
+                            <img
+                              src={product.image_url || "/placeholder.svg"}
+                              alt={product.name}
+                              className="w-full h-full object-cover"
+                              crossOrigin="anonymous"
+                            />
+                          ) : (
+                            <Package className="w-6 h-6 text-gray-500" />
+                          )}
+                        </div>
+                      </td>
                         <td className="py-3 px-4 text-white font-medium">
                           {product.name}
                         </td>
