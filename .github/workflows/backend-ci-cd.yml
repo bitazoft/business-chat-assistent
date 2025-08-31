@@ -44,3 +44,14 @@ jobs:
                 AWS_ACCESSKEYID=${{ secrets.AWS_ACCESSKEYID }}
                 AWS_SECRETACCESSKEY=${{ secrets.AWS_SECRETACCESSKEY }}
                 AWS_REGION=${{ secrets.AWS_REGION }}
+
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            docker pull ${{ secrets.DOCKER_USERNAME }}/chatbot-client-backend:latest
+            docker stop chatbot-client-backend || true && docker rm chatbot-client-backend || true
+            docker run -d --name myapp -p 7001:7001 ${{ secrets.DOCKER_USERNAME }}/chatbot-client-backend:latest
