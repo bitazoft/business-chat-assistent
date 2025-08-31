@@ -4,7 +4,6 @@ import authenticate from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
-// Order management
 router.get('/:seller_id', authenticate, getAllOrders);
 // router.get('/:id', authenticate, getOrderById);
 router.post('/', authenticate, createOrder);
