@@ -25,7 +25,7 @@ ENV AWS_SECRETACCESSKEY=$AWS_SECRETACCESSKEY
 ENV AWS_REGION=$AWS_REGION
 
 # Copy project files to the container
-COPY ./Admin-Portal/backend ./  
+COPY . ./  
 
 # Install dependencies
 RUN npm install  
