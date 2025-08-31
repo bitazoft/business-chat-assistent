@@ -203,6 +203,9 @@ class OptimizedChatbot:
         self.tools = self._create_tools()
         self.agent = self._create_agent()
         
+        # Track tool results for analytics (without changing existing logs)
+        self.last_tool_results = []  # List of {"tool_name": str, "result": str}
+        
     def _create_tools(self):
         """Create optimized tools with embedded context"""
         
@@ -269,76 +272,108 @@ class OptimizedChatbot:
         class EmptyInput(BaseModel):
             pass
 
-        # Wrapper functions with context
+        # Wrapper functions with context and result tracking
         def get_product_info_wrapper(product_name: str) -> dict:
-            return get_product_info(seller_id=self.seller_id, product_name=product_name)
+            result = get_product_info(seller_id=self.seller_id, product_name=product_name)
+            self.last_tool_results.append({"tool_name": "get_product_info", "result": str(result)})
+            return result
 
         def track_order_wrapper(order_id: str) -> dict:
-            return track_order(order_id=order_id)
+            result = track_order(order_id=order_id)
+            self.last_tool_results.append({"tool_name": "track_order", "result": str(order_id)})
+            return result
 
         def place_order_wrapper(items: List[dict]) -> dict:
-            return place_order(seller_id=self.seller_id, user_id=self.user_id, items=items)
+            result = place_order(seller_id=self.seller_id, user_id=self.user_id, items=items)
+            # self.last_tool_results.append({"tool_name": "place_order", "result": str(result)})
+            return result
 
         def save_user_wrapper(name: str, email: str, address: str, number: str) -> dict:
-            return save_user(user_id=self.user_id, name=name, email=email, address=address, number=number)
+            result = save_user(user_id=self.user_id, name=name, email=email, address=address, number=number)
+            # self.last_tool_results.append({"tool_name": "save_user", "result": str(result)})
+            return result
 
         def get_user_info_wrapper() -> dict:
-            return get_user_info(user_id=self.user_id)
+            result = get_user_info(user_id=self.user_id)
+            # self.last_tool_results.append({"tool_name": "get_user_info", "result": str(result)})
+            return result
 
         def check_user_exists_wrapper() -> bool:
-            return check_user_exists(user_id=self.user_id)
+            result = check_user_exists(user_id=self.user_id)
+            # self.last_tool_results.append({"tool_name": "check_user_exists", "result": str(result)})
+            return result
 
         def get_all_products_wrapper() -> List[str]:
-            return get_all_products(seller_id=self.seller_id)
+            result = get_all_products(seller_id=self.seller_id)
+            # self.last_tool_results.append({"tool_name": "get_all_products", "result": str(result)})
+            return result
 
         def update_user_info_wrapper(name: str = "", email: str = "", address: str = "", number: str = "") -> dict:
             name = None if not name else name
             email = None if not email else email
             address = None if not address else address
             number = None if not number else number
-            return update_user_info(user_id=self.user_id, name=name, email=email, address=address, number=number)
+            result = update_user_info(user_id=self.user_id, name=name, email=email, address=address, number=number)
+            # self.last_tool_results.append({"tool_name": "update_user_info", "result": str(result)})
+            return result
         
         def add_item_to_order_wrapper(order_id: str, product_identifier: str, quantity: int) -> str:
-            return add_item_to_order(
+            result = add_item_to_order(
                 customer_id=self.user_id,
                 order_id=order_id,
                 product_identifier=product_identifier,
                 quantity=quantity
             )
+            # self.last_tool_results.append({"tool_name": "add_item_to_order", "result": str(result)})
+            return result
 
         def remove_item_from_order_wrapper(order_id: str, product_identifier: str) -> str:
-            return remove_item_from_order(
+            result = remove_item_from_order(
                 customer_id=self.user_id,
                 order_id=order_id,
                 product_identifier=product_identifier
             )
+            # self.last_tool_results.append({"tool_name": "remove_item_from_order", "result": str(result)})
+            return result
 
         def update_item_quantity_in_order_wrapper(order_id: str, product_identifier: str, new_quantity: int) -> str:
-            return update_item_quantity_in_order(
+            result = update_item_quantity_in_order(
                 customer_id=self.user_id,
                 order_id=order_id,
                 product_identifier=product_identifier,
                 new_quantity=new_quantity
             )
+            # self.last_tool_results.append({"tool_name": "update_item_quantity_in_order", "result": str(result)})
+            return result
 
         def replace_order_items_wrapper(order_id: str, new_items: List[dict]) -> str:
-            return replace_order_items(
+            result = replace_order_items(
                 customer_id=self.user_id,
                 order_id=order_id,
                 new_items=new_items
             )
+            # self.last_tool_results.append({"tool_name": "replace_order_items", "result": str(result)})
+            return result
         
         def get_all_orders_for_customer_wrapper() -> list:
-            return get_all_orders_for_customer(customer_id=self.user_id)
+            result = get_all_orders_for_customer(customer_id=self.user_id)
+            # self.last_tool_results.append({"tool_name": "get_all_orders_for_customer", "result": str(result)})
+            return result
 
         def get_pending_orders_wrapper() -> list:
-            return get_pending_orders(customer_id=self.user_id)
+            result = get_pending_orders(customer_id=self.user_id)
+            # self.last_tool_results.append({"tool_name": "get_pending_orders", "result": str(result)})
+            return result
         
         def get_order_details_wrapper(order_id: int) -> dict:
-            return get_order_details(order_id=order_id)
+            result = get_order_details(order_id=order_id)
+            self.last_tool_results.append({"tool_name": "get_order_details", "result": str(order_id)})
+            return result
 
         def check_product_stock_wrapper(product_id: int, quantity: int) -> dict:
-            return check_product_stock(product_id=product_id, quantity=quantity)
+            result = check_product_stock(product_id=product_id, quantity=quantity)
+            self.last_tool_results.append({"tool_name": "check_product_stock", "result": str(product_id)})
+            return result
 
         # Create tools
         return [
@@ -456,16 +491,78 @@ class OptimizedChatbot:
         return AgentExecutor(
             agent=agent, 
             tools=self.tools, 
-            verbose=False,
+            verbose=True,
             max_iterations=10,  # Increased from 3 to 10 to handle complex workflows
             early_stopping_method="generate",  # Allow agent to stop early if it has an answer
             handle_parsing_errors=True,
             return_intermediate_steps=False  # Don't return intermediate steps for cleaner output
         )
     
+    def get_tool_results(self) -> List[Dict[str, str]]:
+        """Get the tool results from the last conversation turn"""
+        return self.last_tool_results.copy()
+    
+    def clear_tool_results(self):
+        """Clear tool results"""
+        self.last_tool_results = []
+
+    def extract_id_from_str(self, result_data, id_type) -> str:
+        """Extract ID from result data based on type"""
+        result_str = str(result_data)
+        
+        # Check if result is a dictionary with product_id key
+        if isinstance(result_data, dict) and id_type in result_data:
+            return str(result_data[id_type])
+        
+        # Extract from formatted string "Product ID: 123, Product: ..."
+        match = re.search(rf'{id_type}: (\d+)', result_str)
+        if match:
+            return match.group(1)
+        
+        # If no match found, return empty string
+        return ""
+
+    def extract_entities(self) -> Dict[str, Any]:
+        """Extract entities from the last tool results"""
+        result = self.get_tool_results()
+        entities = {}
+        for item in result:
+            tool_name = item.get("tool_name", "")
+            if tool_name == "get_product_info":
+                # Use the dedicated method to extract product ID
+                product_id = self.extract_id_from_str(item['result'], id_type='Product ID')
+                if product_id:
+                    entities["product_id"] = product_id
+            elif tool_name == "track_order":
+                entities["order_id"] = item['result']
+            elif tool_name == "get_order_details":
+                entities["order_id"] = item['result']
+            elif tool_name == "check_product_stock":
+                entities["product_id"] = item['result']
+        return entities
+
+    def log_query(self, query: str, intent: str, response: str, entities: Union[str, Dict[str, Any], List] = "", response_time: int = 0):
+        """Log query asynchronously to avoid blocking"""
+
+        try:
+            log_query(
+                query=query,
+                intent=intent,
+                entities=entities,
+                response=response,
+                seller_id=self.seller_id,
+                user_id=self.user_id,
+                response_time=response_time
+            )
+        except Exception as e:
+            logger.error(f"[Optimized] logging error: {str(e)}")
+    
     def process_message(self, message: str, external_chat_history: List[Dict] = None) -> str:
         """Process message with language detection and optimizations"""
         start_time = time.time()
+        
+        # Clear previous tool results
+        self.clear_tool_results()
         
         try:
             # Use external chat history if provided
@@ -541,12 +638,12 @@ class OptimizedChatbot:
             if len(self.chat_history) > 10:
                 self.chat_history = self.chat_history[-10:]
             
-            # Log query asynchronously (don't wait) with language info
-            threading.Thread(target=self._log_query_async, args=(message, intent, response, detected_language)).start()
             
             total_time = time.time() - start_time
             logger.info(f"[Optimized] Total processing time: {total_time:.2f}s, Language: {detected_language}")
-            
+
+            self.log_query(message, intent, response, self.extract_entities(), total_time*1000)
+
             return response
             
         except Exception as e:
@@ -560,20 +657,6 @@ class OptimizedChatbot:
                 return "මට තාක්ෂණික ගැටලුවක් ඇත. කරුණාකර නැවත උත්සාහ කරන්න."
             else:
                 return "I'm experiencing technical difficulties. Please try again."
-    
-    def _log_query_async(self, query: str, intent: str, response: str, language: str = "english"):
-        """Log query asynchronously to avoid blocking"""
-        try:
-            log_query(
-                query=query,
-                intent=intent,
-                entities=f"fast_detected_lang_{language}",
-                response=response,
-                seller_id=self.seller_id,
-                user_id=self.user_id
-            )
-        except Exception as e:
-            logger.error(f"[Optimized] Async logging error: {str(e)}")
 
 def create_optimized_chatbot(seller_id: str, user_id: str) -> OptimizedChatbot:
     """Factory function to create optimized chatbot"""
