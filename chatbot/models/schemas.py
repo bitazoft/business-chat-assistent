@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
+from sqlalchemy.dialects.postgresql import JSONB
 from db.database import Base
 from datetime import datetime
 
@@ -53,8 +54,9 @@ class ChatLog(Base):
     customer_id = Column(String, ForeignKey("customers.id"), nullable=False)
     user_query = Column(String, nullable=False)
     intent = Column(String)
-    entities = Column(String)
+    entities = Column(JSONB)
     response = Column(String, nullable=False)
+    response_time_ms = Column(Integer, nullable=False)
     timestamp = Column(DateTime, default=datetime.utcnow)
 
 class SellerProfile(Base):
