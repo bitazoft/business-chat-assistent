@@ -4,6 +4,7 @@ import authenticate from '../middlewares/authMiddleware.js';
 
 const router=express.Router();
 
+// routes
 router.post('/add', authenticate, addProduct);
 router.post('/delete/:id', authenticate, deleteProduct);
 router.post('/update/:id', authenticate, updateProduct);
