@@ -30,7 +30,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
-          context: ./
+          context: ./Admin-Portal/backend 
           push: true
           tags: |
                 mksiri/chatbot-client-backend:${{ env.SHORT_SHA }}
