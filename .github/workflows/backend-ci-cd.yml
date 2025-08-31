@@ -52,6 +52,6 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            docker pull ${{ secrets.DOCKER_USERNAME }}/chatbot-client-backend:latest
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/chatbot-client-backend:latest
             docker stop chatbot-client-backend || true && docker rm chatbot-client-backend || true
-            docker run -d --name myapp -p 7001:7001 ${{ secrets.DOCKER_USERNAME }}/chatbot-client-backend:latest
+            docker run -d --name myapp -p 7001:7001 ${{ secrets.DOCKERHUB_USERNAME }}/chatbot-client-backend:latest
