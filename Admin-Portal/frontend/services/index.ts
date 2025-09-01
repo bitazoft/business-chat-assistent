@@ -3,6 +3,7 @@ export * from "./api"
 export * from "./orderService"
 export * from "./productService"
 export * from "./authService"
+export * from "./businessService"
 
 // Re-export commonly used types
 export type {
@@ -22,6 +23,12 @@ export type {
   RegisterData,
   AuthResponse
 } from "./authService"
+
+export type {
+  BusinessDetails,
+  UpdateBusinessDetailsData,
+  UpdatePasswordData
+} from "./businessService"
 
 export type {
   ApiResponse,
