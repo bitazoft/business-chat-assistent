@@ -133,6 +133,7 @@ export function ProductManagement() {
 
   const uploadImage = async (file: File) => {
     try {
+      // create presinged url
       const res = await fetch(`http://localhost:7001/api/uploads/image`,{
         method: "POST",
         credentials: "include",
