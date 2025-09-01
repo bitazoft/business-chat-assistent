@@ -6,7 +6,7 @@ WORKDIR /usr/src/app
 
 # Install dependencies (exact versions from lock file)
 COPY package.json package-lock.json ./
-RUN npm install --legacy-peer-deps --omit=optional
+RUN npm install
 
 # Copy the rest of the source code
 COPY . .
