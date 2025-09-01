@@ -7,6 +7,8 @@ WORKDIR /usr/src/app
 # Copy only package.json & lock first for caching
 COPY package.json package-lock.json ./
 
+RUN npm install --legacy-peer-deps --omit=optional
+
 RUN npm ci --legacy-peer-deps --omit=optional
 
 COPY . .
