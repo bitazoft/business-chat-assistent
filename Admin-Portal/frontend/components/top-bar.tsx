@@ -7,9 +7,10 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 interface TopBarProps {
   user: { id: number; name: string; email: string; role: string}
   onLogout: () => void
+  onNavigateToSettings?: () => void
 }
 
-export function TopBar({ user, onLogout }: TopBarProps) {
+export function TopBar({ user, onLogout, onNavigateToSettings }: TopBarProps) {
   return (
     <header className="h-16 bg-gradient-to-r from-[#1a1a2e] to-[#16213e] border-b border-gray-700 flex items-center justify-between px-6">
       <div>
@@ -40,7 +41,10 @@ export function TopBar({ user, onLogout }: TopBarProps) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="bg-[#1a1a2e] border-gray-700">
-            <DropdownMenuItem className="text-gray-300 hover:text-violet-400 hover:bg-gray-800/50 focus:text-violet-400 focus:bg-gray-800/50">
+            <DropdownMenuItem 
+              onClick={() => onNavigateToSettings?.()}
+              className="text-gray-300 hover:text-violet-400 hover:bg-gray-800/50 focus:text-violet-400 focus:bg-gray-800/50"
+            >
               <User className="w-4 h-4 mr-2" />
               Profile
             </DropdownMenuItem>

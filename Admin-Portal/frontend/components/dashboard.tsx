@@ -45,7 +45,7 @@ export function Dashboard({ user, onLogout }: DashboardProps) {
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
       />
       <div className="flex-1 flex flex-col transition-all duration-300">
-        <TopBar user={user} onLogout={onLogout} />
+        <TopBar user={user} onLogout={onLogout} onNavigateToSettings={() => setActiveSection("settings")} />
         <main className="flex-1 overflow-auto p-6">
           <div className="transition-all duration-500 ease-in-out transform">{renderContent()}</div>
         </main>

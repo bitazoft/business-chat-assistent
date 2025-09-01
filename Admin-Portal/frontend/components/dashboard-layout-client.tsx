@@ -95,7 +95,7 @@ export function DashboardLayoutClient({ children }: DashboardLayoutClientProps) 
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
       />
       <div className="flex-1 flex flex-col min-w-0">
-        <TopBar user={user} onLogout={handleLogout} />
+        <TopBar user={user} onLogout={handleLogout} onNavigateToSettings={() => handleSectionChange("settings")} />
         <main className="flex-1 overflow-auto p-6">
           <div className="transition-all duration-500 ease-in-out transform">{children}</div>
         </main>
