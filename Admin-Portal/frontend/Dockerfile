@@ -1,35 +1,35 @@
-FROM node:18-alpine as base
-RUN apk add --no-cache g++ make py3-pip libc6-compat
-WORKDIR /usr/src/app
-COPY package*.json ./
-EXPOSE 3000
+# Use Node.js 22 (Alpine for smaller image size)
+FROM node:22-alpine3.18 AS builder
 
-FROM base as builder
+# Set working directory
 WORKDIR /usr/src/app
+
+# Install dependencies (exact versions from lock file)
+COPY package.json package-lock.json ./
+RUN npm ci --legacy-peer-deps --omit=optional
+
+# Copy the rest of the source code
 COPY . .
+
+# Build Next.js app
 RUN npm run build
 
+# ---------------------
+# Production Stage
+# ---------------------
+FROM node:22-alpine3.18 AS runner
 
-FROM base as production
 WORKDIR /usr/src/app
 
-ENV NODE_ENV=production
-RUN npm ci
+# Only copy built assets + required files
+COPY --from=builder /usr/src/app/package.json ./
+COPY --from=builder /usr/src/app/package-lock.json ./
+COPY --from=builder /usr/src/app/.next ./.next
+COPY --from=builder /usr/src/app/public ./public
+COPY --from=builder /usr/src/app/node_modules ./node_modules
 
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nextjs -u 1001
-USER nextjs
+# Expose port
+EXPOSE 3000
 
-
-COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/public ./public
-
-CMD npm start
-
-FROM base as dev
-ENV NODE_ENV=development
-RUN npm install 
-COPY . .
-CMD npm run dev
+# Run optimized Next.js app
+CMD ["npm", "start"]
