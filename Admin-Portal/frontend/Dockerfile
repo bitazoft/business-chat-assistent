@@ -4,11 +4,14 @@ FROM node:22-alpine3.18
 # Set the working directory inside the container
 WORKDIR /usr/src/app  
 
-# Copy project files to the container
-COPY . ./  
+# Copy only package.json & lock first for caching
+COPY package.json package-lock.json ./
 
-# Install dependencies
-RUN npm install  
+RUN npm ci --legacy-peer-deps --omit=optional
+
+COPY . .
+
+RUN npm run build
 
 # Expose port (use the PORT env if needed)
 EXPOSE 3000  
