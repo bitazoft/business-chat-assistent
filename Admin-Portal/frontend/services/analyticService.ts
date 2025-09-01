@@ -33,6 +33,21 @@ export interface CustomerInsightsData {
     totalOrders: number;
 }
 
+export interface RevenueData {
+    totalRevenue: number;
+    date?: string;
+    year?: number;
+    month?: number;
+}
+
+export interface OrdersData {
+    orders: any[];
+    orderCount: number;
+    date?: string;
+    year?: number;
+    month?: number;
+}
+
 const fetchOverview = async (sellerId : string): Promise<OverviewData | null> => {
   try {
     const response = await api.get(`/dashboard/overview/${sellerId}`);
@@ -59,6 +74,26 @@ const getDailyEngagementByDate = async(sellerId: string, date: string): Promise<
   try {
     const response = await api.get(`/dashboard/messages-by-time-periods/${sellerId}?date=${date}`);
     return response.messagesByTimePeriods || [];
+  } catch (error) {
+    handleApiError(error);
+    return null;
+  }
+}
+
+const getDailyEngagementLast7Days = async(sellerId: string): Promise<DailyEngagementData[] | null> => {
+  try {
+    const response = await api.get(`/dashboard/messages-by-last-7-days/${sellerId}`);
+    return response.messagesByDays || [];
+  } catch (error) {
+    handleApiError(error);
+    return null;
+  }
+}
+
+const getMonthlyEngagement = async(sellerId: string, months: number = 6): Promise<DailyEngagementData[] | null> => {
+  try {
+    const response = await api.get(`/dashboard/messages-by-months/${sellerId}?months=${months}`);
+    return response.messagesByMonths || [];
   } catch (error) {
     handleApiError(error);
     return null;
@@ -93,7 +128,64 @@ const getAvgResponseTime = async (sellerId: string): Promise<number | null> => {
 const getCustomerByMessageCount = async (sellerId: string, messageCount: number): Promise<number| null> => {
   try {
     const response = await api.get(`/dashboard/customers-with-messages/${sellerId}?limit=${messageCount}`);
-    return response.customers || 0;
+    // console.log(response.customers);
+    return response.totalCustomers || 0;
+  } catch (error) {
+    handleApiError(error);
+    return null;
+  }
+};
+
+const getRevenueByDate = async (sellerId: string, date: string): Promise<RevenueData | null> => {
+  try {
+    const response = await api.get(`/dashboard/revenue-by-date/${sellerId}?date=${date}`);
+    return {
+      totalRevenue: response.totalRevenue || 0,
+      date: response.date
+    };
+  } catch (error) {
+    handleApiError(error);
+    return null;
+  }
+};
+
+const getRevenueByMonth = async (sellerId: string, year: number, month: number): Promise<RevenueData | null> => {
+  try {
+    const response = await api.get(`/dashboard/revenue-by-month/${sellerId}?year=${year}&month=${month}`);
+    return {
+      totalRevenue: response.totalRevenue || 0,
+      year: response.year,
+      month: response.month
+    };
+  } catch (error) {
+    handleApiError(error);
+    return null;
+  }
+};
+
+const getOrdersByDate = async (sellerId: string, date: string): Promise<OrdersData | null> => {
+  try {
+    const response = await api.get(`/dashboard/orders-by-date/${sellerId}?date=${date}`);
+    return {
+      orders: response.orders || [],
+      orderCount: response.orderCount || 0,
+      date: response.date
+    };
+  } catch (error) {
+    handleApiError(error);
+    return null;
+  }
+};
+
+const getOrdersByMonth = async (sellerId: string, year: number, month: number): Promise<OrdersData | null> => {
+  try {
+    const response = await api.get(`/dashboard/orders-by-month/${sellerId}?year=${year}&month=${month}`);
+    return {
+      orders: response.orders || [],
+      orderCount: response.orderCount || 0,
+      year: response.year,
+      month: response.month
+    };
   } catch (error) {
     handleApiError(error);
     return null;
@@ -103,7 +195,13 @@ const getCustomerByMessageCount = async (sellerId: string, messageCount: number)
 export default {
     fetchOverview,
     getDailyEngagementByDate,
+    getDailyEngagementLast7Days,
+    getMonthlyEngagement,
     getPopularProducts,
     getAvgResponseTime,
-    getCustomerByMessageCount
+    getCustomerByMessageCount,
+    getRevenueByDate,
+    getRevenueByMonth,
+    getOrdersByDate,
+    getOrdersByMonth
 }

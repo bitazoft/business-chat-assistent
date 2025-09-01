@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import analyticsSearvice, { OverviewData,PopularProductsData,DailyEngagementData, CustomerInsightsData } from "@/services/analyticService"
 import { use, useEffect, useState } from "react"
 import { format } from "date-fns"
@@ -17,11 +18,14 @@ export function AnalyticsPage() {
   const [loading, setLoading] = useState(true)
   const [popularProductsData, setPopularProductsData] = useState<PopularProductsData[]>([])
   const [dailyEngagementData, setDailyEngagementData] = useState<DailyEngagementData[]>([])
+  const [last7DaysData, setLast7DaysData] = useState<DailyEngagementData[]>([])
+  const [monthlyData, setMonthlyData] = useState<DailyEngagementData[]>([])
   const [customerInsightsData, setCustomerInsightsData] = useState<CustomerInsightsData[]>([])
   const [totalCustomers, setTotalCustomers] = useState<number>(0)
   const [avgResponseTime, setAvgResponseTime] = useState<number>(0)
   const [engagedCustomers, setEngagedCustomers] = useState<number>(0)
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
+  const [selectedMonths, setSelectedMonths] = useState<number>(6)
   const user = getCurrentUser()
 
 
@@ -86,9 +90,11 @@ export function AnalyticsPage() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [overview, dailyEngagement, popularProducts, avgTime, engagedCustomers] = await Promise.all([
+        const [overview, dailyEngagement, last7Days, monthly, popularProducts, avgTime, engagedCustomers] = await Promise.all([
           analyticsSearvice.fetchOverview(user.sellerId!.toString()),
           analyticsSearvice.getDailyEngagementByDate(user.sellerId!.toString(), format(selectedDate, "yyyy-MM-dd")),
+          analyticsSearvice.getDailyEngagementLast7Days(user.sellerId!.toString()),
+          analyticsSearvice.getMonthlyEngagement(user.sellerId!.toString(), selectedMonths),
           analyticsSearvice.getPopularProducts(user.sellerId!.toString()),
           analyticsSearvice.getAvgResponseTime(user.sellerId!.toString()),
           analyticsSearvice.getCustomerByMessageCount(user.sellerId!.toString(), 10)
@@ -96,6 +102,8 @@ export function AnalyticsPage() {
 
         if (overview) setOverviewData(overview);
         if (dailyEngagement) setDailyEngagementData(dailyEngagement);
+        if (last7Days) setLast7DaysData(last7Days);
+        if (monthly) setMonthlyData(monthly);
         if (popularProducts) setPopularProductsData(popularProducts);
         if (avgTime) setAvgResponseTime(avgTime);
         if (engagedCustomers) setEngagedCustomers(engagedCustomers);
@@ -107,7 +115,7 @@ export function AnalyticsPage() {
     };
 
     fetchData();
-  }, [selectedDate, user?.sellerId]);
+  }, [selectedDate, selectedMonths, user?.sellerId]);
 
 
   return (
@@ -202,13 +210,18 @@ export function AnalyticsPage() {
           </CardContent>
         </Card>
 
-        {/* Engagement Trends */}
+        {/* Daily Engagement (Hourly) */}
         <Card className="bg-gradient-to-br from-[#1a1a2e] to-[#16213e] border-gray-700 animate-in slide-in-from-right duration-700">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="text-white">Daily Engagement</CardTitle>
                 <p className="text-gray-400 text-sm">Message volume throughout the day</p>
+                {dailyEngagementData.length > 0 && (
+                  <p className="text-violet-400 text-sm font-semibold mt-1">
+                    Total: {dailyEngagementData.reduce((sum, item) => sum + (item.messageCount || 0), 0)} messages
+                  </p>
+                )}
               </div>
               <Popover>
                 <PopoverTrigger asChild>
@@ -275,6 +288,319 @@ export function AnalyticsPage() {
         </Card>
       </div>
 
+      {/* Engagement Trends - Last 7 Days and Monthly */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Last 7 Days Engagement */}
+        <Card className="bg-gradient-to-br from-[#1a1a2e] to-[#16213e] border-gray-700 animate-in slide-in-from-left duration-700">
+          <CardHeader>
+            <CardTitle className="text-white">Last 7 Days Engagement</CardTitle>
+            <p className="text-gray-400 text-sm">Daily message volume trends</p>
+            {last7DaysData.length > 0 && (
+              <p className="text-blue-400 text-sm font-semibold mt-1">
+                Total: {last7DaysData.reduce((sum, item) => sum + (item.messageCount || 0), 0)} messages
+              </p>
+            )}
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-violet-400"></div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {last7DaysData.length > 0 ? (
+                  <div className="h-64 w-full">
+                    <svg className="w-full h-full" viewBox="0 0 400 200">
+                      <defs>
+                        <linearGradient id="line-gradient-7days" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" style={{ stopColor: '#3b82f6', stopOpacity: 1 }} />
+                          <stop offset="100%" style={{ stopColor: '#06b6d4', stopOpacity: 1 }} />
+                        </linearGradient>
+                        <linearGradient id="area-gradient-7days" x1="0%" y1="0%" x2="0%" y2="100%">
+                          <stop offset="0%" style={{ stopColor: '#3b82f6', stopOpacity: 0.3 }} />
+                          <stop offset="100%" style={{ stopColor: '#3b82f6', stopOpacity: 0 }} />
+                        </linearGradient>
+                      </defs>
+                      
+                      {/* Grid lines */}
+                      {[0, 1, 2, 3, 4].map((i) => (
+                        <line
+                          key={i}
+                          x1="40"
+                          y1={40 + (i * 30)}
+                          x2="360"
+                          y2={40 + (i * 30)}
+                          stroke="#374151"
+                          strokeWidth="0.5"
+                          opacity="0.3"
+                        />
+                      ))}
+                      
+                      {/* Y-axis labels */}
+                      {(() => {
+                        const maxValue = Math.max(...last7DaysData.map(d => d.messageCount || 0), 1);
+                        return [0, 1, 2, 3, 4].map((i) => (
+                          <text
+                            key={i}
+                            x="35"
+                            y={165 - (i * 30)}
+                            fill="#9ca3af"
+                            fontSize="10"
+                            textAnchor="end"
+                          >
+                            {Math.round((maxValue / 4) * i)}
+                          </text>
+                        ));
+                      })()}
+                      
+                      {/* Line and area */}
+                      {(() => {
+                        const maxValue = Math.max(...last7DaysData.map(d => d.messageCount || 0), 1);
+                        const points = last7DaysData.map((day, index) => {
+                          const x = 40 + (index * (320 / (last7DaysData.length - 1)));
+                          const y = 160 - ((day.messageCount || 0) / maxValue) * 120;
+                          return { x, y, value: day.messageCount || 0 };
+                        });
+                        
+                        const pathData = points.reduce((path, point, index) => {
+                          return path + (index === 0 ? `M ${point.x} ${point.y}` : ` L ${point.x} ${point.y}`);
+                        }, '');
+                        
+                        const areaData = `${pathData} L ${points[points.length - 1].x} 160 L 40 160 Z`;
+                        
+                        return (
+                          <>
+                            {/* Area under curve */}
+                            <path
+                              d={areaData}
+                              fill="url(#area-gradient-7days)"
+                              className="animate-in fade-in duration-1000"
+                            />
+                            
+                            {/* Line */}
+                            <path
+                              d={pathData}
+                              fill="none"
+                              stroke="url(#line-gradient-7days)"
+                              strokeWidth="2"
+                              className="animate-in slide-in-from-left duration-1000"
+                              style={{ animationDelay: '200ms' }}
+                            />
+                            
+                            {/* Data points */}
+                            {points.map((point, index) => (
+                              <g key={index}>
+                                <circle
+                                  cx={point.x}
+                                  cy={point.y}
+                                  r="3"
+                                  fill="#3b82f6"
+                                  className="animate-in zoom-in-50 duration-500"
+                                  style={{ animationDelay: `${300 + index * 100}ms` }}
+                                />
+                                <circle
+                                  cx={point.x}
+                                  cy={point.y}
+                                  r="6"
+                                  fill="transparent"
+                                  className="hover:fill-blue-400 hover:fill-opacity-20 transition-all cursor-pointer"
+                                >
+                                  <title>{`${last7DaysData[index].period}: ${point.value} messages`}</title>
+                                </circle>
+                              </g>
+                            ))}
+                          </>
+                        );
+                      })()}
+                      
+                      {/* X-axis labels */}
+                      {last7DaysData.map((day, index) => (
+                        <text
+                          key={index}
+                          x={40 + (index * (320 / (last7DaysData.length - 1)))}
+                          y="180"
+                          fill="#9ca3af"
+                          fontSize="10"
+                          textAnchor="middle"
+                        >
+                          {day.period}
+                        </text>
+                      ))}
+                    </svg>
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-gray-400">No data available for last 7 days</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Monthly Engagement */}
+        <Card className="bg-gradient-to-br from-[#1a1a2e] to-[#16213e] border-gray-700 animate-in slide-in-from-right duration-700">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-white">Monthly Engagement</CardTitle>
+                <p className="text-gray-400 text-sm">Monthly message volume trends</p>
+                {monthlyData.length > 0 && (
+                  <p className="text-orange-400 text-sm font-semibold mt-1">
+                    Total: {monthlyData.reduce((sum, item) => sum + (item.messageCount || 0), 0)} messages
+                  </p>
+                )}
+              </div>
+              <Select value={selectedMonths.toString()} onValueChange={(value) => setSelectedMonths(parseInt(value))}>
+                <SelectTrigger className="w-[180px] bg-[#0f0f23] border-gray-600 text-white hover:bg-gray-800/30">
+                  <SelectValue placeholder="Select months" />
+                </SelectTrigger>
+                <SelectContent className="bg-[#1a1a2e] border-gray-600">
+                  <SelectItem value="3" className="text-white hover:bg-gray-800/30">Last 3 months</SelectItem>
+                  <SelectItem value="6" className="text-white hover:bg-gray-800/30">Last 6 months</SelectItem>
+                  <SelectItem value="12" className="text-white hover:bg-gray-800/30">Last 12 months</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-violet-400"></div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {monthlyData.length > 0 ? (
+                  <div className="h-64 w-full">
+                    <svg className="w-full h-full" viewBox="0 0 400 200">
+                      <defs>
+                        <linearGradient id="line-gradient-monthly" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" style={{ stopColor: '#f97316', stopOpacity: 1 }} />
+                          <stop offset="100%" style={{ stopColor: '#ef4444', stopOpacity: 1 }} />
+                        </linearGradient>
+                        <linearGradient id="area-gradient-monthly" x1="0%" y1="0%" x2="0%" y2="100%">
+                          <stop offset="0%" style={{ stopColor: '#f97316', stopOpacity: 0.3 }} />
+                          <stop offset="100%" style={{ stopColor: '#f97316', stopOpacity: 0 }} />
+                        </linearGradient>
+                      </defs>
+                      
+                      {/* Grid lines */}
+                      {[0, 1, 2, 3, 4].map((i) => (
+                        <line
+                          key={i}
+                          x1="40"
+                          y1={40 + (i * 30)}
+                          x2="360"
+                          y2={40 + (i * 30)}
+                          stroke="#374151"
+                          strokeWidth="0.5"
+                          opacity="0.3"
+                        />
+                      ))}
+                      
+                      {/* Y-axis labels */}
+                      {(() => {
+                        const maxValue = Math.max(...monthlyData.map(d => d.messageCount || 0), 1);
+                        return [0, 1, 2, 3, 4].map((i) => (
+                          <text
+                            key={i}
+                            x="35"
+                            y={165 - (i * 30)}
+                            fill="#9ca3af"
+                            fontSize="10"
+                            textAnchor="end"
+                          >
+                            {Math.round((maxValue / 4) * i)}
+                          </text>
+                        ));
+                      })()}
+                      
+                      {/* Line and area */}
+                      {(() => {
+                        const maxValue = Math.max(...monthlyData.map(d => d.messageCount || 0), 1);
+                        const points = monthlyData.map((month, index) => {
+                          const x = 40 + (index * (320 / (monthlyData.length - 1)));
+                          const y = 160 - ((month.messageCount || 0) / maxValue) * 120;
+                          return { x, y, value: month.messageCount || 0 };
+                        });
+                        
+                        const pathData = points.reduce((path, point, index) => {
+                          return path + (index === 0 ? `M ${point.x} ${point.y}` : ` L ${point.x} ${point.y}`);
+                        }, '');
+                        
+                        const areaData = `${pathData} L ${points[points.length - 1].x} 160 L 40 160 Z`;
+                        
+                        return (
+                          <>
+                            {/* Area under curve */}
+                            <path
+                              d={areaData}
+                              fill="url(#area-gradient-monthly)"
+                              className="animate-in fade-in duration-1000"
+                            />
+                            
+                            {/* Line */}
+                            <path
+                              d={pathData}
+                              fill="none"
+                              stroke="url(#line-gradient-monthly)"
+                              strokeWidth="2"
+                              className="animate-in slide-in-from-right duration-1000"
+                              style={{ animationDelay: '200ms' }}
+                            />
+                            
+                            {/* Data points */}
+                            {points.map((point, index) => (
+                              <g key={index}>
+                                <circle
+                                  cx={point.x}
+                                  cy={point.y}
+                                  r="3"
+                                  fill="#f97316"
+                                  className="animate-in zoom-in-50 duration-500"
+                                  style={{ animationDelay: `${300 + index * 100}ms` }}
+                                />
+                                <circle
+                                  cx={point.x}
+                                  cy={point.y}
+                                  r="6"
+                                  fill="transparent"
+                                  className="hover:fill-orange-400 hover:fill-opacity-20 transition-all cursor-pointer"
+                                >
+                                  <title>{`${monthlyData[index].period}: ${point.value} messages`}</title>
+                                </circle>
+                              </g>
+                            ))}
+                          </>
+                        );
+                      })()}
+                      
+                      {/* X-axis labels */}
+                      {monthlyData.map((month, index) => (
+                        <text
+                          key={index}
+                          x={40 + (index * (320 / (monthlyData.length - 1)))}
+                          y="180"
+                          fill="#9ca3af"
+                          fontSize="10"
+                          textAnchor="middle"
+                        >
+                          {month.period}
+                        </text>
+                      ))}
+                    </svg>
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-gray-400">No monthly data available</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Customer Insights */}
       <Card className="bg-gradient-to-br from-[#1a1a2e] to-[#16213e] border-gray-700 animate-in slide-in-from-bottom duration-700 delay-300">
         <CardHeader>
@@ -285,7 +611,7 @@ export function AnalyticsPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               { 
-                value: overviewData ? `${Math.round((engagedCustomers / Math.max(overviewData.totalUsers, 1)) * 100)}%` : "0%", 
+                value: engagedCustomers && overviewData ? `${Math.round((engagedCustomers / Math.max(overviewData.totalUsers, 1)) * 100)}%` : "0%", 
                 label: "Returning Users", 
                 color: "text-violet-400" 
               },
@@ -303,7 +629,7 @@ export function AnalyticsPage() {
               <div
                 key={index}
                 className="text-center p-4 bg-[#0f0f23] rounded-lg hover:bg-gray-800/30 transition-colors duration-200 animate-in zoom-in-50"
-                style={{ animationDelay: `${(index + 14) * 150}ms` }}
+                style={{ animationDelay: `${(index + 30) * 150}ms` }}
               >
                 <div className={`text-3xl font-bold ${insight.color} mb-2`}>{insight.value}</div>
                 <p className="text-gray-400">{insight.label}</p>

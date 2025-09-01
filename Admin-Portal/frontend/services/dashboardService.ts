@@ -8,10 +8,12 @@ export interface OverviewData {
   totalUsers: number;
   totalUsersThisMonth: number;
   totalUsersLastMonth: number;
+  totalUsersToday: number;
   activeOrders: number;
   totalProfit: number;
   totalProfitThisMonth: number;
   totalProfitLastMonth: number;
+  totalProfitToday: number;
 }
 
 export interface TopProductsData {
@@ -39,10 +41,12 @@ const fetchOverview = async (sellerId : string): Promise<OverviewData | null> =>
       totalUsers: response.totalUsers || 0,
       totalUsersThisMonth: response.totalUsersThisMonth || 0,
       totalUsersLastMonth: response.totalUsersLastMonth || 0,
+      totalUsersToday: response.totalUsersToday || 0,
       activeOrders: response.activeOrders || 0,
       totalProfit: response.totalProfit || 0,
       totalProfitThisMonth: response.totalProfitThisMonth || 0,
       totalProfitLastMonth: response.totalProfitLastMonth || 0,
+      totalProfitToday: response.totalProfitToday || 0,
     };
     return data;
   } catch (error) {

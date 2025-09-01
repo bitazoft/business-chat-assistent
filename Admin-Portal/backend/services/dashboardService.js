@@ -235,6 +235,173 @@ function getTotalProfitLastMonth(seller_id) {
   }).then(result => result._sum.total_amount || 0);
 }
 
+function getTotalProfitToday(seller_id) {
+  const now = new Date();
+  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+  const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
+  return prisma.orders.aggregate({
+    _sum: {
+      total_amount: true
+    },
+    where: {
+      seller_id: parseInt(seller_id),
+      created_at: {
+        gte: startOfDay,
+        lte: endOfDay
+      }
+    }
+  }).then(result => result._sum.total_amount || 0);
+}
+
+function getTotalUsersToday(seller_id) {
+  const now = new Date();
+  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+  const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
+  return prisma.chat_logs.groupBy({
+    by: ['customer_id'],
+    where: {
+      seller_id: parseInt(seller_id),
+      customer_id: {
+        not: null
+      },
+      timestamp: {
+        gte: startOfDay,
+        lte: endOfDay
+      }
+    },
+    _count: {
+      customer_id: true
+    }
+  }).then(result => result.length);
+}
+
+// Get total revenue by specific date
+function getTotalRevenueByDate(seller_id, date) {
+  const targetDate = new Date(date);
+  const startOfDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 0, 0, 0, 0);
+  const endOfDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 23, 59, 59, 999);
+
+  return prisma.orders.aggregate({
+    _sum: {
+      total_amount: true
+    },
+    where: {
+      seller_id: parseInt(seller_id),
+      created_at: {
+        gte: startOfDay,
+        lte: endOfDay
+      }
+    }
+  }).then(result => result._sum.total_amount || 0);
+}
+
+// Get total revenue by specific month
+function getTotalRevenueByMonth(seller_id, year, month) {
+  const startOfMonth = new Date(year, month - 1, 1);
+  const endOfMonth = new Date(year, month, 0, 23, 59, 59, 999);
+
+  return prisma.orders.aggregate({
+    _sum: {
+      total_amount: true
+    },
+    where: {
+      seller_id: parseInt(seller_id),
+      created_at: {
+        gte: startOfMonth,
+        lte: endOfMonth
+      }
+    }
+  }).then(result => result._sum.total_amount || 0);
+}
+
+// Get orders by specific date
+function getOrdersByDate(seller_id, date) {
+  const targetDate = new Date(date);
+  const startOfDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 0, 0, 0, 0);
+  const endOfDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 23, 59, 59, 999);
+
+  return prisma.orders.findMany({
+    where: {
+      seller_id: parseInt(seller_id),
+      created_at: {
+        gte: startOfDay,
+        lte: endOfDay
+      }
+    },
+    orderBy: {
+      created_at: 'desc'
+    },
+    include: {
+      order_items: {
+        include: {
+          products: true
+        }
+      }
+    }
+  });
+}
+
+// Get orders by specific month
+function getOrdersByMonth(seller_id, year, month) {
+  const startOfMonth = new Date(year, month - 1, 1);
+  const endOfMonth = new Date(year, month, 0, 23, 59, 59, 999);
+
+  return prisma.orders.findMany({
+    where: {
+      seller_id: parseInt(seller_id),
+      created_at: {
+        gte: startOfMonth,
+        lte: endOfMonth
+      }
+    },
+    orderBy: {
+      created_at: 'desc'
+    },
+    include: {
+      order_items: {
+        include: {
+          products: true
+        }
+      }
+    }
+  });
+}
+
+// Get order count by specific date
+function getOrderCountByDate(seller_id, date) {
+  const targetDate = new Date(date);
+  const startOfDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 0, 0, 0, 0);
+  const endOfDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 23, 59, 59, 999);
+
+  return prisma.orders.count({
+    where: {
+      seller_id: parseInt(seller_id),
+      created_at: {
+        gte: startOfDay,
+        lte: endOfDay
+      }
+    }
+  });
+}
+
+// Get order count by specific month
+function getOrderCountByMonth(seller_id, year, month) {
+  const startOfMonth = new Date(year, month - 1, 1);
+  const endOfMonth = new Date(year, month, 0, 23, 59, 59, 999);
+
+  return prisma.orders.count({
+    where: {
+      seller_id: parseInt(seller_id),
+      created_at: {
+        gte: startOfMonth,
+        lte: endOfMonth
+      }
+    }
+  });
+}
+
 function getPopularProducts(seller_id) {
   return prisma.chat_logs.findMany({
     where: {
@@ -369,6 +536,79 @@ function getMessagesByTimePeriodsForDate(seller_id, date) {
   );
 }
 
+function getMessagesByLast7Days(seller_id) {
+  const today = new Date();
+  const sevenDaysAgo = new Date(today);
+  sevenDaysAgo.setDate(today.getDate() - 6); // Last 7 days including today
+
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(sevenDaysAgo);
+    date.setDate(sevenDaysAgo.getDate() + i);
+    days.push(date);
+  }
+
+  return Promise.all(
+    days.map(async (date) => {
+      const startTime = new Date(date);
+      startTime.setHours(0, 0, 0, 0);
+      
+      const endTime = new Date(date);
+      endTime.setHours(23, 59, 59, 999);
+      
+      const messageCount = await prisma.chat_logs.count({
+        where: {
+          seller_id: parseInt(seller_id),
+          timestamp: {
+            gte: startTime,
+            lte: endTime
+          }
+        }
+      });
+
+      return {
+        period: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        date: date.toISOString().split('T')[0],
+        messageCount: messageCount
+      };
+    })
+  );
+}
+
+function getMessagesByMonths(seller_id, months = 6) {
+  const today = new Date();
+  const monthsData = [];
+  
+  for (let i = months - 1; i >= 0; i--) {
+    const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
+    monthsData.push(date);
+  }
+
+  return Promise.all(
+    monthsData.map(async (date) => {
+      const startTime = new Date(date.getFullYear(), date.getMonth(), 1);
+      const endTime = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
+      
+      const messageCount = await prisma.chat_logs.count({
+        where: {
+          seller_id: parseInt(seller_id),
+          timestamp: {
+            gte: startTime,
+            lte: endTime
+          }
+        }
+      });
+
+      return {
+        period: date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+        month: date.getMonth() + 1,
+        year: date.getFullYear(),
+        messageCount: messageCount
+      };
+    })
+  );
+}
+
 function getAvgResponseTime(seller_id) {
 
   return prisma.chat_logs.aggregate({
@@ -456,17 +696,27 @@ export default{
   getTotalUsers, 
   getTotalUsersThisMonth,
   getTotalUsersLastMonth,
+  getTotalUsersToday,
   getRecentOrders,
   getTopProducts,
   getActiveOrders,
   getTotalProfit,
   getTotalProfitThisMonth,
   getTotalProfitLastMonth,
+  getTotalProfitToday,
   getTotalMessages,
   getTotalMessagesThisMonth,
   getTotalMessagesLastMonth,
   getPopularProducts,
   getMessagesByTimePeriodsForDate,
+  getMessagesByLast7Days,
+  getMessagesByMonths,
   getAvgResponseTime,
-  getCustomersWithMoreThanMessages
+  getCustomersWithMoreThanMessages,
+  getTotalRevenueByDate,
+  getTotalRevenueByMonth,
+  getOrdersByDate,
+  getOrdersByMonth,
+  getOrderCountByDate,
+  getOrderCountByMonth
 };

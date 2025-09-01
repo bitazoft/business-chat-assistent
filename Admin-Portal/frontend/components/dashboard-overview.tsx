@@ -79,6 +79,20 @@ export function DashboardOverview() {
       color: "text-emerald-400",
       bgColor: "bg-emerald-500/10",
     },
+    {
+      title: "Total Users Today",
+      value: (overviewData.totalUsersToday || 0).toLocaleString(),
+      icon: Users,
+      color: "text-blue-400",
+      bgColor: "bg-blue-500/10",
+    },
+    {
+      title: "Total Profit Today",
+      value: `$${(overviewData.totalProfitToday || 0).toLocaleString()}`,
+      icon: TrendingUp,
+      color: "text-green-400",
+      bgColor: "bg-green-500/10",
+    },
   ] : []
 
   if (loading) {
@@ -89,7 +103,7 @@ export function DashboardOverview() {
           <p className="text-gray-400">Monitor your WhatsApp Business performance</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[...Array(4)].map((_, index) => (
+          {[...Array(6)].map((_, index) => (
             <Card
               key={`loading-card-${index}`}
               className="bg-gradient-to-br from-[#1a1a2e] to-[#16213e] border-gray-700 animate-pulse"
@@ -116,7 +130,7 @@ export function DashboardOverview() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
         {stats.map((stat, index) => {
           const Icon = stat.icon
           return (

@@ -12,10 +12,12 @@ const overview = async (req, res) => {
       totalUsers,
       totalUsersThisMonth,
       totalUsersLastMonth,
+      totalUsersToday,
       activeOrders,
       totalProfit,
       totalProfitThisMonth,
       totalProfitLastMonth,
+      totalProfitToday,
       totalMessages,
       totalMessagesThisMonth,
       totalMessagesLastMonth
@@ -25,10 +27,12 @@ const overview = async (req, res) => {
       dashboardService.getTotalUsers(seller_id),
       dashboardService.getTotalUsersThisMonth(seller_id),
       dashboardService.getTotalUsersLastMonth(seller_id),
+      dashboardService.getTotalUsersToday(seller_id),
       dashboardService.getActiveOrders(seller_id),
       dashboardService.getTotalProfit(seller_id),
       dashboardService.getTotalProfitThisMonth(seller_id),
       dashboardService.getTotalProfitLastMonth(seller_id),
+      dashboardService.getTotalProfitToday(seller_id),
       dashboardService.getTotalMessages(seller_id),
       dashboardService.getTotalMessagesThisMonth(seller_id),
       dashboardService.getTotalMessagesLastMonth(seller_id)
@@ -39,10 +43,12 @@ const overview = async (req, res) => {
       totalUsers,
       totalUsersThisMonth,
       totalUsersLastMonth,
+      totalUsersToday,
       activeOrders,
       totalProfit,
       totalProfitThisMonth,
       totalProfitLastMonth,
+      totalProfitToday,
       totalMessages,
       totalMessagesThisMonth,
       totalMessagesLastMonth
@@ -53,10 +59,12 @@ const overview = async (req, res) => {
       totalUsers,
       totalUsersThisMonth,
       totalUsersLastMonth,
+      totalUsersToday,
       activeOrders,
       totalProfit,
       totalProfitThisMonth,
       totalProfitLastMonth,
+      totalProfitToday,
       totalMessages,
       totalMessagesThisMonth,
       totalMessagesLastMonth
@@ -134,6 +142,42 @@ const messagesByTimePeriodsForDate = async (req, res) => {
   }
 };
 
+const messagesByLast7Days = async (req, res) => {
+  const seller_id = req.params.id;
+
+  if (!seller_id) {
+    return res.status(400).json({ error: 'User ID not found' });
+  }
+
+  try {
+    const messagesByDays = await dashboardService.getMessagesByLast7Days(seller_id);
+    console.log('Messages by Last 7 Days:', messagesByDays);
+    res.json({ messagesByDays });
+  } catch (error) {
+    console.error('Error fetching messages by last 7 days:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+const messagesByMonths = async (req, res) => {
+  const seller_id = req.params.id;
+  const { months } = req.query; // Optional parameter for number of months
+
+  if (!seller_id) {
+    return res.status(400).json({ error: 'User ID not found' });
+  }
+
+  try {
+    const numberOfMonths = months ? parseInt(months) : 6;
+    const messagesByMonths = await dashboardService.getMessagesByMonths(seller_id, numberOfMonths);
+    console.log('Messages by Months:', messagesByMonths);
+    res.json({ messagesByMonths });
+  } catch (error) {
+    console.error('Error fetching messages by months:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 const getCustomersWithMoreThanMessages = async (req, res) => {
   const seller_id = req.params.id; // Get seller_id from authenticated user
   const { limit } = req.query; // Get message limit from query parameters (optional)
@@ -178,6 +222,100 @@ const getAvgResponseTime = async (req, res) => {
   }
 };
 
+// Get total revenue by specific date
+const getTotalRevenueByDate = async (req, res) => {
+  const seller_id = req.params.id;
+  const { date } = req.query;
+
+  if (!seller_id) {
+    return res.status(400).json({ error: 'User ID not found' });
+  }
+
+  if (!date) {
+    return res.status(400).json({ error: 'Date is required (format: YYYY-MM-DD)' });
+  }
+
+  try {
+    const totalRevenue = await dashboardService.getTotalRevenueByDate(seller_id, date);
+    console.log(`Total Revenue for ${date}:`, totalRevenue);
+    res.json({ totalRevenue, date });
+  } catch (error) {
+    console.error('Error fetching total revenue by date:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// Get total revenue by specific month
+const getTotalRevenueByMonth = async (req, res) => {
+  const seller_id = req.params.id;
+  const { year, month } = req.query;
+
+  if (!seller_id) {
+    return res.status(400).json({ error: 'User ID not found' });
+  }
+
+  if (!year || !month) {
+    return res.status(400).json({ error: 'Year and month are required' });
+  }
+
+  try {
+    const totalRevenue = await dashboardService.getTotalRevenueByMonth(seller_id, parseInt(year), parseInt(month));
+    console.log(`Total Revenue for ${year}-${month}:`, totalRevenue);
+    res.json({ totalRevenue, year: parseInt(year), month: parseInt(month) });
+  } catch (error) {
+    console.error('Error fetching total revenue by month:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// Get orders by specific date
+const getOrdersByDate = async (req, res) => {
+  const seller_id = req.params.id;
+  const { date } = req.query;
+
+  if (!seller_id) {
+    return res.status(400).json({ error: 'User ID not found' });
+  }
+
+  if (!date) {
+    return res.status(400).json({ error: 'Date is required (format: YYYY-MM-DD)' });
+  }
+
+  try {
+    const orders = await dashboardService.getOrdersByDate(seller_id, date);
+    const orderCount = await dashboardService.getOrderCountByDate(seller_id, date);
+    console.log(`Orders for ${date}:`, orders.length);
+    res.json({ orders, orderCount, date });
+  } catch (error) {
+    console.error('Error fetching orders by date:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// Get orders by specific month
+const getOrdersByMonth = async (req, res) => {
+  const seller_id = req.params.id;
+  const { year, month } = req.query;
+
+  if (!seller_id) {
+    return res.status(400).json({ error: 'User ID not found' });
+  }
+
+  if (!year || !month) {
+    return res.status(400).json({ error: 'Year and month are required' });
+  }
+
+  try {
+    const orders = await dashboardService.getOrdersByMonth(seller_id, parseInt(year), parseInt(month));
+    const orderCount = await dashboardService.getOrderCountByMonth(seller_id, parseInt(year), parseInt(month));
+    console.log(`Orders for ${year}-${month}:`, orders.length);
+    res.json({ orders, orderCount, year: parseInt(year), month: parseInt(month) });
+  } catch (error) {
+    console.error('Error fetching orders by month:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 export {
   overview,
   recentOrders,
@@ -185,5 +323,11 @@ export {
   popularProducts,
   getCustomersWithMoreThanMessages,
   messagesByTimePeriodsForDate,
-  getAvgResponseTime
+  messagesByLast7Days,
+  messagesByMonths,
+  getAvgResponseTime,
+  getTotalRevenueByDate,
+  getTotalRevenueByMonth,
+  getOrdersByDate,
+  getOrdersByMonth
 };
