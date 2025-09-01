@@ -85,6 +85,7 @@ model customers {
 model item_img {
   product_id Int      @default(autoincrement())
   image      String   @db.VarChar
+  id         Int      @id(map: "item_img_pk") @default(autoincrement())
   products   products @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "item_img_products_fk")
 
 }
