@@ -4,8 +4,9 @@ from vector_store.vector_store import vector_store
 import os
 import numpy as np
 import requests
+import json
 from datetime import datetime
-from typing import List
+from typing import List, Union, Dict, Any
 from sqlalchemy import text
 from collections import defaultdict
 
@@ -16,7 +17,7 @@ def get_product_info(product_name: str, seller_id: str) -> str:
         product = db.query(Product).filter(Product.name.ilike(f"%{product_name}%"), Product.seller_id == int(seller_id)).first()
         if product:
             imgs = get_product_images(product.id)
-            return f"Product: {product.name}, Description: {product.description}, Price: ${product.price}, Stock: {product.stock}, Images: {', '.join(imgs)}"
+            return f"Product ID: {product.id}, Product: {product.name}, Description: {product.description}, Price: ${product.price}, Stock: {product.stock}, Images: {', '.join(imgs)}"
         return "Product not found"
     finally:
         db.close()
@@ -146,16 +147,30 @@ def save_user(user_id: str, name: str, email: str, address: str, number: str) ->
     finally:
         db.close()
 
-def log_query(query: str, intent: str, entities: str, response: str, seller_id: str, user_id: str) -> None:
+def log_query(query: str, intent: str, entities: Union[str, Dict[str, Any], List], response: str, seller_id: str, user_id: str, response_time : int) -> None:
     db = SessionLocal()
     try:
+        # Convert entities to proper JSON format
+        if isinstance(entities, str):
+            # Try to parse as JSON first
+            try:
+                entities_json = json.loads(entities)
+            except json.JSONDecodeError:
+                # If parsing fails, treat as plain text and wrap in object
+                entities_json = {"raw": entities}
+        elif isinstance(entities, (dict, list)):
+            entities_json = entities
+        else:
+            entities_json = {"raw": str(entities)}
+            
         chat_log = ChatLog(
             user_query=query,
             intent=intent,
-            entities=entities,
+            entities=entities_json,
             response=response,
             seller_id=int(seller_id),
-            customer_id=user_id
+            customer_id=user_id,
+            response_time_ms=response_time
         )
         db.add(chat_log)
         db.commit()

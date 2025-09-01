@@ -65,7 +65,7 @@ model products {
   price          Float
   stock          Int
   seller_id      Int
-  item_img       item_img[]
+  item_img       item_img[]      
   order_items    order_items[]
   seller_profile seller_profiles @relation(fields: [seller_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "products_seller_profile_fk")
 }
@@ -85,7 +85,6 @@ model customers {
 model item_img {
   product_id Int      @default(autoincrement())
   image      String   @db.VarChar
-  id         Int      @id(map: "item_img_pk") @default(autoincrement())
   products   products @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "item_img_products_fk")
 
 }

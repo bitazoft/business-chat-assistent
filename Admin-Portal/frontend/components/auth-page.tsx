@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import router from "next/router"
+import { toast } from "sonner"
 
 interface AuthPageProps {
   mode: "login" | "register"
@@ -133,7 +134,12 @@ export function AuthPage({ mode, onLogin, onBack, onSwitchMode }: AuthPageProps)
         })
 
         if (registrationResult.success) {
-          setSuccess("Account created successfully! Redirecting to dashboard...")
+          toast.success("Account created successfully! Redirecting to dashboard...", {
+            style: {
+              background: "#0f0f23",
+              color: "#fff",
+            },
+          });
 
           // Delay before redirect to show success message
           setTimeout(() => {
@@ -159,7 +165,7 @@ export function AuthPage({ mode, onLogin, onBack, onSwitchMode }: AuthPageProps)
         }
       }
     } catch (error: any) {
-      setError(error.message || "Authentication failed")
+      toast.error(error.message || "Authentication failed");
     } finally {
       setLoading(false)
     }

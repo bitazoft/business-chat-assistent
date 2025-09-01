@@ -11,52 +11,6 @@ from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-class SentenceTransformerSingleton:
-    """Singleton class to ensure SentenceTransformer model is loaded only once"""
-    _instance = None
-    _lock = threading.Lock()
-    _model = None
-    _model_name = None
-    
-    def __new__(cls):
-        if cls._instance is None:
-            with cls._lock:
-                if cls._instance is None:
-                    cls._instance = super(SentenceTransformerSingleton, cls).__new__(cls)
-        return cls._instance
-    
-    def get_model(self, model_name: str = "all-MiniLM-L6-v2") -> SentenceTransformer:
-        """Get the SentenceTransformer model, loading it if necessary"""
-        if self._model is None or self._model_name != model_name:
-            with self._lock:
-                if self._model is None or self._model_name != model_name:
-                    logger.info(f"[SentenceTransformerSingleton] Loading embedding model {model_name}...")
-                    start_time = time.time()
-                    try:
-                        self._model = SentenceTransformer(model_name)
-                        self._model_name = model_name
-                        load_time = time.time() - start_time
-                        logger.info(f"[SentenceTransformerSingleton] Embedding model {model_name} loaded in {load_time:.2f}s")
-                    except Exception as e:
-                        logger.error(f"[SentenceTransformerSingleton] Error loading embedding model: {str(e)}")
-                        raise RuntimeError(f"Failed to load embedding model: {str(e)}")
-        
-        return self._model
-
-# Create global singleton instance
-sentence_transformer_singleton = SentenceTransformerSingleton()
-
-# For backward compatibility, create ModelCache alias
-class ModelCache:
-    """Backward compatibility wrapper for SentenceTransformerSingleton"""
-    
-    def __init__(self):
-        self.singleton = sentence_transformer_singleton
-    
-    def get_model(self, model_name: str = "all-MiniLM-L6-v2") -> SentenceTransformer:
-        """Get the SentenceTransformer model"""
-        return self.singleton.get_model(model_name)
-
 class FastVectorStore:
     """Optimized vector store for faster similarity search using FAISS"""
     
@@ -68,6 +22,7 @@ class FastVectorStore:
         self._lock = threading.Lock()
         self._cache = {}
         self._index = None  # FAISS index
+        self._embedding_model = None
         self._embedding_model_name = embedding_model_name
         
     def _lazy_load(self):
@@ -123,10 +78,18 @@ class FastVectorStore:
                     self._index.add(self._embeddings)  # Add vectors to the index
                     logger.info(f"[FastVectorStore] Built FAISS index with {self._index.ntotal} vectors")
                 
-                # Note: SentenceTransformer model is loaded via singleton when first needed
+                # Initialize embedding model
+                logger.info(f"[FastVectorStore] Loading embedding model {self._embedding_model_name}...")
+                try:
+                    self._embedding_model = SentenceTransformer(self._embedding_model_name)
+                    logger.info(f"[FastVectorStore] Embedding model {self._embedding_model_name} loaded")
+                except Exception as e:
+                    logger.error(f"[FastVectorStore] Error loading embedding model: {str(e)}")
+                    raise RuntimeError(f"Failed to load embedding model: {str(e)}")
+                
                 self._loaded = True
                 load_time = time.time() - start_time
-                logger.info(f"[FastVectorStore] Embeddings loaded in {load_time:.2f}s")
+                logger.info(f"[FastVectorStore] Embeddings and model loaded in {load_time:.2f}s")
                 
             except Exception as e:
                 logger.error(f"[FastVectorStore] Error loading embeddings: {str(e)}")
@@ -152,19 +115,16 @@ class FastVectorStore:
         if cache_key in self._cache:
             return self._cache[cache_key]
 
-        # Lazy load embeddings and FAISS index
+        # Lazy load embeddings, FAISS index, and embedding model
         self._lazy_load()
 
-        if len(self._documents) == 0 or self._index is None:
+        if len(self._documents) == 0 or self._index is None or self._embedding_model is None:
             return []
 
         try:
-            # Get the embedding model from singleton
-            embedding_model = sentence_transformer_singleton.get_model(self._embedding_model_name)
-            
             # Convert query string to embedding
             start_time = time.time()
-            query_embedding = embedding_model.encode([query], convert_to_numpy=True, normalize_embeddings=True)
+            query_embedding = self._embedding_model.encode([query], convert_to_numpy=True, normalize_embeddings=True)
             embed_time = time.time() - start_time
             logger.debug(f"[FastVectorStore] Query embedding generated in {embed_time:.2f}s")
 
@@ -182,7 +142,7 @@ class FastVectorStore:
                 logger.info(f"[FastVectorStore] Found match at index {idx} with distance {dist:.4f}")
                 if idx < len(self._documents) and dist <= threshold:  # Apply threshold filter
                     metadata = self._metadata[idx] if idx < len(self._metadata) else {}
-                    matches.append(type('Document', (), {
+                    matches.apped(type('Document', (), {
                         'page_content': str(self._documents[idx]),
                         'metadata': metadata,
                         'similarity_score': dist
@@ -208,16 +168,3 @@ fast_vector_store = FastVectorStore(embedding_model_name="all-MiniLM-L6-v2")
 
 # Backward compatibility
 vector_store = fast_vector_store
-
-def warm_up_model(model_name: str = "all-MiniLM-L6-v2"):
-    """Warm up the SentenceTransformer model by loading it into memory"""
-    logger.info("[VectorStore] Warming up SentenceTransformer model...")
-    try:
-        model = sentence_transformer_singleton.get_model(model_name)
-        # Test the model with a dummy query to ensure it's fully loaded
-        test_embedding = model.encode(["test"], convert_to_numpy=True)
-        logger.info(f"[VectorStore] Model warmed up successfully. Embedding dimension: {test_embedding.shape[1]}")
-        return True
-    except Exception as e:
-        logger.error(f"[VectorStore] Error warming up model: {str(e)}")
-        return False

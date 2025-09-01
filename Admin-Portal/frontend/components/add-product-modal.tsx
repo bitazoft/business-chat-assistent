@@ -2,13 +2,14 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { createPortal } from "react-dom"
-import { X, Plus } from "lucide-react"
+import { X, Plus, Upload, ImageIcon, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { toast } from "sonner"
 
 interface AddProductModalProps {
   isOpen: boolean
@@ -18,23 +19,30 @@ interface AddProductModalProps {
     price: string
     description: string
     stock: number
-  }) => void
+    file: File | null
+  }) => Promise<void>
 }
 
 export function AddProductModal({ isOpen, onClose, onAddProduct }: AddProductModalProps) {
   const [mounted, setMounted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isDragOver, setIsDragOver] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [formData, setFormData] = useState({
     name: "",
     price: "",
     description: "",
     stock: 0,
+    file: null as File | null,
   })
 
+  const [previewUrl, setPreviewUrl] = useState("")
   const [errors, setErrors] = useState({
     name: "",
     price: "",
     description: "",
     stock: "",
+    imageUrl: "",
   })
 
   // Ensure component is mounted before rendering portal
@@ -50,13 +58,18 @@ export function AddProductModal({ isOpen, onClose, onAddProduct }: AddProductMod
         price: "",
         description: "",
         stock: 0,
+        file: null,
       })
+      setPreviewUrl("")
       setErrors({
         name: "",
         price: "",
         description: "",
         stock: "",
+        imageUrl: "",
       })
+      setIsSubmitting(false)
+      setIsDragOver(false)
     }
   }, [isOpen])
 
@@ -100,6 +113,7 @@ export function AddProductModal({ isOpen, onClose, onAddProduct }: AddProductMod
       price: "",
       description: "",
       stock: "",
+      imageUrl: "",
     }
 
     if (!formData.name.trim()) {
@@ -122,11 +136,89 @@ export function AddProductModal({ isOpen, onClose, onAddProduct }: AddProductMod
     return !Object.values(newErrors).some((error) => error !== "")
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleFileSelect = (file: File) => {
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      setErrors((prev) => ({ ...prev, imageUrl: "Please select a valid image file" }))
+      return
+    }
+
+    // Validate file size (5MB limit)
+    if (file.size > 5 * 1024 * 1024) {
+      setErrors((prev) => ({ ...prev, imageUrl: "Image size must be less than 5MB" }))
+      return
+    }
+
+    // Clear any previous image errors
+    setErrors((prev) => ({ ...prev, imageUrl: "" }))
+
+    // Clean up previous preview URL
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl)
+    }
+
+    // Store file and create preview URL
+    setFormData((prev) => ({ ...prev, file }))
+    const newPreviewUrl = URL.createObjectURL(file)
+    setPreviewUrl(newPreviewUrl)
+  }
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      handleFileSelect(file)
+    }
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragOver(true)
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragOver(false)
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragOver(false)
+
+    const file = e.dataTransfer.files[0]
+    if (file) {
+      handleFileSelect(file)
+    }
+  }
+
+  const handleRemoveImage = () => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl)
+    }
+    setFormData((prev) => ({ ...prev, file: null }))
+    setPreviewUrl("")
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    setIsSubmitting(true)
+
     if (validateForm()) {
-      onAddProduct(formData)
+      try {
+        await onAddProduct(formData)
+        setIsSubmitting(false)
+      } catch (error) {
+        toast.error("An error occurred while adding the product. Please try again.", {
+          style: {
+            background: "rgba(255, 0, 0, 0.1)",
+            color: "#fff",
+          },
+        })
+        setIsSubmitting(false)
+      }
     }
   }
 
@@ -150,6 +242,16 @@ export function AddProductModal({ isOpen, onClose, onAddProduct }: AddProductMod
     }
   }
 
+  const handleClose = () => {
+    if (!isSubmitting) {
+      // Clean up preview URL
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl)
+      }
+      onClose()
+    }
+  }
+
   // Don't render anything if not mounted or not open
   if (!mounted || !isOpen) return null
 
@@ -159,9 +261,9 @@ export function AddProductModal({ isOpen, onClose, onAddProduct }: AddProductMod
       className="fixed inset-0 bg-black/60 flex items-center justify-center z-[9999] p-4 animate-in fade-in-0 duration-300"
       onClick={handleBackdropClick}
     >
-      <div className="bg-gradient-to-b from-[#1a1a2e] to-[#16213e] rounded-xl border border-gray-700 w-full max-w-md shadow-2xl animate-in zoom-in-95 duration-300">
+      <div className="bg-gradient-to-b from-[#1a1a2e] to-[#16213e] rounded-xl border border-gray-700 w-full max-w-2xl shadow-2xl animate-in zoom-in-95 duration-300 max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-700">
+        <div className="flex items-center justify-between p-6 border-b border-gray-700 sticky top-0 bg-gradient-to-b from-[#1a1a2e] to-[#16213e] z-10"> 
           <h2 className="text-xl font-bold text-white flex items-center">
             <Plus className="w-5 h-5 mr-2 text-violet-400" />
             Add New Product
@@ -177,7 +279,78 @@ export function AddProductModal({ isOpen, onClose, onAddProduct }: AddProductMod
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {/* Image Upload Section */}
+          <div className="space-y-4">
+            <Label className="text-violet-400 font-medium">Product Image</Label>
+
+            {previewUrl ? (
+              // Image Preview
+              <div className="relative">
+                <div className="w-full h-48 rounded-lg overflow-hidden bg-gray-800 border-2 border-gray-600">
+                  <img
+                    src={previewUrl || "/placeholder.svg"}
+                    alt="Product preview"
+                    className="w-full h-full object-cover"
+                    crossOrigin="anonymous"
+                  />
+                </div>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleRemoveImage}
+                  disabled={isSubmitting}
+                  className="absolute top-2 right-2 bg-red-500/80 hover:bg-red-500 backdrop-blur-sm"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+            ) : (
+              // Upload Area
+              <div
+                className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 cursor-pointer ${
+                  isDragOver
+                    ? "border-violet-400 bg-violet-500/10"
+                    : "border-gray-600 hover:border-gray-500 hover:bg-gray-800/30"
+                } ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                onClick={() => !isSubmitting && fileInputRef.current?.click()}
+              >
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="p-4 rounded-full bg-gray-800">
+                    {isDragOver ? (
+                      <Upload className="w-8 h-8 text-violet-400" />
+                    ) : (
+                      <ImageIcon className="w-8 h-8 text-gray-400" />
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-white font-medium mb-1">
+                      {isDragOver ? "Drop image here" : "Upload product image"}
+                    </p>
+                    <p className="text-gray-400 text-sm">Drag and drop or click to browse (Max 5MB, JPG, PNG, GIF)</p>
+                  </div>
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileInputChange}
+                  disabled={isSubmitting}
+                  className="hidden"
+                />
+              </div>
+            )}
+            {errors.imageUrl && <p className="text-red-400 text-sm">{errors.imageUrl}</p>}
+          </div>
+
+          {/* Form Fields Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Left Column */}
+            <div className="space-y-4">
           {/* Product Name */}
           <div className="space-y-2">
             <Label htmlFor="productName" className="text-violet-400 font-medium">
@@ -213,8 +386,11 @@ export function AddProductModal({ isOpen, onClose, onAddProduct }: AddProductMod
               placeholder="e.g., $99.99"
             />
             {errors.price && <p className="text-red-400 text-sm">{errors.price}</p>}
+            </div>
           </div>
 
+          {/* Right Column */}
+          <div className="space-y-4">
           {/* Stock */}
           <div className="space-y-2">
             <Label htmlFor="productStock" className="text-violet-400 font-medium">
@@ -232,6 +408,8 @@ export function AddProductModal({ isOpen, onClose, onAddProduct }: AddProductMod
               placeholder="Enter stock quantity"
             />
             {errors.stock && <p className="text-red-400 text-sm">{errors.stock}</p>}
+            </div>
+            </div>
           </div>
 
           {/* Description */}
@@ -243,7 +421,7 @@ export function AddProductModal({ isOpen, onClose, onAddProduct }: AddProductMod
               id="productDescription"
               value={formData.description}
               onChange={(e) => handleInputChange("description", e.target.value)}
-              className={`bg-[#0f0f23] border-gray-600 text-white focus:border-violet-400 focus:ring-violet-400/20 transition-all duration-300 min-h-[100px] resize-none ${
+              className={`bg-[#0f0f23] border-gray-600 text-white focus:border-violet-400 focus:ring-violet-400/20 transition-all duration-300 min-h-[120px] resize-none disabled:opacity-50 ${
                 errors.description ? "border-red-500" : ""
               }`}
               placeholder="Enter product description"
@@ -252,7 +430,7 @@ export function AddProductModal({ isOpen, onClose, onAddProduct }: AddProductMod
           </div>
 
           {/* Buttons */}
-          <div className="flex space-x-3 pt-4">
+          <div className="flex space-x-3 pt-4 border-t border-gray-700">
             <Button
               type="button"
               variant="outline"
@@ -263,9 +441,20 @@ export function AddProductModal({ isOpen, onClose, onAddProduct }: AddProductMod
             </Button>
             <Button
               type="submit"
-              className="flex-1 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white shadow-lg hover:shadow-violet-500/25 transition-all duration-300"
+              disabled={isSubmitting}
+              className="flex-1 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white shadow-lg hover:shadow-violet-500/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Add Product
+            {isSubmitting ? (
+              <>
+                <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Adding Product...
+              </>
+            ) : (
+              <>
+                <Plus className="w-4 h-4 mr-2" />
+                Add Product
+              </>
+            )}
             </Button>
           </div>
         </form>

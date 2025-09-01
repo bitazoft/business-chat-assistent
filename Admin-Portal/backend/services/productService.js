@@ -3,7 +3,7 @@ import ProductServiceError from "../utils/errors/productServiceError.js";
 const prisma = new PrismaClient();
 
 async function createProduct(data) {
-  const { name, description, price, stock, seller_id } = data;
+  const { name, description, price, stock, image_url, seller_id } = data;
 
   try {
     return await prisma.products.create({
@@ -12,6 +12,7 @@ async function createProduct(data) {
         description,
         price,
         stock,
+        image_url,
         seller_id,
       },
     });
