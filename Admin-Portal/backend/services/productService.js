@@ -33,6 +33,7 @@ async function getProductById(id) {
 
 async function getAllProducts(seller_id) {
   try {
+    console.log("Fetching all products for seller:", seller_id);
     return await prisma.products.findMany({
       where: { seller_id },
     });

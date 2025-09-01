@@ -5,7 +5,6 @@ import { ProductManagement } from "@/components/product-management"
 import { OrdersPage } from "@/components/orders-page"
 import { AnalyticsPage } from "@/components/analytics-page"
 import { SettingsPage } from "@/components/settings-page"
-import { TrackingDashboard } from "@/components/tracking-dashboard"
 import { useState } from "react"
 import { TopBar } from "./top-bar"
 import { Sidebar } from "./sidebar"
@@ -32,8 +31,6 @@ export function Dashboard({ user, onLogout }: DashboardProps) {
         return <AnalyticsPage />
       case "settings":
         return <SettingsPage />
-      case "tracking":
-        return <TrackingDashboard/> 
       default:
         return <DashboardOverview />
     }

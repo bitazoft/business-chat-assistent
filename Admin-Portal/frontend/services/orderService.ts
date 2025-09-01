@@ -99,11 +99,11 @@ export const fetchOrders = async (sellerId: string): Promise<Order[]> => {
     )
 
     console.log('Raw backend data:', data)
-    
-    const transformedOrders = (data.orders || []).map(transformOrderData)
-    console.log('Transformed orders:', transformedOrders)
-    
-    return transformedOrders
+
+    const orders: Order[] = (data.orders || []).map(transformOrderData)
+    console.log('Transformed orders:', orders)
+
+    return orders
   } catch (error) {
     handleApiError(error, "Failed to fetch orders")
     throw error
