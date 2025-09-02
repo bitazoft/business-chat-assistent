@@ -41,7 +41,8 @@ from repositories.tools import (
     get_all_orders_for_customer,
     get_pending_orders,
     get_order_details,
-    check_product_stock
+    check_product_stock,
+    upload_payment_proof_and_update_order
 )
 from vector_store.vector_store import fast_vector_store as vector_store
 from agent.customer_service_rag import customer_service_rag
@@ -108,7 +109,7 @@ def get_unified_system_prompt(seller_id: str) -> str:
             Available tools: {', '.join(['get_product_info', 'track_order', 'place_order', 'get_user_info', 'save_user', 'check_user_exists', 'update_user_info', 'add_item_to_order', 'remove_item_from_order', 'update_item_quantity_in_order', 'replace_order_items', 'get_all_orders_for_customer', 'get_pending_orders'])}
 
             CORE INSTRUCTIONS (Be direct and efficient):
-            1. Product information: use get_product_info with image urls
+            1. Product information: use get_product_info without image urls
             2. Order tracking: use track_order immediately with order ID
             3. Place orders: ALWAYS check_user_exists first, then proceed
             4. User management: use appropriate user tools
@@ -125,7 +126,8 @@ def get_unified_system_prompt(seller_id: str) -> str:
                 * Sinhala: "ඔබගේ ඇණවුම සිදු කිරීම සදහා ඔබගේ විස්තර අවශ්‍යයි. කරුණාකර ඔබගේ සම්පූර්ණ නම, ඊමේල් ලිපිනය, ගෘහ ලිපිනය සහ දුරකථන අංකය ලබා දෙන්න."
                 * Singlish: "ඔබගේ ඇණවුම සිදු කිරීම සදහා ඔබගේ විස්තර අවශ්‍යයි. කරුණාකර ඔබගේ සම්පූර්ණ නම, ඊමේල් ලිපිනය, ගෘහ ලිපිනය සහ දුරකථන අංකය ලබා දෙන්න."
             3. IF user exists: Use get_user_info and proceed with place_order
-            4. Execute place_order immediately after user confirmation
+            4. Execute place_order immediately after user confirmation and ask payment method COD or Bank Transfer
+            5. If he said bank transfer check whether the image received of the bank transfer confirmation receipt and confirm that is the bank transfer receipt and save that receipt image by running upload_payment_proof_and_update_order method with given file path
 
             ORDER EDITING (Execute immediately when requested):
             - add_item_to_order: Add new item to existing pending order
@@ -267,7 +269,9 @@ class OptimizedChatbot:
         class CheckStockInput(BaseModel):
             product_id: Union[int, str] = Field(..., description="Product ID to check")
             quantity: int = Field(..., gt=0, description="Quantity to verify against stock")
-
+        class UploadPaymentProofInput(BaseModel):
+            order_id: str = Field(..., description="Order ID to upload payment proof for")
+            payment_proof_file: str = Field(..., description="Payment proof file location")
 
         class EmptyInput(BaseModel):
             pass
@@ -375,6 +379,14 @@ class OptimizedChatbot:
             self.last_tool_results.append({"tool_name": "check_product_stock", "result": str(product_id)})
             return result
 
+        def upload_payment_proof_and_update_order_wrapper(order_id: str, payment_proof_file: str) -> str:
+            result = upload_payment_proof_and_update_order(
+                order_id=order_id,
+                file_path=payment_proof_file
+            )
+            # self.last_tool_results.append({"tool_name": "upload_payment_proof_and_update_order", "result": str(result)})
+            return result
+
         # Create tools
         return [
             StructuredTool(
@@ -472,6 +484,12 @@ class OptimizedChatbot:
                 description="Check if a product has enough stock before editing.",
                 func=check_product_stock_wrapper,
                 args_schema=CheckStockInput
+            ),
+            StructuredTool(
+                name="upload_payment_proof_and_update_order",
+                func=upload_payment_proof_and_update_order_wrapper,
+                description="Upload payment proof for an order and update its status.",
+                args_schema=UploadPaymentProofInput
             )
         ]
     
@@ -521,6 +539,19 @@ class OptimizedChatbot:
         
         # If no match found, return empty string
         return ""
+
+    def get_img_urls(self) -> List[str]:
+        """Get image URLs from the last tool results"""
+        result = self.get_tool_results()
+        img_urls = []
+        for item in result:
+           tool_name = item.get("tool_name", "")
+           if tool_name == "get_product_info":
+               # Split by comma first, then clean up each URL
+               urls_text = item['result']
+               if isinstance(urls_text, str):
+                img_urls.extend(re.findall(r'https?://[^\s,]+', str(urls_text)))                   
+        return img_urls
 
     def extract_entities(self) -> Dict[str, Any]:
         """Extract entities from the last tool results"""

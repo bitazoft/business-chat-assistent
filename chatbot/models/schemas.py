@@ -37,6 +37,7 @@ class Order(Base):
     customer_id = Column(String,ForeignKey("customers.id"), nullable=False)
     status = Column(String, nullable=False)
     total_amount = Column(Float, nullable=False)
+    payment_proof = Column(String, nullable=True)  # URL to payment proof image
     created_at = Column(DateTime, default=datetime.utcnow)
 
 class OrderItem(Base):

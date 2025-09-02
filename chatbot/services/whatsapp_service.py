@@ -32,6 +32,8 @@ class WhatsAppMessage:
     content: str
     message_id: Optional[str] = None
     timestamp: Optional[str] = None
+    media_id: Optional[str] = None
+    media_mime_type: Optional[str] = None
 
 @dataclass
 class WhatsAppConfig:
@@ -314,22 +316,37 @@ class WhatsAppService:
             message_type = message_data.get("type", "")
             
             content = ""
+            media_id = None
+            media_mime_type = None
+            
             if message_type == "text":
                 content = message_data.get("text", {}).get("body", "")
             elif message_type == "image":
-                content = message_data.get("image", {}).get("caption", "")
+                image_data = message_data.get("image", {})
+                content = image_data.get("caption", "Image received")
+                media_id = image_data.get("id")
+                media_mime_type = image_data.get("mime_type")
             elif message_type == "audio":
+                audio_data = message_data.get("audio", {})
                 content = "[Audio message]"
+                media_id = audio_data.get("id")
+                media_mime_type = audio_data.get("mime_type")
             elif message_type == "video":
-                content = message_data.get("video", {}).get("caption", "[Video message]")
+                video_data = message_data.get("video", {})
+                content = video_data.get("caption", "[Video message]")
+                media_id = video_data.get("id")
+                media_mime_type = video_data.get("mime_type")
             elif message_type == "document":
-                content = message_data.get("document", {}).get("filename", "[Document]")
+                document_data = message_data.get("document", {})
+                content = document_data.get("filename", "[Document]")
+                media_id = document_data.get("id")
+                media_mime_type = document_data.get("mime_type")
             else:
                 content = f"[{message_type} message]"
             
             phone_number_id = value.get("metadata", {}).get("phone_number_id", "")
             
-            logger.info(f"📨 Received WhatsApp message from {from_number} to account {phone_number_id}: {content[:50]}...")
+            logger.info(f"📨 Received WhatsApp message from {from_number} to account {phone_number_id}: {content[:50]} message Type : {message_type}")
             
             return WhatsAppMessage(
                 from_number=from_number,
@@ -337,7 +354,9 @@ class WhatsAppService:
                 message_type=MessageType(message_type) if message_type in [mt.value for mt in MessageType] else MessageType.TEXT,
                 content=content,
                 message_id=message_id,
-                timestamp=timestamp
+                timestamp=timestamp,
+                media_id=media_id,
+                media_mime_type=media_mime_type
             )
             
         except Exception as e:
@@ -403,6 +422,143 @@ class WhatsAppService:
             logger.error(f"❌ Failed to mark message as read for account {phone_number_id}: {str(e)}")
             return False
     
+    def download_image(self, whatsapp_message: WhatsAppMessage, save_directory: str = "./downloads") -> Dict[str, Any]:
+        """
+        Convenience method to download an image from a WhatsApp message
+        
+        Args:
+            whatsapp_message: WhatsAppMessage object containing media info
+            save_directory: Directory to save the image
+            
+        Returns:
+            Dictionary with download result including file path
+        """
+        if whatsapp_message.message_type != MessageType.IMAGE or not whatsapp_message.media_id:
+            return {
+                "success": False,
+                "error": "Message is not an image or missing media ID",
+                "content": None,
+                "file_path": None
+            }
+        
+        # Generate filename based on media ID and mime type
+        import os
+        from datetime import datetime
+        
+        file_extension = ""
+        if whatsapp_message.media_mime_type:
+            if "jpeg" in whatsapp_message.media_mime_type or "jpg" in whatsapp_message.media_mime_type:
+                file_extension = ".jpg"
+            elif "png" in whatsapp_message.media_mime_type:
+                file_extension = ".png"
+            elif "gif" in whatsapp_message.media_mime_type:
+                file_extension = ".gif"
+            elif "webp" in whatsapp_message.media_mime_type:
+                file_extension = ".webp"
+        
+        if not file_extension:
+            file_extension = ".jpg"  # Default
+        
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"whatsapp_image_{whatsapp_message.from_number}_{timestamp}_{whatsapp_message.media_id[:8]}{file_extension}"
+        save_path = os.path.join(save_directory, filename)
+        
+        return self.download_media(
+            media_id=whatsapp_message.media_id,
+            phone_number_id=whatsapp_message.to_number,
+            save_path=save_path
+        )
+
+    def download_media(self, media_id: str, phone_number_id: str, save_path: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Download media file from WhatsApp using media ID
+        
+        Args:
+            media_id: Media ID from the message
+            phone_number_id: Phone number ID of the account
+            save_path: Optional path to save the file (if None, returns content in memory)
+            
+        Returns:
+            Dictionary with download result
+        """
+        config = self.get_config(phone_number_id)
+        if not config or not self.is_configured(phone_number_id):
+            error_msg = f"WhatsApp service is not properly configured for account {phone_number_id}"
+            logger.error(error_msg)
+            return {
+                "success": False,
+                "error": error_msg,
+                "content": None,
+                "file_path": None
+            }
+        
+        try:
+            # Step 1: Get media URL
+            media_url = f"https://graph.facebook.com/v22.0/{media_id}"
+            headers = {
+                "Authorization": f"Bearer {config.access_token}"
+            }
+            
+            logger.info(f"Getting media URL for {media_id} from account {phone_number_id}")
+            
+            response = requests.get(media_url, headers=headers, timeout=30)
+            response.raise_for_status()
+            
+            media_info = response.json()
+            download_url = media_info.get("url")
+            mime_type = media_info.get("mime_type", "")
+            file_size = media_info.get("file_size", 0)
+            
+            if not download_url:
+                error_msg = "No download URL found in media info"
+                logger.error(error_msg)
+                return {
+                    "success": False,
+                    "error": error_msg,
+                    "content": None,
+                    "file_path": None
+                }
+            
+            # Step 2: Download the actual file
+            logger.info(f"Downloading media from {download_url}")
+            
+            download_response = requests.get(download_url, headers=headers, timeout=60)
+            download_response.raise_for_status()
+            
+            content = download_response.content
+            
+            result = {
+                "success": True,
+                "mime_type": mime_type,
+                "file_size": file_size,
+                "media_id": media_id,
+                "file_path": None
+            }
+            
+            # Step 3: Save to file if path provided
+            if save_path:
+                import os
+                os.makedirs(os.path.dirname(save_path), exist_ok=True)
+                
+                with open(save_path, 'wb') as f:
+                    f.write(content)
+                
+                result["file_path"] = save_path
+                logger.info(f"✅ Media saved to {save_path}")
+            else:
+                logger.info(f"✅ Media downloaded in memory ({len(content)} bytes)")
+            
+            return result
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to download media {media_id} from account {phone_number_id}: {str(e)}")
+            return {
+                "success": False,
+                "error": str(e),
+                "content": None,
+                "file_path": None
+            }
+
     def get_profile_info(self, phone_number: str, phone_number_id: str) -> Dict[str, Any]:
         """
         Get profile information for a WhatsApp user using a specific account

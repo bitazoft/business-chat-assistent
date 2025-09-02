@@ -6,11 +6,13 @@ from concurrent.futures import ThreadPoolExecutor
 import threading
 from utils.logger import get_logger
 from services.whatsapp_service import whatsapp_service
+# from services.image_analysis_service import deepseek_vision_service
 from repositories.tools import get_seller_id_by_whatsapp_number_id
 from agent.agent import create_optimized_chatbot
 import asyncio
 from datetime import datetime
 import re
+import os
 
 logger = get_logger(__name__)
 
@@ -24,48 +26,6 @@ MAX_THREADS = 10  # Configurable maximum number of concurrent threads
 thread_pool = ThreadPoolExecutor(max_workers=MAX_THREADS)
 # Lock for thread-safe session management
 sessions_lock = threading.Lock()
-
-def remove_urls_from_message(message: str) -> str:
-    """Clean and format message for WhatsApp - remove URLs, markdown, and improve readability"""
-    # Remove URLs (http, https)
-    cleaned_message = re.sub(r'https?://[^\s,\n]+', '', message)
-    
-    # Remove the entire Images section (multi-line format)
-    cleaned_message = re.sub(r'\*Images:\*.*?(?=\n\n|\Z)', '', cleaned_message, flags=re.DOTALL | re.IGNORECASE)
-    
-    # Remove any remaining standalone "Images:" text
-    cleaned_message = re.sub(r'\bImages:\s*', '', cleaned_message, flags=re.IGNORECASE)
-    
-    # Remove markdown bold formatting (*text*)
-    cleaned_message = re.sub(r'\*([^*]+)\*', r'\1', cleaned_message)
-    
-    # Convert single-line dash format to readable format
-    # Replace " - " with line breaks for better readability
-    if ' - ' in cleaned_message and '\n' not in cleaned_message:
-        # Split by dashes and format nicely
-        parts = cleaned_message.split(' - ')
-        if len(parts) > 1:
-            # First part is usually the product name
-            product_name = parts[0].strip()
-            formatted_parts = [product_name]
-            
-            for part in parts[1:]:
-                part = part.strip()
-                if part:
-                    # Add line break before each detail
-                    formatted_parts.append(part)
-            
-            cleaned_message = '\n'.join(formatted_parts)
-    
-    # Remove empty bullet points and lines with just dashes or bullets
-    cleaned_message = re.sub(r'^\s*[-*•]\s*$', '', cleaned_message, flags=re.MULTILINE)
-    
-    # Clean up extra whitespace
-    cleaned_message = re.sub(r'\n\s*\n\s*\n', '\n\n', cleaned_message)  # Multiple empty lines -> double
-    cleaned_message = re.sub(r'[ \t]+', ' ', cleaned_message)  # Multiple spaces/tabs -> single space
-    cleaned_message = cleaned_message.strip()
-    
-    return cleaned_message
 
 def get_or_create_chatbot(phone_number: str, seller_id: str = "default_seller"):
     """Get existing chatbot session or create new one"""
@@ -99,15 +59,12 @@ def process_whatsapp_message(phone_number: str, message_content: str, message_id
         response = chatbot.process_message(message_content)
         logger.info(response)
         # send images
-        if 'Images' in response:
-            urls = re.findall(r'https?://[^\s,]+', response)
-            if urls:
-                print(urls)
-                # Remove URLs from response for text message
-                response = remove_urls_from_message(response)
-                # Send each image
-                for url in urls:
-                    whatsapp_service.send_image_message(phone_number, url, "", whatsapp_number_id)
+        img_urls = chatbot.get_img_urls()
+        if img_urls:
+            for url in img_urls:
+                whatsapp_service.send_image_message(phone_number, url, "", whatsapp_number_id)
+        # # Remove URLs from response for text message
+        # response = remove_urls_from_message(response)
 
         # Send response back to WhatsApp
         result = whatsapp_service.send_text_message(phone_number, response, whatsapp_number_id)
@@ -123,6 +80,51 @@ def process_whatsapp_message(phone_number: str, message_content: str, message_id
         logger.error(f"❌ Error processing WhatsApp message: {str(e)}")
         # Send error message to user
         error_message = "I'm experiencing technical difficulties. Please try again in a moment."
+        whatsapp_service.send_text_message(phone_number, error_message, whatsapp_number_id)
+
+def process_image_with_deepseek(image_path: str, phone_number: str, whatsapp_number_id: str):
+    """Process image with DeepSeek Vision and send analysis"""
+    try:
+        if not deepseek_vision_service.is_configured():
+            logger.warning("DeepSeek Vision service not configured")
+            return
+        
+        logger.info(f"🔍 Analyzing image with DeepSeek Vision: {image_path}")
+        
+        # Analyze image with business context
+        analysis_result = deepseek_vision_service.analyze_image_for_business(
+            image_path=image_path,
+            business_context="This is a customer inquiry image from WhatsApp business chat.",
+            language="en"  # Using English for analysis
+        )
+        
+        if analysis_result["success"]:
+            analysis_text = analysis_result["analysis"]
+            
+            # Send the analysis back to the customer
+            response_message = f"🔍 Image Analysis:\n\n{analysis_text}"
+            
+            result = whatsapp_service.send_text_message(phone_number, response_message, whatsapp_number_id)
+            
+            if result["success"]:
+                logger.info(f"Image analysis sent to {phone_number}")
+            else:
+                logger.error(f"Failed to send image analysis to {phone_number}")
+                
+            # Also try to extract text if any
+            text_result = deepseek_vision_service.extract_text_from_image(image_path, "en")
+            if text_result["success"] and text_result["analysis"].strip():
+                text_message = f"Text extracted from image:\n\n{text_result['analysis']}"
+                whatsapp_service.send_text_message(phone_number, text_message, whatsapp_number_id)
+                
+        else:
+            logger.error(f"Failed to analyze image: {analysis_result.get('error')}")
+            error_message = "Sorry, I couldn't analyze the image. Please try again."
+            whatsapp_service.send_text_message(phone_number, error_message, whatsapp_number_id)
+            
+    except Exception as e:
+        logger.error(f"Error processing image with DeepSeek: {str(e)}")
+        error_message = "An error occurred while analyzing the image."
         whatsapp_service.send_text_message(phone_number, error_message, whatsapp_number_id)
 
 async def process_whatsapp_message_async(phone_number: str, message_content: str, message_id: str, whatsapp_number_id: str = "default_seller"):
@@ -177,8 +179,54 @@ async def handle_webhook(request: Request, background_tasks: BackgroundTasks):
         
         # Parse the message
         whatsapp_message = whatsapp_service.parse_webhook_message(webhook_data)
+
+        # Handle image messages with DeepSeek Vision
+        if whatsapp_message and whatsapp_message.message_type.value == "image":
+            logger.info(f"Received image message from {whatsapp_message.from_number}")
+            
+            # Download the image
+            download_result = whatsapp_service.download_image(whatsapp_message)
+            
+            if download_result["success"] and download_result["file_path"]:
+                logger.info(f"Image downloaded: {download_result['file_path']}")
+                
+
+                # Process image with DeepSeek Vision in background
+                # background_tasks.add_task(
+                #     process_image_with_deepseek,
+                #     download_result["file_path"],
+                #     whatsapp_message.from_number,
+                #     whatsapp_message.to_number
+                # )
+                # Also send a quick acknowledgment
+                ack_message = "Image received, analyzing..."
+                whatsapp_service.send_text_message(
+                    whatsapp_message.from_number, 
+                    ack_message, 
+                    whatsapp_message.to_number
+                )
+
+                content = f"[Image received: {download_result['file_path']}]"
+                background_tasks.add_task(
+                process_whatsapp_message_async,
+                whatsapp_message.from_number,
+                content,
+                whatsapp_message.message_id,
+                whatsapp_message.to_number
+            )
+                
         
-        if whatsapp_message and whatsapp_message.content:
+            else:
+                logger.error(f"Failed to download image: {download_result.get('error')}")
+                error_message = "Sorry, I couldn't download the image. Please try again."
+                whatsapp_service.send_text_message(
+                    whatsapp_message.from_number, 
+                    error_message, 
+                    whatsapp_message.to_number
+                )
+        
+        # Handle text messages normally
+        elif whatsapp_message and whatsapp_message.content:
             # Process message in background to respond quickly
             background_tasks.add_task(
                 process_whatsapp_message_async,
@@ -189,6 +237,7 @@ async def handle_webhook(request: Request, background_tasks: BackgroundTasks):
             )
             
             logger.info(f"✅ Message queued for processing from {whatsapp_message.from_number} , to {whatsapp_message.to_number}")
+        
         else:
             logger.info("📝 Webhook received but no message to process (might be status update)")
         
@@ -297,3 +346,100 @@ async def get_profile(phone_number: str):
     except Exception as e:
         logger.error(f"❌ Error getting profile: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/analyze-image")
+async def analyze_image_endpoint(data: Dict[str, Any]):
+    """
+    Manual endpoint to analyze images using DeepSeek Vision
+    
+    Body format:
+    {
+        "image_path": "/path/to/image.jpg",
+        "prompt": "Custom analysis prompt (optional)",
+        "language": "en" or "ar",
+        "business_context": "Additional business context (optional)"
+    }
+    """
+    try:
+        image_path = data.get("image_path")
+        prompt = data.get("prompt")
+        language = data.get("language", "en")
+        business_context = data.get("business_context", "")
+        
+        if not image_path:
+            raise HTTPException(status_code=400, detail="Missing 'image_path' field")
+        
+        if not deepseek_vision_service.is_configured():
+            raise HTTPException(status_code=503, detail="DeepSeek Vision service not configured")
+        
+        if not os.path.exists(image_path):
+            raise HTTPException(status_code=404, detail="Image file not found")
+        
+        # Perform analysis
+        if business_context or not prompt:
+            result = deepseek_vision_service.analyze_image_for_business(
+                image_path=image_path,
+                business_context=business_context,
+                language=language
+            )
+        else:
+            result = deepseek_vision_service.analyze_image(
+                image_path=image_path,
+                prompt=prompt,
+                language=language
+            )
+        
+        return result
+        
+    except Exception as e:
+        logger.error(f"❌ Error in image analysis endpoint: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/extract-text")
+async def extract_text_endpoint(data: Dict[str, Any]):
+    """
+    Manual endpoint to extract text from images using DeepSeek Vision
+    
+    Body format:
+    {
+        "image_path": "/path/to/image.jpg",
+        "language": "en" or "ar"
+    }
+    """
+    try:
+        image_path = data.get("image_path")
+        language = data.get("language", "en")
+        
+        if not image_path:
+            raise HTTPException(status_code=400, detail="Missing 'image_path' field")
+        
+        if not deepseek_vision_service.is_configured():
+            raise HTTPException(status_code=503, detail="DeepSeek Vision service not configured")
+        
+        if not os.path.exists(image_path):
+            raise HTTPException(status_code=404, detail="Image file not found")
+        
+        # Extract text
+        result = deepseek_vision_service.extract_text_from_image(
+            image_path=image_path,
+            language=language
+        )
+        
+        return result
+        
+    except Exception as e:
+        logger.error(f"❌ Error in text extraction endpoint: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/vision/status")
+async def vision_status():
+    """
+    Get DeepSeek Vision service status
+    """
+    return {
+        "service": "DeepSeek Vision",
+        "configured": deepseek_vision_service.is_configured(),
+        "supported_formats": deepseek_vision_service.get_supported_formats(),
+        "model": deepseek_vision_service.model,
+        "api_available": bool(deepseek_vision_service.api_key)
+    }

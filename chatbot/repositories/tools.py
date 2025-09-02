@@ -9,6 +9,18 @@ from datetime import datetime
 from typing import List, Union, Dict, Any
 from sqlalchemy import text
 from collections import defaultdict
+import asyncio
+
+# Import S3 service for payment proof handling
+try:
+    from services.s3_service import upload_payment_proof, generate_presigned_url
+except ImportError:
+    # Fallback if boto3 is not installed
+    async def upload_payment_proof(*args, **kwargs):
+        return {"error": "S3 service not available - boto3 not installed"}
+    
+    async def generate_presigned_url(*args, **kwargs):
+        return {"error": "S3 service not available - boto3 not installed"}
 
 # LangChain Tools
 def get_product_info(product_name: str, seller_id: str) -> str:
@@ -657,6 +669,8 @@ def get_seller_id_by_whatsapp_number_id(whatsapp_number_id: str) -> str:
     finally:
         db.close()
 
+
+
 def get_product_images(product_id: int) -> str:
     """Get image URL for a product by its ID"""
     db = SessionLocal()
@@ -664,5 +678,295 @@ def get_product_images(product_id: int) -> str:
         images = db.query(ProductImage).filter(ProductImage.product_id == product_id).all()
         urls = [img.image for img in images if img.image]
         return urls if urls else ["https://www.shutterstock.com/image-photo/person-using-smartphone-interact-friendly-600nw-2482428287.jpg"]
+    finally:
+        db.close()
+
+
+# Payment Proof Functions
+def upload_payment_proof_for_order(order_id: int, file_name: str, file_type: str, file_content: bytes) -> str:
+    """
+    Upload payment proof image to S3, save URL to order, then delete the image.
+    
+    Args:
+        order_id: ID of the order to update
+        file_name: Name of the payment proof file
+        file_type: MIME type of the file
+        file_content: File content as bytes
+        
+    Returns:
+        str: Success/error message
+    """
+    try:
+        # Run the async function
+        result = asyncio.run(upload_payment_proof(
+            order_id=order_id,
+            file_name=file_name,
+            file_type=file_type,
+            file_size=len(file_content),
+            file_content=file_content
+        ))
+        
+        if result.get('success'):
+            return f"Payment proof uploaded successfully for order {order_id}. File URL: {result.get('file_url')}"
+        else:
+            return f"Error uploading payment proof: {result.get('error', 'Unknown error')}"
+            
+    except Exception as e:
+        return f"Error uploading payment proof: {str(e)}"
+
+def get_presigned_upload_url(file_name: str, file_type: str, file_size: int, folder: str = "payment-proofs") -> dict:
+    """
+    Generate a presigned URL for uploading payment proof files.
+    
+    Args:
+        file_name: Name of the file
+        file_type: MIME type of the file
+        file_size: Size of the file in bytes
+        folder: S3 folder to upload to
+        
+    Returns:
+        dict: Contains upload_url and file_url, or error
+    """
+    try:
+        # Run the async function
+        result = asyncio.run(generate_presigned_url(
+            file_name=file_name,
+            file_type=file_type,
+            file_size=file_size,
+            folder=folder
+        ))
+        
+        return result
+        
+    except Exception as e:
+        return {"error": f"Error generating presigned URL: {str(e)}"}
+
+def update_order_payment_proof(order_id: int, payment_proof_url: str) -> str:
+    """
+    Update order with payment proof URL directly.
+    
+    Args:
+        order_id: ID of the order to update
+        payment_proof_url: URL of the uploaded payment proof
+        
+    Returns:
+        str: Success/error message
+    """
+    db = SessionLocal()
+    try:
+        order = db.query(Order).filter(Order.id == order_id).first()
+        if not order:
+            return f"Order with ID {order_id} not found"
+        
+        order.payment_proof = payment_proof_url
+        db.commit()
+        
+        return f"Payment proof URL updated successfully for order {order_id}"
+        
+    except Exception as e:
+        db.rollback()
+        return f"Error updating payment proof: {str(e)}"
+    finally:
+        db.close()
+
+def get_order_payment_proof(order_id: int) -> str:
+    """
+    Get payment proof URL for an order.
+    
+    Args:
+        order_id: ID of the order
+        
+    Returns:
+        str: Payment proof URL or error message
+    """
+    db = SessionLocal()
+    try:
+        order = db.query(Order).filter(Order.id == order_id).first()
+        if not order:
+            return f"Order with ID {order_id} not found"
+        
+        if order.payment_proof:
+            return order.payment_proof
+        else:
+            return f"No payment proof found for order {order_id}"
+            
+    except Exception as e:
+        return f"Error retrieving payment proof: {str(e)}"
+    finally:
+        db.close()
+
+
+def upload_payment_proof_and_update_order(order_id: int, file_path: str) -> str:
+    """
+    Upload payment proof image from local file path to S3, save URL to order database, and delete local file.
+    
+    Args:
+        order_id: ID of the order to update with payment proof
+        file_path: Local file path to the payment proof image
+        
+    Returns:
+        str: Success/error message
+    """
+    try:
+        # Check if file exists
+        if not os.path.exists(file_path):
+            return f"Error: File not found at path '{file_path}'"
+        
+        # Get file information
+        file_name = os.path.basename(file_path)
+        file_size = os.path.getsize(file_path)
+        
+        # Determine file type based on extension
+        file_extension = os.path.splitext(file_name)[1].lower()
+        file_type_map = {
+            '.jpg': 'image/jpeg',
+            '.jpeg': 'image/jpeg',
+            '.png': 'image/png',
+            '.gif': 'image/gif',
+            '.webp': 'image/webp',
+            '.pdf': 'application/pdf'
+        }
+        
+        file_type = file_type_map.get(file_extension)
+        if not file_type:
+            return f"Error: Unsupported file type '{file_extension}'. Supported types: {list(file_type_map.keys())}"
+        
+        # Read file content
+        try:
+            with open(file_path, 'rb') as f:
+                file_content = f.read()
+        except Exception as e:
+            return f"Error reading file: {str(e)}"
+        
+        # Check if order exists
+        db = SessionLocal()
+        try:
+            order = db.query(Order).filter(Order.id == order_id).first()
+            if not order:
+                return f"Error: Order with ID {order_id} not found"
+        finally:
+            db.close()
+        
+        # Upload to S3 and update order
+        try:
+            # Import S3 service locally to avoid import errors if boto3 not installed
+            from services.s3_service import s3_service
+            
+            # Upload file directly to S3
+            result = asyncio.run(s3_service.upload_file_direct(
+                file_name=file_name,
+                file_type=file_type,
+                file_content=file_content,
+                folder="payment-proofs"
+            ))
+            
+            file_url = result['file_url']
+            
+            # Update order with payment proof URL
+            db = SessionLocal()
+            try:
+                order = db.query(Order).filter(Order.id == order_id).first()
+                order.payment_proof = file_url
+                db.commit()
+                
+                # Delete local file after successful upload and DB update
+                try:
+                    os.remove(file_path)
+                    file_deleted_msg = f" Local file '{file_path}' has been deleted."
+                except OSError as e:
+                    file_deleted_msg = f" Warning: Could not delete local file '{file_path}': {str(e)}"
+                
+                return f"✅ Payment proof uploaded successfully for order {order_id}. File URL: {file_url}.{file_deleted_msg}"
+                
+            except Exception as e:
+                db.rollback()
+                # If DB update fails, try to delete the S3 file to avoid orphaned files
+                try:
+                    asyncio.run(s3_service.delete_file(result['key']))
+                except:
+                    pass  # Ignore S3 cleanup errors
+                return f"Error updating order in database: {str(e)}"
+            finally:
+                db.close()
+                
+        except ImportError:
+            return "Error: S3 service not available - boto3 not installed. Please install boto3: pip install boto3"
+        except Exception as e:
+            return f"Error uploading to S3: {str(e)}"
+            
+    except Exception as e:
+        return f"Error processing payment proof upload: {str(e)}"
+
+
+def get_order_payment_status(order_id: int) -> str:
+    """
+    Get payment proof status and URL for an order.
+    
+    Args:
+        order_id: ID of the order to check
+        
+    Returns:
+        str: Payment proof status and URL or error message
+    """
+    db = SessionLocal()
+    try:
+        order = db.query(Order).filter(Order.id == order_id).first()
+        if not order:
+            return f"Order with ID {order_id} not found"
+        
+        if order.payment_proof:
+            return f"Order {order_id} has payment proof uploaded. URL: {order.payment_proof}"
+        else:
+            return f"Order {order_id} does not have payment proof uploaded yet"
+            
+    except Exception as e:
+        return f"Error retrieving payment status: {str(e)}"
+    finally:
+        db.close()
+
+
+def remove_order_payment_proof(order_id: int) -> str:
+    """
+    Remove payment proof URL from order and optionally delete S3 file.
+    
+    Args:
+        order_id: ID of the order to remove payment proof from
+        
+    Returns:
+        str: Success/error message
+    """
+    db = SessionLocal()
+    try:
+        order = db.query(Order).filter(Order.id == order_id).first()
+        if not order:
+            return f"Order with ID {order_id} not found"
+        
+        if not order.payment_proof:
+            return f"Order {order_id} does not have payment proof to remove"
+        
+        old_url = order.payment_proof
+        
+        # Try to delete from S3 if possible
+        try:
+            from services.s3_service import s3_service
+            # Extract S3 key from URL
+            if 's3.amazonaws.com/' in old_url:
+                s3_key = old_url.split('s3.amazonaws.com/')[-1]
+                asyncio.run(s3_service.delete_file(s3_key))
+                s3_delete_msg = " S3 file has been deleted."
+            else:
+                s3_delete_msg = " Could not delete S3 file (invalid URL format)."
+        except:
+            s3_delete_msg = " Could not delete S3 file."
+        
+        # Remove URL from database
+        order.payment_proof = None
+        db.commit()
+        
+        return f"✅ Payment proof removed from order {order_id}.{s3_delete_msg}"
+        
+    except Exception as e:
+        db.rollback()
+        return f"Error removing payment proof: {str(e)}"
     finally:
         db.close()

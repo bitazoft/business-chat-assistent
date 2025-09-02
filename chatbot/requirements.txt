@@ -46,3 +46,7 @@ pandas
 sentence-transformers
 
 langchain-community
+
+# AWS S3 support
+boto3
+botocore
