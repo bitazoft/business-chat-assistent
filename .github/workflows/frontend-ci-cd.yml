@@ -36,7 +36,7 @@ jobs:
                 mksiri/chatbot-client-frontend:${{ env.SHORT_SHA }}
                 mksiri/chatbot-client-frontend:latest
           build-args: |
-                NEXT_PUBLIC_API_BASE_URL=${{ env.API_BASE_URL }}
+                NEXT_PUBLIC_API_BASE_URL=${{ secrets.API_BASE_URL }}
 
       - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v1.0.0
