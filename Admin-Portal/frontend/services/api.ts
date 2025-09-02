@@ -2,7 +2,7 @@ import { toast } from "sonner"
 
 // Base API configuration
 export const API_CONFIG = {
-  BASE_URL: "http://localhost:7001/api",
+  BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL,
   TIMEOUT: 10000, // 10 seconds
   Credentials: "include"
 }

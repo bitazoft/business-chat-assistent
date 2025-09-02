@@ -13,7 +13,7 @@ export function DashboardWrapper({ user }: DashboardWrapperProps) {
 
   const handleLogout = async () => {
       try {
-        await fetch("http://localhost:7001/api/auth/logout", {
+        await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/logout`, {
           method: "POST",
           credentials: "include",
         });

@@ -40,7 +40,7 @@ export function AuthPage({ mode, onLogin, onBack, onSwitchMode }: AuthPageProps)
   const loginLogic = async (credentials: { email: string; password: string }) => {
     try {
       // Replace this with your actual API call
-      const response = await fetch("http://localhost:7001/api/auth/login", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`, {
           method: "POST",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
@@ -81,7 +81,7 @@ export function AuthPage({ mode, onLogin, onBack, onSwitchMode }: AuthPageProps)
   }) => {
     try {
       // Replace this with your actual API call
-      const response = await fetch("http://localhost:7001/api/auth/register", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/register`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

@@ -53,7 +53,7 @@ export function ProductManagement() {
   }, [searchTerm]);
 
   const fetchProducts = async () => {
-    fetch(`http://localhost:7001/api/products/getAll/${user?.sellerId}`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/products/getAll/${user?.sellerId}`, {
       method: "GET",
       credentials: "include",
       headers: {
@@ -112,7 +112,7 @@ export function ProductManagement() {
 
   const handleDeleteProduct = async (productId: number) => {
     try {
-      await fetch(`http://localhost:7001/api/products/delete/${productId}`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/products/delete/${productId}`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -134,7 +134,7 @@ export function ProductManagement() {
   const uploadImage = async (file: File) => {
     try {
       // create presinged url
-      const res = await fetch(`http://localhost:7001/api/uploads/image`,{
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/image`,{
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -183,7 +183,7 @@ export function ProductManagement() {
     try {
       const imageUrl = await uploadImage(productData.file!);
 
-      await fetch(`http://localhost:7001/api/products/add`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/products/add`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -227,7 +227,7 @@ export function ProductManagement() {
       }
 
       await fetch(
-        `http://localhost:7001/api/products/update/${selectedProduct?.id}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/update/${selectedProduct?.id}`,
         {
           method: "POST",
           credentials: "include",
