@@ -4,25 +4,34 @@ FROM node:22-alpine3.18 AS builder
 # Set working directory
 WORKDIR /usr/src/app
 
-# Install dependencies (exact versions from lock file)
+# Accept build argument
+ARG NEXT_PUBLIC_API_BASE_URL
+
+# Debug: Print what we received
+RUN echo "=== BUILD DEBUG ==="
+RUN echo "Received build arg: ${NEXT_PUBLIC_API_BASE_URL}"
+
+# Install dependencies first
 COPY package.json package-lock.json ./
 RUN npm install
 
 # Copy the rest of the source code
 COPY . .
 
-# Accept build argument and set environment variable
-ARG NEXT_PUBLIC_API_BASE_URL
-ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
+# Create .env.production file with the build arg
+RUN echo "NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}" > .env.production
 
-# Debug: Print what we received
-RUN echo "=== BUILD DEBUG ==="
-RUN echo "NEXT_PUBLIC_API_BASE_URL build arg: ${NEXT_PUBLIC_API_BASE_URL}"
-RUN echo "NEXT_PUBLIC_API_BASE_URL env var: $NEXT_PUBLIC_API_BASE_URL"
+# Verify the .env file was created correctly
+RUN echo "Created .env.production file:"
+RUN cat .env.production
 RUN echo "=================="
 
-# Build Next.js app
+# Build Next.js app (it will read from .env.production)
 RUN npm run build
+
+# Verify the environment variable was embedded in the build
+RUN echo "Checking if variable was embedded in build:"
+RUN find /usr/src/app/.next -name "*.js" -exec grep -l "${NEXT_PUBLIC_API_BASE_URL}" {} \; 2>/dev/null | head -3 || echo "Not found in JS files"
 
 # ---------------------
 # Production Stage
