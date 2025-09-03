@@ -31,6 +31,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: ./Admin-Portal/frontend 
+          no-cache: true
           push: true
           tags: |
                 mksiri/chatbot-client-frontend:${{ env.SHORT_SHA }}
