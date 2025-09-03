@@ -11,9 +11,15 @@ RUN npm install
 # Copy the rest of the source code
 COPY . .
 
-# Set environment variable for API base URL (can be overridden at build time)
+# Accept build argument and set environment variable
 ARG NEXT_PUBLIC_API_BASE_URL
 ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
+
+# Debug: Print what we received
+RUN echo "=== BUILD DEBUG ==="
+RUN echo "NEXT_PUBLIC_API_BASE_URL build arg: ${NEXT_PUBLIC_API_BASE_URL}"
+RUN echo "NEXT_PUBLIC_API_BASE_URL env var: $NEXT_PUBLIC_API_BASE_URL"
+RUN echo "=================="
 
 # Build Next.js app
 RUN npm run build
