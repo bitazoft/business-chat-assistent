@@ -25,7 +25,7 @@ export function AuthPageClient() {
       router.push("/dashboard")
     } catch (error) {
       console.error("Error setting session:", error)
-      // Fallback: still try to redirect
+      
       router.push("/dashboard")
     }
   }
