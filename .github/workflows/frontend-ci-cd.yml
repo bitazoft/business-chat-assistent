@@ -27,17 +27,31 @@ jobs:
         id: vars
         run: echo "SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_ENV
     
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: ./Admin-Portal/frontend 
-          no-cache: true
-          push: true
-          tags: |
-                mksiri/chatbot-client-frontend:${{ env.SHORT_SHA }}
-                mksiri/chatbot-client-frontend:latest
-          build-args: |
-                NEXT_PUBLIC_API_BASE_URL=${{ secrets.API_BASE_URL }}
+      # - name: Build and push Docker image
+      #   uses: docker/build-push-action@v4
+      #   with:
+      #     context: ./Admin-Portal/frontend 
+      #     no-cache: true
+      #     push: true
+      #     tags: |
+      #           mksiri/chatbot-client-frontend:${{ env.SHORT_SHA }}
+      #           mksiri/chatbot-client-frontend:latest
+      #     build-args: |
+      #           NEXT_PUBLIC_API_BASE_URL=${{ secrets.API_BASE_URL }}
+
+      - name: Build Docker image
+        working-directory: ./Admin-Portal/frontend
+        run: |
+          docker build \
+            --build-arg NEXT_PUBLIC_API_BASE_URL=${{ secrets.API_BASE_URL }} \
+            -t mksiri/chatbot-client-frontend:${{ env.SHORT_SHA }} \
+            -t mksiri/chatbot-client-frontend:latest \
+            .
+
+      - name: Push Docker image
+        run: |
+          docker push mksiri/chatbot-client-frontend:${{ env.SHORT_SHA }}
+          docker push mksiri/chatbot-client-frontend:latest
 
       - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v1.0.0
