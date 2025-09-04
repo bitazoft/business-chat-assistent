@@ -21,7 +21,6 @@ export function AuthPageWrapper() {
     try {
       setUserSession(userData)
 
-      // Redirect to dashboard
       router.push("/dashboard")
     } catch (error) {
       console.error("Error setting session:", error)
