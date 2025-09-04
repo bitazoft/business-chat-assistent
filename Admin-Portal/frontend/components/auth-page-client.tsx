@@ -19,7 +19,6 @@ export function AuthPageClient() {
 
   const handleLogin = (userData: { id: number; name: string; email: string; role: string; sellerId: number | null}) => {
     try {
-      // Set session using the helper function
       setUserSession(userData)
 
       // Redirect to dashboard
