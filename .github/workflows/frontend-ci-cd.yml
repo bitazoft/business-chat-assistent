@@ -49,4 +49,5 @@ jobs:
           script: |
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/chatbot-client-frontend:latest
             docker stop chatbot-client-frontend || true && docker rm chatbot-client-frontend || true
+            docker rmi -f ${{ secrets.DOCKERHUB_USERNAME }}/chatbot-client-frontend:latest || true
             docker run -d --name chatbot-client-frontend -p 3000:3000 ${{ secrets.DOCKERHUB_USERNAME }}/chatbot-client-frontend:latest
