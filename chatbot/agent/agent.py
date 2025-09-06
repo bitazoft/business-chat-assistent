@@ -509,7 +509,7 @@ class OptimizedChatbot:
         return AgentExecutor(
             agent=agent, 
             tools=self.tools, 
-            verbose=True,
+            verbose=False,
             max_iterations=10,  # Increased from 3 to 10 to handle complex workflows
             early_stopping_method="generate",  # Allow agent to stop early if it has an answer
             handle_parsing_errors=True,
@@ -606,17 +606,21 @@ class OptimizedChatbot:
             # Detect language from user message using language agent
             # language_agent = get_language_agent()
             # language_result = detect_language_detailed(message)
-            detected_language = detect_language(message)
-            logger.info(f"[Language] Detected language: {detected_language}")
-            
+            detected_language = "unknown"
+            if(os.getenv("LANGUAGE_DETECTION_ENABLED","false").lower()=="true"):
+                detected_language = detect_language(message)
+                logger.info(f"[Language] Detected language: {detected_language}")
+
             # Fast intent detection (skip LLM call)
             intent = fast_intent_detection(message)
             logger.info(f"[Optimized] Detected intent: {intent} for message: '{message}' in {time.time() - start_time:.2f}s")
             
             # # Get minimal RAG examples
-            examples = get_cached_rag_examples(message, self.seller_id, k=3)
-            logger.info(f"[Optimized] Retrieved RAG examples: {examples}... for intent: {intent}")
-            
+            examples = None
+            if(os.getenv("RAG_ENABLED","false").lower()=="true"):
+                examples = get_cached_rag_examples(message, self.seller_id, k=3)
+                logger.info(f"[Optimized] Retrieved RAG examples: {examples}... for intent: {intent}")
+
             # Format chat history for agent
             formatted_history = []
             for msg in self.chat_history[-20:]:  # Only last 3 exchanges for speed
@@ -630,7 +634,7 @@ class OptimizedChatbot:
             try:
                 result = self.agent.invoke({
                     "input": message,
-                    "examples": "",
+                    "examples": examples if examples is not None else "",
                     "intent": intent,
                     "chat_history": formatted_history
                 })

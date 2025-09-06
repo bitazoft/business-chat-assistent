@@ -99,7 +99,7 @@ class FastVectorStore:
                 self._metadata = []
                 self._loaded = True
     
-    @lru_cache(maxsize=100)
+    @lru_cache(maxsize=500)
     def similarity_search(self, query: str, k: int = 3, threshold: float = 3) -> List:
         """Fast similarity search using FAISS with caching, converting query string to embedding
         Args:
@@ -142,7 +142,7 @@ class FastVectorStore:
                 logger.info(f"[FastVectorStore] Found match at index {idx} with distance {dist:.4f}")
                 if idx < len(self._documents) and dist <= threshold:  # Apply threshold filter
                     metadata = self._metadata[idx] if idx < len(self._metadata) else {}
-                    matches.apped(type('Document', (), {
+                    matches.append(type('Document', (), {
                         'page_content': str(self._documents[idx]),
                         'metadata': metadata,
                         'similarity_score': dist

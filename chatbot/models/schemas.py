@@ -72,4 +72,4 @@ class ProductImage(Base):
     __tablename__ = "item_img"
     id = Column(Integer, primary_key=True)
     product_id = Column(Integer, ForeignKey("products.id"), nullable=False)
-    image = Column(String, nullable=False)
+    image_url = Column(String, nullable=False)

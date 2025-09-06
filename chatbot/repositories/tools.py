@@ -676,7 +676,7 @@ def get_product_images(product_id: int) -> str:
     db = SessionLocal()
     try:
         images = db.query(ProductImage).filter(ProductImage.product_id == product_id).all()
-        urls = [img.image for img in images if img.image]
+        urls = [img.image_url for img in images if img.image_url]
         return urls if urls else ["https://www.shutterstock.com/image-photo/person-using-smartphone-interact-friendly-600nw-2482428287.jpg"]
     finally:
         db.close()
