@@ -114,7 +114,7 @@ async function updateProduct(productId, updateData) {
             where: { id: img.id },
             data: { image_url: img.url, is_main: img.isMain },
           });
-        }else{
+        } else {
           await tx.item_img.create({
             data: { image_url: img.url, is_main: img.isMain, product_id: productId },
           });
