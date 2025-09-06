@@ -25,7 +25,7 @@ model chat_logs {
   intent           String?  @db.VarChar
   entities         Json?
   response         String   @db.VarChar
-  timestamp        DateTime @default(now()) @db.Timestamp(6)
+  timestamp        DateTime @default(now()) @db.Timestamptz(6)
   customer_id      String?  @db.VarChar
   seller_id        Int
   response_time_ms Int?
@@ -35,7 +35,7 @@ model orders {
   id             Int             @id @default(autoincrement())
   status         String          @db.VarChar
   total_amount   Float
-  created_at     DateTime?       @default(now()) @db.Timestamp(6)
+  created_at     DateTime?       @default(now()) @db.Timestamptz(6)
   customer_id    String?         @db.VarChar
   seller_id      Int
   payment_method String?         @db.VarChar
@@ -65,7 +65,9 @@ model products {
   price          Float
   stock          Int
   seller_id      Int
-  item_img       item_img[]      
+  created_at     DateTime        @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime        @updatedAt @db.Timestamptz(6)
+  item_img       item_img[]
   order_items    order_items[]
   seller_profile seller_profiles @relation(fields: [seller_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "products_seller_profile_fk")
 }
@@ -76,7 +78,7 @@ model customers {
   address    String    @db.VarChar
   number1    String    @db.VarChar
   number2    String?   @db.VarChar
-  created_at DateTime? @default(now()) @db.Timestamp(6)
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
   email      String?   @db.VarChar
   orders     orders[]
 }
@@ -84,10 +86,12 @@ model customers {
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model item_img {
   product_id Int      @default(autoincrement())
-  image      String   @db.VarChar
+  image_url  String   @db.VarChar
   id         Int      @id(map: "item_img_pk") @default(autoincrement())
-  products   products @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "item_img_products_fk")
-
+  is_main    Boolean  @default(false)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @updatedAt @db.Timestamptz(6)
+  products   products @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "item_img_products_fk")
 }
 
 model seller_profiles {
