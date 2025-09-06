@@ -229,7 +229,7 @@ export function ProductManagement() {
             color: "#fff",
           },
         });
-      }else{
+      } else {
         const err = await res.json();
         throw new Error(err.error || "Failed to add product");
       }
