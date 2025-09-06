@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
 import { createPortal } from "react-dom"
-import { X, Edit, Upload, ImageIcon, Trash2 } from "lucide-react"
+import { X, Edit, Upload, ImageIcon, Trash2, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -12,16 +12,30 @@ import { Textarea } from "@/components/ui/textarea"
 import type { Product } from "@/components/product-management"
 import { toast } from "sonner"
 
+interface EditableImage {
+  item_image_id?: number
+  file: File | null
+  url: string
+  isMain: boolean
+  action: "keep" | "update" | "delete" | "add"
+}
+
 interface EditProductModalProps {
   isOpen: boolean
   onClose: () => void
   onUpdateProduct: (productData: {
     name: string
-    price: string
+    price: number
     description: string
     stock: number
-    file: File | null
-    existingImageUrl?: string
+    imageUpdates: Array<{
+      item_image_id?: number
+      file?: File
+      isMain: boolean
+      action: "keep" | "update" | "delete" | "add"
+      url?: string
+    }>
+    mainImageId?: number
   }) => Promise<void>
   product: Product | null
 }
@@ -29,23 +43,29 @@ interface EditProductModalProps {
 export function EditProductModal({ isOpen, onClose, onUpdateProduct, product }: EditProductModalProps) {
   const [mounted, setMounted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isDragOver, setIsDragOver] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const fileInputRefs = useRef<(HTMLInputElement | null)[]>([])
   const [formData, setFormData] = useState({
     name: "",
-    price: "",
+    price: 0,
     description: "",
     stock: 0,
-    file: null as File | null,
   })
 
-  const [previewUrl, setPreviewUrl] = useState("")
+  const [images, setImages] = useState<EditableImage[]>([
+    { file: null, url: "", isMain: true, action: "keep" },
+    { file: null, url: "", isMain: false, action: "keep" },
+    { file: null, url: "", isMain: false, action: "keep" },
+    { file: null, url: "", isMain: false, action: "keep" },
+    { file: null, url: "", isMain: false, action: "keep" },
+  ])
+
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
   const [errors, setErrors] = useState({
     name: "",
     price: "",
     description: "",
     stock: "",
-    imageUrl: "",
+    images: "",
   })
 
   // Ensure component is mounted before rendering portal
@@ -61,18 +81,46 @@ export function EditProductModal({ isOpen, onClose, onUpdateProduct, product }: 
         price: product.price,
         description: product.description || "",
         stock: product.stock,
-        file: null, // Always start with no new file
       })
-      setPreviewUrl(product.image_url || "") 
+
+      // Initialize images from product data
+      const productImages = product.images || []
+      const initialImages: EditableImage[] = [
+        { file: null, url: "", isMain: true, action: "keep" },
+        { file: null, url: "", isMain: false, action: "keep" },
+        { file: null, url: "", isMain: false, action: "keep" },
+        { file: null, url: "", isMain: false, action: "keep" },
+        { file: null, url: "", isMain: false, action: "keep" },
+      ]
+
+      // Fill with existing product images
+      productImages.forEach((img, index) => {
+        if (index < 5) {
+          initialImages[index] = {
+            item_image_id: img.id,
+            file: null,
+            url: img.url,
+            isMain: img.isMain,
+            action: "keep",
+          }
+        }
+      })
+
+      // Ensure we have a main image
+      if (productImages.length > 0 && !productImages.some((img) => img.isMain)) {
+        initialImages[0].isMain = true
+      }
+
+      setImages(initialImages)
       setErrors({
         name: "",
         price: "",
         description: "",
         stock: "",
-        imageUrl: "",
+        images: "",
       })
       setIsSubmitting(false)
-      setIsDragOver(false)
+      setDragOverIndex(null)
     }
   }, [isOpen, product])
 
@@ -116,7 +164,7 @@ export function EditProductModal({ isOpen, onClose, onUpdateProduct, product }: 
       price: "",
       description: "",
       stock: "",
-      imageUrl: "",
+      images: "",
     }
 
     if (!formData.name.trim()) {
@@ -127,7 +175,7 @@ export function EditProductModal({ isOpen, onClose, onUpdateProduct, product }: 
       newErrors.price = "Price is required"
     }
 
-    if (parseFloat(formData.price) < 0) {
+    if (formData.price < 0) {
       newErrors.price = "Price cannot be negative"
     }
 
@@ -139,98 +187,186 @@ export function EditProductModal({ isOpen, onClose, onUpdateProduct, product }: 
       newErrors.stock = "Stock cannot be negative"
     }
 
+    // Check if at least one image exists (not deleted)
+    const hasImages = images.some((img) => img.action !== "delete" && (img.file !== null || img.url !== ""))
+    if (!hasImages) {
+      newErrors.images = "At least one product image is required"
+    }
+
     setErrors(newErrors)
     return !Object.values(newErrors).some((error) => error !== "")
   }
 
-  const handleFileSelect = (file: File) => {
+  const handleFileSelect = (file: File, index: number) => {
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      setErrors((prev) => ({ ...prev, image: "Please select a valid image file" }))
+      setErrors((prev) => ({ ...prev, images: "Please select valid image files only" }))
       return
     }
 
     // Validate file size (5MB limit)
     if (file.size > 5 * 1024 * 1024) {
-      setErrors((prev) => ({ ...prev, image: "Image size must be less than 5MB" }))
+      setErrors((prev) => ({ ...prev, images: "Each image must be less than 5MB" }))
       return
     }
 
     // Clear any previous image errors
-    setErrors((prev) => ({ ...prev, image: "" }))
+    setErrors((prev) => ({ ...prev, images: "" }))
 
-    // Clean up previous preview URL if it's a blob URL
-    if (previewUrl && previewUrl.startsWith("blob:")) {
-      URL.revokeObjectURL(previewUrl)
+    // Clean up previous blob URL if it exists
+    if (images[index].url && images[index].url.startsWith("blob:")) {
+      URL.revokeObjectURL(images[index].url)
     }
 
-    // Store file and create preview URL
-    setFormData((prev) => ({ ...prev, file }))
+    // Update the specific image slot
     const newPreviewUrl = URL.createObjectURL(file)
-    setPreviewUrl(newPreviewUrl)
+    setImages((prev) =>
+      prev.map((img, i) => {
+        if (i === index) {
+          return {
+            ...img,
+            file,
+            url: newPreviewUrl,
+            action: img.item_image_id ? "update" : "add",
+          }
+        }
+        return img
+      }),
+    )
 
     // Create object URL for preview
     const imageUrl = URL.createObjectURL(file)
     setFormData((prev) => ({ ...prev, imageUrl }))
   }
 
-  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const file = e.target.files?.[0]
     if (file) {
-      handleFileSelect(file)
+      handleFileSelect(file, index)
     }
   }
 
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDragOver = (e: React.DragEvent, index: number) => {
     e.preventDefault()
-    setIsDragOver(true)
+    setDragOverIndex(index)
   }
 
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault()
-    setIsDragOver(false)
+    setDragOverIndex(null)
   }
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = (e: React.DragEvent, index: number) => {
     e.preventDefault()
-    setIsDragOver(false)
+    setDragOverIndex(null)
 
     const file = e.dataTransfer.files[0]
     if (file) {
-      handleFileSelect(file)
+      handleFileSelect(file, index)
     }
   }
 
-  const handleRemoveImage = () => {
-    if (previewUrl && previewUrl.startsWith("blob:")) {
-      URL.revokeObjectURL(previewUrl)
+  const handleRemoveImage = (index: number) => {
+    // Clean up blob URL if it exists
+    if (images[index].url && images[index].url.startsWith("blob:")) {
+      URL.revokeObjectURL(images[index].url)
     }
-    setFormData((prev) => ({ ...prev, file: null }))
-    setPreviewUrl("")
-    setFormData((prev) => ({ ...prev, imageUrl: "" }))
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ""
+
+    
+    setImages((prev) =>
+      prev.map((img, i) => {
+        if (i === index) {
+          if (img.item_image_id) {
+            // Mark existing image for deletion
+            return {
+              ...img,
+              file: null,
+              url: "",
+              action: "delete",
+            }
+          } else {
+            // Remove new image that hasn't been saved yet
+            return {
+              ...img,
+              file: null,
+              url: "",
+              action: "keep",
+            }
+          }
+        }
+        return img
+      }),
+    )
+
+    if (fileInputRefs.current[index]) {
+      fileInputRefs.current[index]!.value = ""
     }
+  }
+
+  const handleSetMainImage = (index: number) => {
+    // Only allow setting main if this slot has an image and isn't marked for deletion
+    if (images[index].action === "delete" || (!images[index].file && !images[index].url)) return
+
+    setImages((prev) =>
+      prev.map((img, i) => ({
+        ...img,
+        isMain: i === index,
+      })),
+    )
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    if (!validateForm()) {
+      toast.error("Validation Error !!", {
+        style: {
+          background: "rgba(255, 0, 0, 0.1)",
+          color: "#fff",
+        },
+      })
+      return
+    }
+
     setIsSubmitting(true)
 
-    if (validateForm()) {
-      try {
-        await onUpdateProduct(formData)
-      } catch (error) {
-        toast.error("An error occurred while adding the product. Please try again.", {
-          style: {
-            background: "rgba(255, 0, 0, 0.1)",
-            color: "#fff",
-          },
-        })
-      } finally {
-        setIsSubmitting(false)
-      }
+    try {
+      // Find the main image ID
+      const mainImage = images.find((img) => img.isMain && img.action !== "delete")
+      const mainImageId = mainImage?.item_image_id
+
+      // Prepare image updates for API
+      const imageUpdates = images
+        .filter(
+          (img) =>
+            img.action !== "keep" ||
+            img.isMain !== (product?.images?.find((pImg) => pImg.id === img.item_image_id)?.isMain || false),
+        )
+        .map((img) => ({
+          item_image_id: img.item_image_id,
+          file: img.file || undefined,
+          isMain: img.isMain,
+          action: img.action,
+          url: img.action === "keep" ? img.url : undefined,
+        }))
+
+      await onUpdateProduct({
+        name: formData.name,
+        price: formData.price,
+        description: formData.description,
+        stock: formData.stock,
+        imageUpdates,
+        mainImageId,
+      })
+    } catch (error) {
+      toast.error("An error occurred while adding the product. Please try again.", {
+        style: {
+          background: "rgba(255, 0, 0, 0.1)",
+          color: "#fff",
+        },
+      })
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -256,10 +392,12 @@ export function EditProductModal({ isOpen, onClose, onUpdateProduct, product }: 
 
   const handleClose = () => {
     if (!isSubmitting) {
-      // Clean up preview URL if it's a blob URL
-      if (previewUrl && previewUrl.startsWith("blob:")) {
-        URL.revokeObjectURL(previewUrl)
-      }
+      // Clean up blob URLs
+      images.forEach((img) => {
+        if (img.url && img.url.startsWith("blob:")) {
+          URL.revokeObjectURL(img.url)
+        }
+      })
       onClose()
     }
   }
@@ -273,8 +411,8 @@ export function EditProductModal({ isOpen, onClose, onUpdateProduct, product }: 
       className="fixed inset-0 bg-black/60 flex items-center justify-center z-[9999] p-4 animate-in fade-in-0 duration-300"
       onClick={handleBackdropClick}
     >
-      <div className="bg-gradient-to-b from-[#1a1a2e] to-[#16213e] rounded-xl border border-gray-700 w-full max-w-2xl shadow-2xl animate-in zoom-in-95 duration-300 max-h-[90vh] overflow-y-auto">
-        {/* Header */}
+    <div className="bg-gradient-to-b from-[#1a1a2e] to-[#16213e] rounded-xl border border-gray-700 w-full max-w-4xl shadow-2xl animate-in zoom-in-95 duration-300 max-h-[90vh] overflow-y-auto">
+      {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-700 sticky top-0 bg-gradient-to-b from-[#1a1a2e] to-[#16213e] z-10">
           <h2 className="text-xl font-bold text-white flex items-center">
             <Edit className="w-5 h-5 mr-2 text-violet-400" />
@@ -292,82 +430,127 @@ export function EditProductModal({ isOpen, onClose, onUpdateProduct, product }: 
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Image Upload Section */}
+          {/* Product Images Section */}
           <div className="space-y-4">
-            <Label className="text-violet-400 font-medium">Product Image</Label>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileInputChange}
-                  disabled={isSubmitting}
-                  className="hidden"
-                />
-            {previewUrl ? (
-              // Image Preview
-              <div className="relative">
-                <div className="w-full h-48 rounded-lg overflow-hidden bg-gray-800 border-2 border-gray-600">
-                  <img
-                    src={previewUrl || "/placeholder.svg"}
-                    alt="Product preview"
-                    className="w-full h-full object-cover"
-                    crossOrigin="anonymous"
+            <div className="flex items-center justify-between">
+              <Label className="text-violet-400 font-medium">Product Images (Up to 5)</Label>
+              <div className="text-sm text-gray-400">
+                <Star className="w-4 h-4 inline mr-1 text-yellow-400" />
+                Click the star to set main image
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              {images.map((image, index) => (
+                <div key={index} className="relative">
+                  {/* Hidden file input */}
+                  <input
+                    ref={(el) => {fileInputRefs.current[index] = el}}
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleFileInputChange(e, index)}
+                    disabled={isSubmitting}
+                    className="hidden"
                   />
-                </div>
+
+              {image.url && image.action !== "delete" ? (
+                // Image Preview
+                    <div className="relative group">
+                    <div
+                      className={`w-full h-32 rounded-lg overflow-hidden bg-gray-800 border-2 ${
+                        image.isMain ? "border-yellow-400" : "border-gray-600"
+                      } ${image.action === ("delete" as typeof image.action) ? "opacity-50" : ""}`}
+                    >
+                      <img
+                        src={image.url || "/placeholder.svg"}
+                        alt={`Product image ${index + 1}`}
+                        className="w-full h-full object-cover"
+                        crossOrigin="anonymous"
+                      />
+                    </div>
+
+                    {/* Main image indicator */}
+                    {image.isMain && (
+                      <div className="absolute top-1 left-1 bg-yellow-400 text-black px-1 py-0.5 rounded text-xs font-semibold">
+                        MAIN
+                      </div>
+                    )}
+
+                    {/* Update indicator */}
+                    {image.action === "update" && (
+                      <div className="absolute top-1 left-1 bg-blue-400 text-white px-1 py-0.5 rounded text-xs font-semibold">
+                        UPDATED
+                      </div>
+                    )}
+
+                    {/* Action buttons */}
+                    <div className="absolute top-1 right-1 flex space-x-1">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleSetMainImage(index)}
+                        disabled={isSubmitting || image.isMain || image.action === ("delete" as typeof image.action)}
+                        className={`w-6 h-6 p-0 ${
+                          image.isMain
+                            ? "bg-yellow-400/80 text-black"
+                            : "bg-gray-800/80 hover:bg-yellow-400/80 hover:text-black text-yellow-400"
+                        } backdrop-blur-sm`}
+                      >
+                        <Star className="w-3 h-3" />
+                      </Button>
                 <Button
                   type="button"
                   variant="destructive"
-                  size="sm"
-                  onClick={handleRemoveImage}
+                  onClick={() => handleRemoveImage(index)}
                   disabled={isSubmitting}
-                  className="absolute top-2 right-2 bg-red-500/80 hover:bg-red-500 backdrop-blur-sm"
+                  className="w-6 h-6 p-0 bg-red-500/80 hover:bg-red-500 backdrop-blur-sm"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-3 h-3" />
                 </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => !isSubmitting && fileInputRef.current?.click()}
-                  disabled={isSubmitting}
-                  className="absolute bottom-2 right-2 bg-gray-800/80 hover:bg-gray-700 backdrop-blur-sm border-gray-600"
-                >
-                  <Upload className="w-4 h-4 mr-1" />
+              </div>
+
+              {/* Change button */}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRefs.current[index]?.click()}
+                disabled={isSubmitting}
+                className="absolute bottom-1 left-1 right-1 bg-gray-800/80 hover:bg-gray-700 backdrop-blur-sm border-gray-600 text-xs h-6 disabled:opacity-50"
+              >
+                <Upload className="w-3 h-3 mr-1" />
                   Change
                 </Button>
               </div>
             ) : (
               // Upload Area
               <div
-                className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 cursor-pointer ${
-                  isDragOver
-                    ? "border-violet-400 bg-violet-500/10"
-                    : "border-gray-600 hover:border-gray-500 hover:bg-gray-800/30"
-                } ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                onClick={() => !isSubmitting && fileInputRef.current?.click()}
-              >
-                <div className="flex flex-col items-center space-y-4">
-                  <div className="p-4 rounded-full bg-gray-800">
-                    {isDragOver ? (
-                      <Upload className="w-8 h-8 text-violet-400" />
-                    ) : (
-                      <ImageIcon className="w-8 h-8 text-gray-400" />
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-white font-medium mb-1">
-                      {isDragOver ? "Drop image here" : "Upload product image"}
-                    </p>
-                    <p className="text-gray-400 text-sm">Drag and drop or click to browse (Max 5MB, JPG, PNG, GIF)</p>
-                  </div>
-                </div>
+              className={`w-full h-32 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all duration-300 ${
+                dragOverIndex === index
+                  ? "border-violet-400 bg-violet-500/10"
+                  : "border-gray-600 hover:border-gray-500 hover:bg-gray-800/30"
+              } ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+              onDragOver={(e) => handleDragOver(e, index)}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, index)}
+              onClick={() => !isSubmitting && fileInputRefs.current[index]?.click()}
+            >
+              <div className="text-center">
+                {dragOverIndex === index ? (
+                  <Upload className="w-6 h-6 text-violet-400 mx-auto mb-1" />
+                ) : (
+                  <ImageIcon className="w-6 h-6 text-gray-400 mx-auto mb-1" />
+                )}
+                <p className="text-xs text-gray-400">{index === 0 ? "Main Image" : `Image ${index + 1}`}</p>
               </div>
-            )}
-            {errors.imageUrl && <p className="text-red-400 text-sm">{errors.imageUrl}</p>}
-          </div>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+    {errors.images && <p className="text-red-400 text-sm">{errors.images}</p>}
+  </div>
 
           {/* Form Fields Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -399,7 +582,7 @@ export function EditProductModal({ isOpen, onClose, onUpdateProduct, product }: 
             </Label>
             <Input
               id="editProductPrice"
-              type="text"
+              type="number"
               value={formData.price}
               onChange={(e) => handleInputChange("price", e.target.value)}
               className={`bg-[#0f0f23] border-gray-600 text-white focus:border-violet-400 focus:ring-violet-400/20 transition-all duration-300 ${
