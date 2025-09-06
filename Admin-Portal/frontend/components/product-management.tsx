@@ -26,15 +26,21 @@ import {
 } from "@/components/ui/select";
 import { json } from "stream/consumers";
 
+export interface ProductImage {
+  id?: number
+  url: string
+  isMain: boolean
+}
+
 export interface Product {
   id: number;
   name: string;
-  price: string;
+  price: number;
   stock: number;
   category: string;
   status: string;
   description?: string;
-  image_url: string;
+  images?: ProductImage[]
 }
 
 export function ProductManagement() {
@@ -112,11 +118,16 @@ export function ProductManagement() {
 
   const handleDeleteProduct = async (productId: number) => {
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/products/delete/${productId}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/products/delete/${productId}`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
       });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Failed to delete product");
+      }
 
       fetchProducts();
 
@@ -175,15 +186,29 @@ export function ProductManagement() {
   // Empty function for add product - you can implement your logic here
   const onAddProduct = async (productData: {
     name: string;
-    price: string;
+    price: number;
     description: string;
     stock: number;
-    file: File | null
+    images: Array<{
+      file: File
+      isMain: boolean
+    }>
   }) => {
     try {
-      const imageUrl = await uploadImage(productData.file!);
+      // Simulate API validation
+      if (products.some((p) => p.name.toLowerCase() === productData.name.toLowerCase())) {
+        toast.error("A product with this name already exists")
+        return
+      }
 
-      await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/products/add`, {
+      // Process images
+      const processedImages: ProductImage[] = await Promise.all(productData.images.map(async (img, index) => ({
+        id: undefined,
+        url: await uploadImage(img.file), 
+        isMain: img.isMain,
+      })));
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/products/add`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -192,20 +217,26 @@ export function ProductManagement() {
           price: productData.price,
           description: productData.description,
           stock: productData.stock,
-          image_url: imageUrl,
+          images: processedImages,
           seller_id: user?.sellerId,
         }),
       });
+      
+      if (res.status === 200) {
+        toast.success("Product added successfully !!", {
+          style: {
+            background: "rgba(0, 128, 0, 0.1)",
+            color: "#fff",
+          },
+        });
+      }else{
+        const err = await res.json();
+        throw new Error(err.error || "Failed to add product");
+      }
 
       fetchProducts();
       setIsAddModalOpen(false);
 
-      toast.success("Product added successfully !!", {
-        style: {
-          background: "rgba(0, 128, 0, 0.3)",
-          color: "#fff",
-        },
-      });
     } catch (error) {
       toast.error((error as Error).toString());
     }
@@ -214,20 +245,62 @@ export function ProductManagement() {
   // Empty function for update product - you can implement your logic here
   const onUpdateProduct = async (productData: {
     name: string;
-    price: string;
+    price: number;
     description: string;
     stock: number;
-    file: File | null
-    existingImageUrl?: string
+    imageUpdates: Array<{
+      item_image_id?: number 
+      file?: File 
+      isMain: boolean
+      action: "keep" | "update" | "delete" | "add"
+      url?: string
+    }>
+    mainImageId?: number
   }) => {
     try {
-      let imageUrl;
-      if (productData.file != null) {
-        imageUrl = await uploadImage(productData.file)
-      }
+      const processedImages: ProductImage[] = []
 
-      await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/update/${selectedProduct?.id}`,
+      for (const update of productData.imageUpdates) {
+        switch (update.action) {
+          case "keep":
+            // Keep existing image as is
+            if (update.item_image_id && update.url) {
+              processedImages.push({
+                id: update.item_image_id,
+                url: update.url,
+                isMain: update.isMain,
+              })
+            }
+            break
+
+          case "update":
+            // Update existing image with new file
+            if (update.item_image_id && update.file) {
+              processedImages.push({
+                id: update.item_image_id,
+                url: await uploadImage(update.file),
+                isMain: update.isMain,
+              })
+            }
+            break
+
+          case "add":
+            if (update.file) {
+              processedImages.push({
+                id: undefined,
+                url:  await uploadImage(update.file),
+                isMain: update.isMain,
+              })
+            }
+            break
+
+          case "delete":
+            // Don't add to processed images (effectively deletes it)
+            // In real app, you would call API to delete the image record
+            break
+        }
+      }
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/products/update/${selectedProduct?.id}`,
         {
           method: "POST",
           credentials: "include",
@@ -237,22 +310,28 @@ export function ProductManagement() {
             price: productData.price,
             description: productData.description,
             stock: productData.stock,
-            image_url: imageUrl ? imageUrl : productData.existingImageUrl,
+            images: processedImages,
             seller_id: user?.sellerId,
           }),
         }
       );
 
+      if (res.status === 200) {
+        toast.success("Product details updated successfully!", {
+          style: {
+            background: "rgba(0, 128, 0, 0.1)",
+            color: "#fff",
+          },
+        });
+      }else{
+        const err = await res.json();
+        throw new Error(err.error || "Failed to update product");
+      }
+
       fetchProducts();
       setIsEditModalOpen(false);
       setSelectedProduct(null);
 
-      toast.success("Product details updated successfully!", {
-        style: {
-          background: "rgba(0, 128, 0, 0.3)",
-          color: "#fff",
-        },
-      });
     } catch (error) {
       toast.error((error as Error).toString());
     }
@@ -392,16 +471,20 @@ export function ProductManagement() {
                       >
                       <td className="py-3 px-4">
                         <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-800 flex items-center justify-center">
-                          {product.image_url ? (
-                            <img
-                              src={product.image_url || "/placeholder.svg"}
-                              alt={product.name}
-                              className="w-full h-full object-cover"
-                              crossOrigin="anonymous"
-                            />
-                          ) : (
-                            <Package className="w-6 h-6 text-gray-500" />
-                          )}
+                            {(() => {
+                              const mainImage = product.images?.find((img) => img.isMain)
+                              const imageUrl = mainImage?.url || product.images?.find((img)=>img.url)?.url || null;
+                              return imageUrl ? (
+                                <img
+                                  src={imageUrl || "/placeholder.svg"}
+                                  alt={product.name}
+                                  className="w-full h-full object-cover"
+                                  crossOrigin="anonymous"
+                                />
+                              ) : (
+                                <Package className="w-6 h-6 text-gray-500" />
+                              )
+                            })()}
                         </div>
                       </td>
                         <td className="py-3 px-4 text-white font-medium">
