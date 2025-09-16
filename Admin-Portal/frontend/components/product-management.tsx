@@ -195,7 +195,6 @@ export function ProductManagement() {
     }>
   }) => {
     try {
-      // Simulate API validation
       if (products.some((p) => p.name.toLowerCase() === productData.name.toLowerCase())) {
         toast.error("A product with this name already exists")
         return
