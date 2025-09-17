@@ -51,19 +51,30 @@ import os
 import re
 
 # Load environment variables
-DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
-DEEPSEEK_API_BASE = os.getenv("DEEPSEEK_API_BASE", "https://api.deepseek.com/v1")
+API_KEY = os.getenv("API_KEY")
+API_BASE = os.getenv("API_BASE", "https://api.deepseek.com/v1")
 
-# Configure LLM with optimized settings for speed
-llm = ChatDeepSeek(
-    model="deepseek-chat",
-    api_key=DEEPSEEK_API_KEY,
-    base_url=DEEPSEEK_API_BASE,
-    temperature=0.1,  # Lower temperature for faster, more deterministic responses
-    max_tokens=512,   # Limit response length for speed
-    timeout=300,     
-    max_retries=3     # Reduce retries for faster failure handling
-)
+if(os.getenv("CHAT_MODEL")== "DEEPSEEK"):
+    # Configure LLM with optimized settings for speed
+    llm = ChatDeepSeek(
+        model="deepseek-chat",
+        api_key=API_KEY,
+        base_url=API_BASE,
+        temperature=0.1,  # Lower temperature for faster, more deterministic responses
+        max_tokens=512,   # Limit response length for speed
+        timeout=300,     
+        max_retries=3     # Reduce retries for faster failure handling
+    )
+    
+elif(os.getenv("CHAT_MODEL")=="GPT"):
+    llm = ChatOpenAI(
+        model_name=os.getenv("CHAT_MODEL_NAME","gpt-3.5-turbo"),
+        temperature=0.1,  # Lower temperature for faster, more deterministic responses
+        max_tokens=512,   # Limit response length for speed
+        timeout=300,     
+        max_retries=3     # Reduce retries for faster failure handling
+    )
+
 
 # Caching for frequently accessed data
 @lru_cache(maxsize=100)
