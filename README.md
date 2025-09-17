@@ -214,4 +214,4 @@ You can containerize each service separately; no root-level compose is provided 
 
 ## License
 
-MIT (or your preferred license) 
+MIT Licence 
