@@ -18,10 +18,10 @@ const dbConnect = async () => {
     console.log(`✅ Connected to PostgreSQL`);
     console.log(`🔹 Host: ${host}`);
     console.log(`🔹 Database: ${database}`);
-    client.release(); // Return client to pool
+    client.release(); 
   } catch (err) {
     console.error("❌ PostgreSQL connection error:", err.message);
-    process.exit(1); // Optional: stop app if DB is critical
+    process.exit(1);
   }
 };
 
