@@ -9,7 +9,7 @@ user_id = "user5"
 chat_history = []
 
 # Chat endpoint
-url = "http://127.0.0.1:8000/chat"
+url = "http://127.0.0.1:8001/chat"
 
 print("🧠 Chatbot session started. Type 'exit' to quit.\n")
 

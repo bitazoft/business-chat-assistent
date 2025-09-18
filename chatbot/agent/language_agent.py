@@ -12,24 +12,46 @@ import re
 import os
 from functools import lru_cache
 from utils.logger import get_logger
+from langchain.chat_models import ChatOpenAI
 
 # Get logger for this module
 logger = get_logger(__name__)
 
 # Load environment variables
-DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
-DEEPSEEK_API_BASE = os.getenv("DEEPSEEK_API_BASE", "https://api.deepseek.com/v1")
+API_KEY = os.getenv("API_KEY")
+API_BASE = os.getenv("API_BASE", "https://api.deepseek.com/v1")
 
 # Configure LLM for language detection
 language_detection_llm = ChatDeepSeek(
     model="deepseek-chat",
-    api_key=DEEPSEEK_API_KEY,
-    base_url=DEEPSEEK_API_BASE,
+    api_key=API_KEY,
+    base_url=API_BASE,
     temperature=0.0,  # Very low temperature for consistent classification
     max_tokens=50,    # Very short responses for speed
     timeout=60,       # Quick timeout
     max_retries=2
 )
+
+if os.getenv("AI_PROVIDER") == "GPT":
+    
+    language_detection_llm = ChatOpenAI(
+        model_name=os.getenv("CHAT_MODEL", "gpt-3.5-turbo"),
+        openai_api_key=API_KEY,
+        temperature=0.0,
+        max_tokens=50,
+        timeout=60,
+        max_retries=2
+    )       
+elif os.getenv("AI_PROVIDER") != "DEEPSEEK":
+    language_detection_llm = ChatDeepSeek(
+        model="deepseek-chat",
+        api_key=API_KEY,    
+        base_url=API_BASE,
+        temperature=0.0,
+        max_tokens=50,
+        timeout=60,
+        max_retries=2
+    )
 
 class LanguageDetectionResult(BaseModel):
     """Result of language detection"""

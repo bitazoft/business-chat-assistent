@@ -1,4 +1,4 @@
-from langchain_openai import ChatOpenAI
+from langchain_community.chat_models import ChatOpenAI
 from langchain_deepseek.chat_models import ChatDeepSeek
 from langchain_openai import OpenAIEmbeddings
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
@@ -54,10 +54,10 @@ import re
 API_KEY = os.getenv("API_KEY")
 API_BASE = os.getenv("API_BASE", "https://api.deepseek.com/v1")
 
-if(os.getenv("CHAT_MODEL")== "DEEPSEEK"):
+if(os.getenv("AI_PROVIDER")== "DEEPSEEK"):
     # Configure LLM with optimized settings for speed
     llm = ChatDeepSeek(
-        model="deepseek-chat",
+        model=os.getenv("CHAT_MODEL","deepseek-chat"),
         api_key=API_KEY,
         base_url=API_BASE,
         temperature=0.1,  # Lower temperature for faster, more deterministic responses
@@ -66,9 +66,10 @@ if(os.getenv("CHAT_MODEL")== "DEEPSEEK"):
         max_retries=3     # Reduce retries for faster failure handling
     )
     
-elif(os.getenv("CHAT_MODEL")=="GPT"):
+elif(os.getenv("AI_PROVIDER")=="GPT"):
     llm = ChatOpenAI(
-        model_name=os.getenv("CHAT_MODEL_NAME","gpt-3.5-turbo"),
+        model_name=os.getenv("CHAT_MODEL","gpt-3.5-turbo"),
+        openai_api_key=API_KEY,  # Explicitly set API key
         temperature=0.1,  # Lower temperature for faster, more deterministic responses
         max_tokens=512,   # Limit response length for speed
         timeout=300,     

@@ -17,6 +17,7 @@ typing_extensions
 langchain
 langchain-openai
 langchain-deepseek
+langchain-community
 
 # Token encoding (used in LangChain/OpenAI)
 tiktoken
