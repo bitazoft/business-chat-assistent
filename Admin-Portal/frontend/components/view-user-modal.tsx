@@ -69,6 +69,8 @@ export function ViewUserModal({ isOpen, onClose, user, onStatusChange }: ViewUse
         return "bg-purple-500/20 text-purple-400 border-purple-500/30"
       case "user":
         return "bg-blue-500/20 text-blue-400 border-blue-500/30"
+      case "seller":
+        return "bg-orange-500/20 text-orange-400 border-orange-500/30"
       default:
         return "bg-gray-500/20 text-gray-400 border-gray-500/30"
     }
@@ -198,7 +200,7 @@ export function ViewUserModal({ isOpen, onClose, user, onStatusChange }: ViewUse
               </div>
               <div className="text-center p-4 bg-[#1a1a2e] rounded-lg">
                 <DollarSign className="w-8 h-8 text-violet-400 mx-auto mb-2" />
-                <p className="text-2xl font-bold text-violet-400">{user.totalSpent}</p>
+                <p className="text-2xl font-bold text-violet-400">{user.totalEarned}</p>
                 <p className="text-gray-400 text-sm">Total Spent</p>
               </div>
             </div>
@@ -210,28 +212,38 @@ export function ViewUserModal({ isOpen, onClose, user, onStatusChange }: ViewUse
             <div className="flex items-center space-x-4">
               <div className="flex-1">
                 <p className="text-gray-400 text-sm mb-2">Change User Status</p>
-                <Select value={user.status} onValueChange={handleStatusChange}>
+                <Select
+                  value={user.status}
+                  onValueChange={handleStatusChange}
+                >
                   <SelectTrigger className="bg-[#1a1a2e] border-gray-600 text-white focus:border-violet-400">
-                    <SelectValue />
+                    <SelectValue placeholder="Select status" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1a1a2e] border-gray-600">
+
+                  <SelectContent
+                    className="bg-[#1a1a2e] border-gray-600 z-[10000]"
+                    side="bottom"
+                    position="popper"
+                  >
                     <SelectItem value="active" className="text-white hover:bg-gray-800">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
+                      <span className="flex items-center space-x-2">
+                        <span className="w-2 h-2 bg-emerald-400 rounded-full" />
                         <span>Active</span>
-                      </div>
+                      </span>
                     </SelectItem>
+
                     <SelectItem value="inactive" className="text-white hover:bg-gray-800">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                      <span className="flex items-center space-x-2">
+                        <span className="w-2 h-2 bg-yellow-400 rounded-full" />
                         <span>Inactive</span>
-                      </div>
+                      </span>
                     </SelectItem>
+
                     <SelectItem value="suspended" className="text-white hover:bg-gray-800">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-red-400 rounded-full"></div>
+                      <span className="flex items-center space-x-2">
+                        <span className="w-2 h-2 bg-red-400 rounded-full" />
                         <span>Suspended</span>
-                      </div>
+                      </span>
                     </SelectItem>
                   </SelectContent>
                 </Select>

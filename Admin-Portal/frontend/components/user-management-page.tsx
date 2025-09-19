@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { AddUserModal } from "@/components/add-user-modal"
 import { EditUserModal } from "@/components/edit-user-modal"
 import { ViewUserModal } from "@/components/view-user-modal"
+import { fetchUsers } from "@/services/userService"
 
 export interface User {
   id: string
@@ -23,92 +24,92 @@ export interface User {
   createdAt: string
   lastLogin?: string
   totalOrders: number
-  totalSpent: string
+  totalEarned: string
 }
 
-const initialUsers: User[] = [
-  {
-    id: "usr_001",
-    businessName: "Tech Solutions Inc",
-    email: "admin@techsolutions.com",
-    whatsappNumber: "+1 (555) 123-4567",
-    address: "123 Tech Street, Silicon Valley, CA",
-    role: "admin",
-    status: "active",
-    createdAt: "2024-01-15",
-    lastLogin: "2024-01-20",
-    totalOrders: 0,
-    totalSpent: "$0.00",
-  },
-  {
-    id: "usr_002",
-    businessName: "Fashion Boutique",
-    email: "owner@fashionboutique.com",
-    whatsappNumber: "+1 (555) 234-5678",
-    address: "456 Fashion Ave, New York, NY",
-    role: "user",
-    status: "active",
-    createdAt: "2024-01-10",
-    lastLogin: "2024-01-19",
-    totalOrders: 45,
-    totalSpent: "$12,450.00",
-  },
-  {
-    id: "usr_003",
-    businessName: "Food Delivery Co",
-    email: "manager@fooddelivery.com",
-    whatsappNumber: "+1 (555) 345-6789",
-    address: "789 Food Court, Chicago, IL",
-    role: "user",
-    status: "active",
-    createdAt: "2024-01-08",
-    lastLogin: "2024-01-18",
-    totalOrders: 128,
-    totalSpent: "$8,920.00",
-  },
-  {
-    id: "usr_004",
-    businessName: "Electronics Store",
-    email: "info@electronicsstore.com",
-    whatsappNumber: "+1 (555) 456-7890",
-    address: "321 Electronics Blvd, Austin, TX",
-    role: "user",
-    status: "suspended",
-    createdAt: "2024-01-05",
-    lastLogin: "2024-01-15",
-    totalOrders: 23,
-    totalSpent: "$5,670.00",
-  },
-  {
-    id: "usr_005",
-    businessName: "Home Decor Studio",
-    email: "contact@homedecor.com",
-    whatsappNumber: "+1 (555) 567-8901",
-    address: "654 Design Lane, Los Angeles, CA",
-    role: "user",
-    status: "inactive",
-    createdAt: "2024-01-03",
-    lastLogin: "2024-01-10",
-    totalOrders: 12,
-    totalSpent: "$2,340.00",
-  },
-  {
-    id: "usr_006",
-    businessName: "Sports Equipment",
-    email: "sales@sportsequip.com",
-    whatsappNumber: "+1 (555) 678-9012",
-    address: "987 Sports Way, Denver, CO",
-    role: "user",
-    status: "active",
-    createdAt: "2024-01-01",
-    lastLogin: "2024-01-20",
-    totalOrders: 67,
-    totalSpent: "$15,890.00",
-  },
-]
+// const initialUsers: User[] = [
+//   {
+//     id: "usr_001",
+//     businessName: "Tech Solutions Inc",
+//     email: "admin@techsolutions.com",
+//     whatsappNumber: "+1 (555) 123-4567",
+//     address: "123 Tech Street, Silicon Valley, CA",
+//     role: "admin",
+//     status: "active",
+//     createdAt: "2024-01-15",
+//     lastLogin: "2024-01-20",
+//     totalOrders: 0,
+//     totalEarned: "$0.00",
+//   },
+//   {
+//     id: "usr_002",
+//     businessName: "Fashion Boutique",
+//     email: "owner@fashionboutique.com",
+//     whatsappNumber: "+1 (555) 234-5678",
+//     address: "456 Fashion Ave, New York, NY",
+//     role: "user",
+//     status: "active",
+//     createdAt: "2024-01-10",
+//     lastLogin: "2024-01-19",
+//     totalOrders: 45,
+//     totalEarned: "$12,450.00",
+//   },
+//   {
+//     id: "usr_003",
+//     businessName: "Food Delivery Co",
+//     email: "manager@fooddelivery.com",
+//     whatsappNumber: "+1 (555) 345-6789",
+//     address: "789 Food Court, Chicago, IL",
+//     role: "user",
+//     status: "active",
+//     createdAt: "2024-01-08",
+//     lastLogin: "2024-01-18",
+//     totalOrders: 128,
+//     totalEarned: "$8,920.00",
+//   },
+//   {
+//     id: "usr_004",
+//     businessName: "Electronics Store",
+//     email: "info@electronicsstore.com",
+//     whatsappNumber: "+1 (555) 456-7890",
+//     address: "321 Electronics Blvd, Austin, TX",
+//     role: "user",
+//     status: "suspended",
+//     createdAt: "2024-01-05",
+//     lastLogin: "2024-01-15",
+//     totalOrders: 23,
+//     totalEarned: "$5,670.00",
+//   },
+//   {
+//     id: "usr_005",
+//     businessName: "Home Decor Studio",
+//     email: "contact@homedecor.com",
+//     whatsappNumber: "+1 (555) 567-8901",
+//     address: "654 Design Lane, Los Angeles, CA",
+//     role: "user",
+//     status: "inactive",
+//     createdAt: "2024-01-03",
+//     lastLogin: "2024-01-10",
+//     totalOrders: 12,
+//     totalEarned: "$2,340.00",
+//   },
+//   {
+//     id: "usr_006",
+//     businessName: "Sports Equipment",
+//     email: "sales@sportsequip.com",
+//     whatsappNumber: "+1 (555) 678-9012",
+//     address: "987 Sports Way, Denver, CO",
+//     role: "user",
+//     status: "active",
+//     createdAt: "2024-01-01",
+//     lastLogin: "2024-01-20",
+//     totalOrders: 67,
+//     totalEarned: "$15,890.00",
+//   },
+// ]
 
 export function UserManagementPage() {
-  const [users, setUsers] = useState<User[]>(initialUsers)
+  const [users, setUsers] = useState<User[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [roleFilter, setRoleFilter] = useState("all")
@@ -141,7 +142,17 @@ export function UserManagementPage() {
   // Reset to first page when filters change
   useEffect(() => {
     setCurrentPage(1)
+    loadUsers()
   }, [searchTerm, statusFilter, roleFilter])
+  
+  const loadUsers = async () => {
+    try {
+      const usersData = await fetchUsers()
+      setUsers(usersData)
+    } catch (error) {
+      // Error handling is already done in the service
+    }
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -162,6 +173,8 @@ export function UserManagementPage() {
         return "bg-purple-500/20 text-purple-400 border-purple-500/30"
       case "user":
         return "bg-blue-500/20 text-blue-400 border-blue-500/30"
+      case "seller":
+        return "bg-orange-500/20 text-orange-400 border-orange-500/30"
       default:
         return "bg-gray-500/20 text-gray-400 border-gray-500/30"
     }
@@ -249,7 +262,7 @@ export function UserManagementPage() {
         status: "active",
         createdAt: new Date().toISOString().split("T")[0],
         totalOrders: 0,
-        totalSpent: "$0.00",
+        totalEarned: "$0.00",
       }
 
       setUsers([...users, newUser])
@@ -436,8 +449,8 @@ export function UserManagementPage() {
             <SelectItem value="admin" className="text-white hover:bg-gray-800">
               Admin
             </SelectItem>
-            <SelectItem value="user" className="text-white hover:bg-gray-800">
-              User
+            <SelectItem value="seller" className="text-white hover:bg-gray-800">
+              Seller
             </SelectItem>
           </SelectContent>
         </Select>
@@ -480,7 +493,7 @@ export function UserManagementPage() {
                   <th className="text-left py-3 px-4 text-violet-400 font-semibold">Role</th>
                   <th className="text-left py-3 px-4 text-violet-400 font-semibold">Status</th>
                   <th className="text-left py-3 px-4 text-violet-400 font-semibold">Orders</th>
-                  <th className="text-left py-3 px-4 text-violet-400 font-semibold">Total Spent</th>
+                  <th className="text-left py-3 px-4 text-violet-400 font-semibold">Total Earns</th>
                   <th className="text-left py-3 px-4 text-violet-400 font-semibold">Actions</th>
                 </tr>
               </thead>
@@ -506,7 +519,7 @@ export function UserManagementPage() {
                       <Badge className={getStatusColor(user.status)}>{user.status.toUpperCase()}</Badge>
                     </td>
                     <td className="py-3 px-4 text-emerald-400 font-semibold">{user.totalOrders}</td>
-                    <td className="py-3 px-4 text-violet-400 font-semibold">{user.totalSpent}</td>
+                    <td className="py-3 px-4 text-violet-400 font-semibold">{user.totalEarned}</td>
                     <td className="py-3 px-4">
                       <div className="flex space-x-2">
                         <Button
