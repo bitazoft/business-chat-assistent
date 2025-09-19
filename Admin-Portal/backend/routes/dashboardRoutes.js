@@ -15,6 +15,7 @@ import {
   getOrdersByMonth
 } from '../controllers/dashboardController.js';
 import authenticate from '../middlewares/authMiddleware.js';
+import authorizeRole from '../middlewares/roleMiddleware.js';
 
 const router=express.Router();
 
@@ -22,20 +23,20 @@ const router=express.Router();
 // router.get('/recent-orders', authenticate, recentOrders);
 // router.get('/top-products', authenticate, topProducts);
 
-router.get('/overview/:id', overview);
-router.get('/recent-orders/:id', recentOrders);
-router.get('/top-products/:id', topProducts);
-router.get('/popular-products/:id', popularProducts);
-router.get('/messages-by-time-periods/:id', messagesByTimePeriodsForDate);
-router.get('/messages-by-last-7-days/:id', messagesByLast7Days);
-router.get('/messages-by-months/:id', messagesByMonths);
-router.get('/customers-with-messages/:id', getCustomersWithMoreThanMessages);
-router.get('/avg-response-time/:id', getAvgResponseTime);
+router.get('/overview/:id', authenticate, authorizeRole("seller"), overview);
+router.get('/recent-orders/:id', authenticate, authorizeRole("seller"), recentOrders);
+router.get('/top-products/:id', authenticate, authorizeRole("seller"), topProducts);
+router.get('/popular-products/:id', authenticate, authorizeRole("seller"), popularProducts);
+router.get('/messages-by-time-periods/:id', authenticate, authorizeRole("seller"), messagesByTimePeriodsForDate);
+router.get('/messages-by-last-7-days/:id', authenticate, authorizeRole("seller"), messagesByLast7Days);
+router.get('/messages-by-months/:id', authenticate, authorizeRole("seller"), messagesByMonths);
+router.get('/customers-with-messages/:id', authenticate, authorizeRole("seller"), getCustomersWithMoreThanMessages);
+router.get('/avg-response-time/:id', authenticate, authorizeRole("seller"), getAvgResponseTime);
 
 // New revenue and orders endpoints
-router.get('/revenue-by-date/:id', getTotalRevenueByDate);
-router.get('/revenue-by-month/:id', getTotalRevenueByMonth);
-router.get('/orders-by-date/:id', getOrdersByDate);
-router.get('/orders-by-month/:id', getOrdersByMonth);
+router.get('/revenue-by-date/:id', authenticate, authorizeRole("seller"), getTotalRevenueByDate);
+router.get('/revenue-by-month/:id', authenticate, authorizeRole("seller"), getTotalRevenueByMonth);
+router.get('/orders-by-date/:id', authenticate, authorizeRole("seller"), getOrdersByDate);
+router.get('/orders-by-month/:id', authenticate, authorizeRole("seller"), getOrdersByMonth);
 
 export default router;
