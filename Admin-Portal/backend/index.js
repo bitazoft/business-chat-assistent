@@ -7,6 +7,7 @@ import uploadRoutes from './routes/uploadRoutes.js';
 import orderRoutes from './routes/orderRoute.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
 import businessRoutes from './routes/businessRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 import { dbConnect } from './config/db.js';
 import cookieParser from "cookie-parser";
 
@@ -30,6 +31,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/business', businessRoutes);
 app.use('/api/uploads', uploadRoutes);
+app.use('/api/users', userRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
