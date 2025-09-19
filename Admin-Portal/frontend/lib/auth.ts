@@ -26,10 +26,9 @@ export function getCurrentUserClient(): User | null {
 
     const userData = JSON.parse(savedUser)
 
-    // Validate that we have the required fields
-    if (!userData.email || !userData.name) {
+    if (!userData.email || !userData.name || !userData.role) {
       console.error("Invalid user data structure:", userData)
-      clearUserSession()
+      // clearUserSession()
       return null
     }
 
@@ -110,7 +109,7 @@ export function getUserFromCookies(): User | null {
 
     const userData = JSON.parse(userCookie)
 
-    if (!userData.email || !userData.businessName) {
+    if (!userData.email || !userData.name || !userData.role) {
       return null
     }
 
@@ -141,4 +140,12 @@ export function getCurrentUser(): User | null {
   }
 
   return user
+}
+
+export function isAdmin(user: User | null): boolean {
+  return user?.role === "admin"
+}
+
+export function hasRole(user: User | null, role: "admin" | "user"): boolean {
+  return user?.role === role
 }
