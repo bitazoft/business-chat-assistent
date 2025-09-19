@@ -1,8 +1,12 @@
 "use client"
 
-import { BarChart3, Package, ShoppingCart, Settings, Home, MessageCircle, Menu, X } from "lucide-react"
+import { BarChart3, Package, ShoppingCart, Settings, Home, MessageCircle, Menu, 
+  X,
+  Users,
+  TrendingUp,} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { getCurrentUser, isAdmin } from "@/lib/auth"
 
 interface SidebarProps {
   activeSection: string
@@ -12,14 +16,21 @@ interface SidebarProps {
 }
 
 const menuItems = [
-  { id: "dashboard", label: "Dashboard", icon: Home },
-  { id: "products", label: "Products", icon: Package },
-  { id: "orders", label: "Orders", icon: ShoppingCart },
-  { id: "analytics", label: "Analytics", icon: BarChart3 },
-  { id: "settings", label: "Settings", icon: Settings },
+  { id: "dashboard", label: "Dashboard", icon: Home, adminOnly: false },
+  { id: "products", label: "Products", icon: Package, adminOnly: false },
+  { id: "orders", label: "Orders", icon: ShoppingCart, adminOnly: false },
+  { id: "analytics", label: "Analytics", icon: BarChart3, adminOnly: false },
+  { id: "users", label: "User Management", icon: Users, adminOnly: true },
+  { id: "insights", label: "Platform Insights", icon: TrendingUp, adminOnly: true },
+  { id: "settings", label: "Settings", icon: Settings, adminOnly: false },
   ]
 
 export function Sidebar({ activeSection, onSectionChange, collapsed, onToggleCollapse }: SidebarProps) {
+  const currentUser = getCurrentUser()
+  const userIsAdmin = isAdmin(currentUser)
+
+  // Filter menu items based on user role
+  const visibleMenuItems = menuItems.filter((item) => !item.adminOnly || userIsAdmin)
   return (
     <div
       className={cn(
@@ -28,11 +39,14 @@ export function Sidebar({ activeSection, onSectionChange, collapsed, onToggleCol
       )}
     >
       {/* Header */}
-      <div className="p-4 border-b border-gray-700 flex items-center justify-between">
+      <div className="p-3 border-b border-gray-700 flex items-center justify-between">
         {!collapsed && (
           <div className="flex items-center space-x-2">
             <MessageCircle className="w-8 h-8 text-violet-400" />
-            <span className="text-xl font-bold text-white">WhatsApp AI</span>
+            <div className="flex flex-col">
+              <span className="text-xl font-bold text-white">WhatsApp AI</span>
+              {userIsAdmin && <span className="text-xs text-yellow-400 font-semibold">ADMIN PANEL</span>}
+            </div>
           </div>
         )}
         <Button
@@ -48,7 +62,7 @@ export function Sidebar({ activeSection, onSectionChange, collapsed, onToggleCol
       {/* Navigation */}
       <nav className="flex-1 p-4">
         <ul className="space-y-2">
-          {menuItems.map((item) => {
+        {visibleMenuItems.map((item) => {
             const Icon = item.icon
             const isActive = activeSection === item.id
 
@@ -58,15 +72,21 @@ export function Sidebar({ activeSection, onSectionChange, collapsed, onToggleCol
                   variant="ghost"
                   onClick={() => onSectionChange(item.id)}
                   className={cn(
-                    "w-full justify-start transition-all duration-300 group",
-                    collapsed ? "px-2" : "px-4",
+                    "w-full justify-start transition-all duration-300 group relative",
                     isActive
                       ? "bg-gradient-to-r from-violet-500/20 to-purple-600/20 text-violet-400 border-r-2 border-violet-400"
                       : "text-gray-300 hover:text-violet-400 hover:bg-gray-800/50",
                   )}
                 >
                   <Icon className={cn("w-5 h-5 transition-colors duration-200", collapsed ? "mx-auto" : "mr-3")} />
-                  {!collapsed && <span className="font-medium transition-all duration-300">{item.label}</span>}
+                  {!collapsed && (
+                    <div className="flex items-center justify-between w-full">
+                      <span className="font-medium transition-all duration-300">{item.label}</span>
+                      {item.adminOnly && (
+                        <span className="text-xs bg-yellow-400/20 text-yellow-400 px-1 py-0.5 rounded">ADMIN</span>
+                      )}
+                    </div>
+                  )}
                 </Button>
               </li>
             )
@@ -77,8 +97,9 @@ export function Sidebar({ activeSection, onSectionChange, collapsed, onToggleCol
       {/* Collapse indicator */}
       {collapsed && (
         <div className="p-4 border-t border-gray-700">
-          <div className="w-8 h-8 mx-auto bg-gradient-to-r from-violet-500 to-purple-600 rounded-full flex items-center justify-center">
-            <MessageCircle className="w-4 h-4 text-white" />
+          <div className="w-8 h-8 mx-auto bg-gradient-to-r from-violet-500 to-purple-600 rounded-full flex items-center justify-center relative">
+          <MessageCircle className="w-4 h-4 text-white" />
+          {userIsAdmin && <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full"></div>}
           </div>
         </div>
       )}

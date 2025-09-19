@@ -1,21 +1,13 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { AuthPage } from "@/components/auth-page"
 import { setUserSession } from "@/lib/auth"
 
 export function AuthPageClient() {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const [mode, setMode] = useState<"login" | "register">("login")
-
-  useEffect(() => {
-    const modeParam = searchParams.get("mode")
-    if (modeParam === "register" || modeParam === "login") {
-      setMode(modeParam)
-    }
-  }, [searchParams])
+  const [mode] = useState<"login">("login")
 
   const handleLogin = (userData: { id: number; name: string; email: string; role: string; sellerId: number | null}) => {
     try {
@@ -34,10 +26,7 @@ export function AuthPageClient() {
     router.push("/")
   }
 
-  const handleSwitchMode = (newMode: "login" | "register") => {
-    setMode(newMode)
-    router.push(`/auth?mode=${newMode}`)
-  }
+  const handleSwitchMode = () => {}
 
   return <AuthPage mode={mode} onLogin={handleLogin} onBack={handleBack} onSwitchMode={handleSwitchMode} />
 } 
