@@ -1,4 +1,4 @@
-from langchain_community.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 from langchain_deepseek.chat_models import ChatDeepSeek
 from langchain_openai import OpenAIEmbeddings
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
@@ -42,13 +42,46 @@ from repositories.tools import (
     get_pending_orders,
     get_order_details,
     check_product_stock,
-    upload_payment_proof_and_update_order
+    upload_payment_proof_and_update_order,
+    cancel_order
 )
 from vector_store.vector_store import fast_vector_store as vector_store
 from agent.customer_service_rag import customer_service_rag
 from agent.language_agent import get_language_agent, detect_language_detailed,detect_language
 import os
 import re
+
+# Import templates
+from templates.message_templates import MessageTemplates
+
+# Template integration helper functions
+def format_product_info_response(product_data):
+    """Format product info using beautiful template"""
+    return MessageTemplates.product_details(product_data)
+
+def format_product_list_response(products_data):
+    """Format product list using beautiful template"""  
+    return MessageTemplates.product_list(products_data)
+
+def format_order_details_response(order_data):
+    """Format order details using beautiful template"""
+    return MessageTemplates.order_details(order_data)
+
+def format_tracking_response(tracking_data):
+    """Format tracking info using beautiful template"""
+    return MessageTemplates.tracking_status(tracking_data)
+
+def format_customer_info_response(customer_data):
+    """Format customer info using beautiful template"""
+    return MessageTemplates.customer_info(customer_data)
+
+def format_payment_confirmation_response(payment_data):
+    """Format payment confirmation using beautiful template"""
+    return MessageTemplates.payment_confirmation(payment_data)
+
+def format_error_response(error_type, details=""):
+    """Format error message using beautiful template"""
+    return MessageTemplates.error_message(error_type, details)
 
 # Load environment variables
 API_KEY = os.getenv("API_KEY")
@@ -71,7 +104,7 @@ elif(os.getenv("AI_PROVIDER")=="GPT"):
         model_name=os.getenv("CHAT_MODEL","gpt-3.5-turbo"),
         openai_api_key=API_KEY,  # Explicitly set API key
         temperature=0.1,  # Lower temperature for faster, more deterministic responses
-        max_tokens=512,   # Limit response length for speed
+        max_tokens=256,   # Limit response length for speed
         timeout=300,     
         max_retries=3     # Reduce retries for faster failure handling
     )
@@ -109,7 +142,8 @@ def get_cached_intents(seller_id: str):
 
 def get_unified_system_prompt(seller_id: str) -> str:
     """Get unified system prompt that handles all languages"""
-    return f"""You are a business assistant for seller {seller_id}. You can communicate in English, Sinhala, and Singlish (mixed Sinhala-English).
+    tools_list = ', '.join(['get_product_info', 'track_order', 'place_order', 'get_user_info', 'save_user', 'check_user_exists', 'update_user_info', 'add_item_to_order', 'remove_item_from_order', 'update_item_quantity_in_order', 'replace_order_items', 'get_all_orders_for_customer', 'get_pending_orders', 'cancel_order'])
+    return f"""You are a business assistant for seller {seller_id}.
 
             LANGUAGE ADAPTATION RULES:
             - Detect the user's language from their message
@@ -117,8 +151,9 @@ def get_unified_system_prompt(seller_id: str) -> str:
             - If user writes in English: Respond in English
             - If user writes in Sinhala (සිංහල): Respond in Sinhala
             - If user writes in Singlish (mixed): Respond in Sinhala
+            - But if he ask order details or products show the retrieved data in English(as it is in the database)
 
-            Available tools: {', '.join(['get_product_info', 'track_order', 'place_order', 'get_user_info', 'save_user', 'check_user_exists', 'update_user_info', 'add_item_to_order', 'remove_item_from_order', 'update_item_quantity_in_order', 'replace_order_items', 'get_all_orders_for_customer', 'get_pending_orders'])}
+            Available tools: {tools_list}
 
             CORE INSTRUCTIONS (Be direct and efficient):
             1. Product information: use get_product_info without image urls
@@ -128,6 +163,14 @@ def get_unified_system_prompt(seller_id: str) -> str:
             5. Order management: use granular order editing tools
             6. Be helpful and match the user's communication style
             7. Execute tools directly - don't ask for confirmation unless user data is missing
+
+            CRITICAL RESPONSE FORMATTING:
+            - When tools return beautifully formatted responses with emojis and templates, return ONLY the tool output - NO ADDITIONAL FORMATTING
+            - NEVER add asterisks (**) or markdown formatting to tool responses that are already formatted
+            - DO NOT reformat, summarize, rephrase, or change the tool output in any way
+            - If a tool returns a structured template with emojis (🛍️, 📦, 🚚, etc.), return it exactly as-is
+            - DO NOT create your own version of the formatted response - just return the tool output directly
+            - Only add brief commentary if the tool output needs translation or context, but keep the original formatting intact
 
             CRITICAL ORDER WORKFLOW (Must follow exactly):
             When user wants to place an order:
@@ -152,7 +195,7 @@ def get_unified_system_prompt(seller_id: str) -> str:
 
             EFFICIENCY RULES:
             - Execute tools immediately when you have required parameters
-            - Don't ask for confirmation unless absolutely necessary
+            - Ask for confirmation for putting , cancelling orders
             - NEVER generate fake user information
             - Extract parameters accurately from user input
             - If a tool fails, provide a clear explanation and alternative
@@ -223,106 +266,288 @@ class OptimizedChatbot:
     def _create_tools(self):
         """Create optimized tools with embedded context"""
         
-        # Define input schemas
+        # Define input schemas with comprehensive examples
         class GetProductInfoInput(BaseModel):
-            product_name: str = Field(description="Name of the product")
+            product_name: str = Field(
+                description="Name or identifier of the product to get information about",
+                examples=["laptop", "iPhone 15", "gaming chair", "wireless headphones", "1"]
+            )
 
         class TrackOrderInput(BaseModel):
-            order_id: str = Field(description="Order ID to track")
+            order_id: str = Field(
+                description="Order ID to track - can be numeric string or alphanumeric",
+                examples=["12345", "ORD001", "67890", "ORDER_ABC123"]
+            )
 
         class PlaceOrderInput(BaseModel):
-            items: List[dict] = Field(description="List of items with product_id and quantity")
+            items: List[dict] = Field(
+                description="List of items to order. Each item should be a dictionary with 'product_id' (int) and 'quantity' (int) keys. Example: [{'product_id': 1, 'quantity': 2}, {'product_id': 3, 'quantity': 1}] use get productInfo method to get the product ids",
+                examples=[[{"product_id": 1, "quantity": 2}], [{"product_id": 3, "quantity": 1}, {"product_id": 2, "quantity": 3}]]
+            )
 
         class SaveUserInput(BaseModel):
-            name: str = Field(description="User's full name")
-            email: str = Field(description="User's email address")
-            address: str = Field(description="User's address")
-            number: str = Field(description="User's phone number")
+            name: str = Field(
+                description="User's full name (first and last name)",
+                examples=["John Smith", "Nimal Perera", "Sarah Johnson"]
+            )
+            email: str = Field(
+                description="User's email address in valid email format", 
+                examples=["john.smith@gmail.com", "nimal@yahoo.com", "sarah.j@outlook.com"]
+            )
+            address: str = Field(
+                description="User's complete physical address including city/area",
+                examples=["123 Main St, Colombo 07", "45/2 Galle Road, Mount Lavinia", "78 Kandy Road, Peradeniya"]
+            )
+            number: str = Field(
+                description="User's phone number (mobile or landline)",
+                examples=["+94771234567", "0771234567", "011-2345678", "+94112345678"]
+            )
 
         class UpdateUserInfoInput(BaseModel):
-            name: str = Field(description="User's name", default="")
-            email: str = Field(description="User's email", default="")
-            address: str = Field(description="User's address", default="")
-            number: str = Field(description="User's phone", default="")
+            name: str = Field(
+                description="User's name to update (optional, leave empty if not changing)", 
+                default="",
+                examples=["John Smith", "පීතර සිල්වා", ""]
+            )
+            email: str = Field(
+                description="User's email to update (optional, leave empty if not changing)", 
+                default="",
+                examples=["john.new@gmail.com", "updated@email.com", ""]
+            )
+            address: str = Field(
+                description="User's address to update (optional, leave empty if not changing)", 
+                default="",
+                examples=["New Address, Colombo 05", "456 Updated St, Kandy", ""]
+            )
+            number: str = Field(
+                description="User's phone to update (optional, leave empty if not changing)", 
+                default="",
+                examples=["+94779876543", "0119876543", ""]
+            )
             
         class OrderItemInput(BaseModel):
-            product_id: Union[int, str] = Field(..., description="Product ID or Name")
-            quantity: int = Field(..., gt=0, description="Quantity of the product")
+            product_id: Union[int, str] = Field(
+                ..., 
+                description="Product ID (numeric) or product name (string)",
+                examples=[1, "laptop", 25, "iPhone 15", "gaming_mouse"]
+            )
+            quantity: int = Field(
+                ..., 
+                gt=0, 
+                description="Quantity of the product (must be positive integer)",
+                examples=[1, 2, 5, 10, 3]
+            )
 
         class EditOrderInput(BaseModel):
-            customer_id: str = Field(..., description="User ID who placed the order")
-            order_id: Union[str, int] = Field(..., description="Order ID to be edited")
-            new_items: List[OrderItemInput] = Field(..., description="Updated list of order items")
+            customer_id: str = Field(
+                ..., 
+                description="User ID who placed the order",
+                examples=["user123", "customer_456", "USR789"]
+            )
+            order_id: Union[str, int] = Field(
+                ..., 
+                description="Order ID to be edited (numeric or string)",
+                examples=[12345, "ORD001", 67890, "ORDER_ABC"]
+            )
+            new_items: List[OrderItemInput] = Field(
+                ..., 
+                description="Updated complete list of order items (replaces existing items)"
+            )
         
         class AddItemToOrderInput(BaseModel):
-            order_id: str = Field(..., description="Order ID to add item to")
-            product_identifier: str = Field(..., description="Product ID (numeric) or product name (string)")
-            quantity: int = Field(..., gt=0, description="Quantity to add")
+            order_id: str = Field(
+                ..., 
+                description="Order ID to add item to",
+                examples=["12345", "ORD001", "67890"]
+            )
+            product_identifier: str = Field(
+                ..., 
+                description="Product ID (numeric) or product name (string)",
+                examples=["1", "laptop", "25", "iPhone 15", "gaming_mouse"]
+            )
+            quantity: int = Field(
+                ..., 
+                gt=0, 
+                description="Quantity to add (positive integer)",
+                examples=[1, 2, 3, 5, 10]
+            )
 
         class RemoveItemFromOrderInput(BaseModel):
-            order_id: str = Field(..., description="Order ID to remove item from")
-            product_identifier: str = Field(..., description="Product ID (numeric) or product name (string)")
+            order_id: str = Field(
+                ..., 
+                description="Order ID to remove item from",
+                examples=["12345", "ORD001", "67890"]
+            )
+            product_identifier: str = Field(
+                ..., 
+                description="Product ID (numeric) or product name (string) to remove",
+                examples=["1", "laptop", "25", "iPhone 15"]
+            )
 
         class UpdateItemQuantityInput(BaseModel):
-            order_id: str = Field(..., description="Order ID to update item in")
-            product_identifier: str = Field(..., description="Product ID (numeric) or product name (string)")
-            new_quantity: int = Field(..., gt=0, description="New quantity for the item")
+            order_id: str = Field(
+                ..., 
+                description="Order ID to update item quantity in",
+                examples=["12345", "ORD001", "67890"]
+            )
+            product_identifier: str = Field(
+                ..., 
+                description="Product ID (numeric) or product name (string) to update",
+                examples=["1", "laptop", "25", "iPhone 15"]
+            )
+            new_quantity: int = Field(
+                ..., 
+                gt=0, 
+                description="New quantity for the item (positive integer)",
+                examples=[1, 2, 5, 10, 15]
+            )
 
         class ReplaceOrderItemsInput(BaseModel):
-            order_id: str = Field(..., description="Order ID to replace items in")
-            new_items: List[OrderItemInput] = Field(..., description="New list of order items")
+            order_id: str = Field(
+                ..., 
+                description="Order ID to completely replace items in",
+                examples=["12345", "ORD001", "67890"]
+            )
+            new_items: List[OrderItemInput] = Field(
+                ..., 
+                description="Complete new list of order items (replaces all existing items)"
+            )
         
         class GetOrdersInput(BaseModel):
-            customer_id: str = Field(..., description="User ID to retrieve orders for")
+            customer_id: str = Field(
+                ..., 
+                description="User ID to retrieve all orders for",
+                examples=["user123", "customer_456", "USR789"]
+            )
             
         class GetOrderDetailsInput(BaseModel):
-            order_id: Union[int, str] = Field(..., description="Order ID to retrieve")
+            order_id: Union[int, str] = Field(
+                ..., 
+                description="Specific Order ID to retrieve detailed information for",
+                examples=[12345, "ORD001", 67890, "ORDER_ABC123"]
+            )
 
         class CheckStockInput(BaseModel):
-            product_id: Union[int, str] = Field(..., description="Product ID to check")
-            quantity: int = Field(..., gt=0, description="Quantity to verify against stock")
+            product_id: Union[int, str] = Field(
+                ..., 
+                description="Product ID (numeric) or name (string) to check stock for",
+                examples=[1, "laptop", 25, "iPhone 15", "gaming_mouse"]
+            )
+            quantity: int = Field(
+                ..., 
+                gt=0, 
+                description="Quantity to verify if available in stock",
+                examples=[1, 2, 5, 10, 20]
+            )
+        
         class UploadPaymentProofInput(BaseModel):
-            order_id: str = Field(..., description="Order ID to upload payment proof for")
-            payment_proof_file: str = Field(..., description="Payment proof file location")
+            order_id: str = Field(
+                ..., 
+                description="Order ID to upload payment proof for",
+                examples=["12345", "ORD001", "67890"]
+            )
+            payment_proof_file: str = Field(
+                ..., 
+                description="File path to payment proof image (bank transfer receipt, etc.)",
+                examples=["/uploads/payment_123.jpg", "payment_receipt.png", "/tmp/bank_transfer.pdf"]
+            )
+        
+        class CancelOrderInput(BaseModel):
+            order_id: str = Field(
+                ..., 
+                description="Order ID to cancel (only pending orders can be cancelled)",
+                examples=["12345", "ORD001", "67890"]
+            )
+            reason: str = Field(
+                default="", 
+                description="Optional reason for cancellation",
+                examples=["Changed mind", "Found better price", "No longer needed", "Ordered by mistake", ""]
+            )
 
         class EmptyInput(BaseModel):
             pass
 
         # Wrapper functions with context and result tracking
-        def get_product_info_wrapper(product_name: str) -> dict:
+        def get_product_info_wrapper(product_name: str) -> str:
             result = get_product_info(seller_id=self.seller_id, product_name=product_name)
-            self.last_tool_results.append({"tool_name": "get_product_info", "result": str(result)})
-            return result
+            self.last_tool_results.append({"tool_name": "get_product_info", "result": result.get("images", [])})
+            
+            # Format result using beautiful template
+            if "not found" in str(result).lower():
+                return format_error_response("not_found", f"Product '{product_name}' not found in our catalog")
+            else:
+                return format_product_info_response(result)
 
-        def track_order_wrapper(order_id: str) -> dict:
+        def track_order_wrapper(order_id: str) -> str:
             result = track_order(order_id=order_id)
-            self.last_tool_results.append({"tool_name": "track_order", "result": str(order_id)})
-            return result
+            self.last_tool_results.append({"tool_name": "track_order", "result": str(result)})
+            
+            # Format result using beautiful template
+            if "not found" in str(result).lower() or "invalid" in str(result).lower():
+                return format_error_response("not_found", f"Order #{order_id} not found")
+            else:
+                # Parse the result and format it
+                tracking_data = {"order_id": order_id, "status": "pending", "details": result}
+                return format_tracking_response(tracking_data)
 
-        def place_order_wrapper(items: List[dict]) -> dict:
+        def place_order_wrapper(items: List[dict]) -> str:
+            # Validate items parameter
+            if not items or not isinstance(items, list):
+                logger.error(f"[place_order_wrapper] Invalid items parameter: {items}")
+                return format_error_response("invalid_input", "Invalid items parameter. Expected list of dictionaries with product_id and quantity.")
+            
+            # Validate each item in the list
+            for i, item in enumerate(items):
+                if not isinstance(item, dict):
+                    logger.error(f"[place_order_wrapper] Item {i} is not a dictionary: {item}")
+                    return format_error_response("invalid_input", f"Item {i} must be a dictionary with product_id and quantity keys.")
+                
+                if 'product_id' not in item or 'quantity' not in item:
+                    logger.error(f"[place_order_wrapper] Item {i} missing required keys: {item}")
+                    return format_error_response("invalid_input", f"Item {i} must have both 'product_id' and 'quantity' keys.")
+            
             result = place_order(seller_id=self.seller_id, user_id=self.user_id, items=items)
             # self.last_tool_results.append({"tool_name": "place_order", "result": str(result)})
-            return result
+            
+            # Format result using beautiful template
+            if "error" in str(result).lower() or "not found" in str(result).lower():
+                return format_error_response("system_error", str(result))
+            elif "insufficient stock" in str(result).lower():
+                return format_error_response("out_of_stock", str(result))
+            else:
+                # Format as order confirmation
+                order_data = {"items": items, "status": "pending", "result": result}
+                return format_order_details_response(order_data)
 
         def save_user_wrapper(name: str, email: str, address: str, number: str) -> dict:
             result = save_user(user_id=self.user_id, name=name, email=email, address=address, number=number)
             # self.last_tool_results.append({"tool_name": "save_user", "result": str(result)})
             return result
 
-        def get_user_info_wrapper() -> dict:
+        def get_user_info_wrapper() -> str:
             result = get_user_info(user_id=self.user_id)
             # self.last_tool_results.append({"tool_name": "get_user_info", "result": str(result)})
-            return result
+            
+            # Format result using beautiful template
+            if "not found" in str(result).lower() or "does not exist" in str(result).lower():
+                return format_error_response("not_found", "User information not found")
+            else:
+                return format_customer_info_response(result)
 
         def check_user_exists_wrapper() -> bool:
             result = check_user_exists(user_id=self.user_id)
             # self.last_tool_results.append({"tool_name": "check_user_exists", "result": str(result)})
             return result
 
-        def get_all_products_wrapper() -> List[str]:
+        def get_all_products_wrapper() -> str:
             result = get_all_products(seller_id=self.seller_id)
             # self.last_tool_results.append({"tool_name": "get_all_products", "result": str(result)})
-            return result
+            
+            # Format result using beautiful template
+            if not result or "no products" in str(result).lower():
+                return format_error_response("not_found", "No products available at the moment")
+            else:
+                return format_product_list_response(result)
 
         def update_user_info_wrapper(name: str = "", email: str = "", address: str = "", number: str = "") -> dict:
             name = None if not name else name
@@ -384,7 +609,11 @@ class OptimizedChatbot:
         def get_order_details_wrapper(order_id: int) -> dict:
             result = get_order_details(order_id=order_id)
             self.last_tool_results.append({"tool_name": "get_order_details", "result": str(order_id)})
-            return result
+            if not result or "not found" in str(result).lower():
+                return format_error_response("not_found", f"Order #{order_id} not found")
+            else:
+                return format_order_details_response(result)
+            
 
         def check_product_stock_wrapper(product_id: int, quantity: int) -> dict:
             result = check_product_stock(product_id=product_id, quantity=quantity)
@@ -399,109 +628,124 @@ class OptimizedChatbot:
             # self.last_tool_results.append({"tool_name": "upload_payment_proof_and_update_order", "result": str(result)})
             return result
 
-        # Create tools
+        def cancel_order_wrapper(order_id: str, reason: str = "") -> str:
+            result = cancel_order(
+                customer_id=self.user_id,
+                order_id=order_id,
+                reason=reason
+            )
+            # self.last_tool_results.append({"tool_name": "cancel_order", "result": str(result)})
+            return result
+
+        # Create tools with comprehensive descriptions and examples
         return [
             StructuredTool(
                 name="get_product_info",
                 func=get_product_info_wrapper,
-                description="Get product details by name",
+                description="Get detailed product information including price, description, and images by product name or ID. Example: get_product_info(product_name='laptop') or get_product_info(product_name='iPhone 15')",
                 args_schema=GetProductInfoInput
             ),
             StructuredTool(
                 name="track_order",
                 func=track_order_wrapper,
-                description="Track order status by order ID",
+                description="Track order status and delivery information by order ID. Returns current status, estimated delivery, tracking details. Example: track_order(order_id='12345') or track_order(order_id='ORD001')",
                 args_schema=TrackOrderInput
             ),
             StructuredTool(
                 name="place_order",
                 func=place_order_wrapper,
-                description="Place an order with list of items",
+                description="Place a new order with specified items and quantities. Each item must have 'product_id' and 'quantity'. Example: place_order(items=[{'product_id': 1, 'quantity': 2}, {'product_id': 'laptop', 'quantity': 1}]). NEVER use empty dict {}!",
                 args_schema=PlaceOrderInput
             ),
             StructuredTool(
                 name="save_user",
                 func=save_user_wrapper,
-                description="Create new user with details",
+                description="Create a new user account with personal details (name, email, address, phone). Required for first-time customers. Example: save_user(name='John Smith', email='john@email.com', address='123 Main St', number='+94771234567')",
                 args_schema=SaveUserInput
             ),
             StructuredTool(
                 name="get_user_info",
                 func=get_user_info_wrapper,
-                description="Get current user information",
+                description="Retrieve current user's profile information (name, email, address, phone). No parameters needed - uses current user context. Example: get_user_info()",
                 args_schema=EmptyInput
             ),
             StructuredTool(
                 name="check_user_exists",
                 func=check_user_exists_wrapper,
-                description="Check if user exists",
+                description="Check if current user exists in the system. Returns True/False. Essential before placing orders. No parameters needed. Example: check_user_exists()",
                 args_schema=EmptyInput
             ),
             StructuredTool(
                 name="update_user_info",
                 func=update_user_info_wrapper,
-                description="Update user information",
+                description="Update specific user profile fields. Only provide fields to change, leave others empty. Example: update_user_info(name='New Name', email='') to only update name",
                 args_schema=UpdateUserInfoInput
             ),
             StructuredTool(
                 name="get_all_products",
                 func=get_all_products_wrapper,
-                description="Get all products for seller",
+                description="Get complete list of all available products from the seller's catalog. No parameters needed. Example: get_all_products()",
                 args_schema=EmptyInput
             ),
             StructuredTool(
                 name="add_item_to_order",
                 func=add_item_to_order_wrapper,
-                description="Add an item to an existing pending order or update quantity if item already exists",
+                description="Add a new item to existing pending order or increase quantity if item exists. Example: add_item_to_order(order_id='12345', product_identifier='laptop', quantity=1)",
                 args_schema=AddItemToOrderInput
             ),
             StructuredTool(
                 name="remove_item_from_order",
                 func=remove_item_from_order_wrapper,
-                description="Remove an item completely from an existing pending order",
+                description="Completely remove a specific item from existing pending order. Example: remove_item_from_order(order_id='12345', product_identifier='laptop')",
                 args_schema=RemoveItemFromOrderInput
             ),
             StructuredTool(
                 name="update_item_quantity_in_order",
                 func=update_item_quantity_in_order_wrapper,
-                description="Update the quantity of a specific item in an existing pending order",
+                description="Change quantity of existing item in pending order. Example: update_item_quantity_in_order(order_id='12345', product_identifier='laptop', new_quantity=3)",
                 args_schema=UpdateItemQuantityInput
             ),
             StructuredTool(
                 name="replace_order_items",
                 func=replace_order_items_wrapper,
-                description="Replace all items in an existing pending order with new items (like original edit_order)",
+                description="Replace ALL items in pending order with completely new item list. Example: replace_order_items(order_id='12345', new_items=[OrderItemInput(product_id=1, quantity=2)])",
                 args_schema=ReplaceOrderItemsInput
             ),
             StructuredTool(
                 name="get_all_orders_for_customer",
-                description="Get all orders and their items for the current customer",
+                description="Retrieve complete order history for current customer including all statuses (pending, confirmed, delivered). No parameters needed. Example: get_all_orders_for_customer()",
                 func=get_all_orders_for_customer_wrapper,
                 args_schema=EmptyInput
             ),
             StructuredTool(
                 name="get_pending_orders",
-                description="Retrieve all pending orders for the current customer",
+                description="Get only pending/unpaid orders for current customer. Useful for order editing. No parameters needed. Example: get_pending_orders()",
                 func=get_pending_orders_wrapper,
                 args_schema=EmptyInput
             ),
             StructuredTool(
                 name="get_order_details",
-                description="Get detailed information about a specific order.",
+                description="Get detailed information about specific order including items, status, total cost. Example: get_order_details(order_id='12345') or get_order_details(order_id=67890)",
                 func=get_order_details_wrapper,
                 args_schema=GetOrderDetailsInput
             ),
             StructuredTool(
                 name="check_product_stock",
-                description="Check if a product has enough stock before editing.",
+                description="Verify if sufficient stock available before placing/editing orders. Example: check_product_stock(product_id=1, quantity=5) or check_product_stock(product_id='laptop', quantity=2)",
                 func=check_product_stock_wrapper,
                 args_schema=CheckStockInput
             ),
             StructuredTool(
                 name="upload_payment_proof_and_update_order",
                 func=upload_payment_proof_and_update_order_wrapper,
-                description="Upload payment proof for an order and update its status.",
+                description="Upload bank transfer receipt image and update order payment status. Example: upload_payment_proof_and_update_order(order_id='12345', payment_proof_file='/uploads/receipt.jpg')",
                 args_schema=UploadPaymentProofInput
+            ),
+            StructuredTool(
+                name="cancel_order",
+                func=cancel_order_wrapper,
+                description="Cancel a pending order and restore product stock. Only pending orders can be cancelled. Example: cancel_order(order_id='12345', reason='Changed mind')",
+                args_schema=CancelOrderInput
             )
         ]
     
@@ -554,15 +798,10 @@ class OptimizedChatbot:
 
     def get_img_urls(self) -> List[str]:
         """Get image URLs from the last tool results"""
-        result = self.get_tool_results()
         img_urls = []
-        for item in result:
-           tool_name = item.get("tool_name", "")
-           if tool_name == "get_product_info":
-               # Split by comma first, then clean up each URL
-               urls_text = item['result']
-               if isinstance(urls_text, str):
-                img_urls.extend(re.findall(r'https?://[^\s,]+', str(urls_text)))                   
+        for item in self.get_tool_results():
+            if item.get("tool_name") == "get_product_info":
+                img_urls.extend(item['result'])
         return img_urls
 
     def extract_entities(self) -> Dict[str, Any]:
@@ -585,8 +824,7 @@ class OptimizedChatbot:
         return entities
 
     def log_query(self, query: str, intent: str, response: str, entities: Union[str, Dict[str, Any], List] = "", response_time: int = 0):
-        """Log query asynchronously to avoid blocking"""
-
+        """Log query synchronously"""
         try:
             log_query(
                 query=query,
@@ -653,6 +891,30 @@ class OptimizedChatbot:
                 
                 response = result.get("output", "I couldn't process your request.")
                 
+                # Post-process response to ensure template formatting is preserved
+                tool_results = self.get_tool_results()
+                if tool_results:
+                    # Look for template-formatted tool responses
+                    for tool_result in tool_results:
+                        tool_name = tool_result.get("tool_name", "")
+                        tool_output = str(tool_result.get("result", ""))
+                        
+                        # Check if this is a formatted template response (starts with emojis)
+                        template_indicators = ["🛍️", "🚚", "📋", "🛒", "👤", "💰", "🔍", "📦", "⚠️", "🔧", "💳"]
+                        if any(tool_output.startswith(indicator) for indicator in template_indicators):
+                            # This is a pre-formatted template - use it directly instead of agent response
+                            response = tool_output
+                            logger.info(f"[Template] Using pre-formatted template response for {tool_name}")
+                            break
+                        
+                        # Also check if agent response contains duplicate formatting
+                        if ("**" in response and "*" in tool_output and 
+                            tool_name in ["get_product_info", "track_order", "place_order", "get_all_products", "get_user_info"]):
+                            # Agent added extra formatting - use the clean tool output
+                            response = tool_output
+                            logger.info(f"[Template] Replaced agent's duplicated formatting with clean template for {tool_name}")
+                            break
+                
                 # Check if the agent stopped due to max iterations
                 if "Agent stopped due to iteration limit or time limit" in str(result):
                     logger.warning(f"[Agent] Hit max iterations for message: {message}")
@@ -667,16 +929,28 @@ class OptimizedChatbot:
                         response = "I'm here to help! Could you please rephrase your request or be more specific about what you need?"
                         
             except Exception as agent_error:
-                logger.error(f"[Agent] Execution error: {str(agent_error)}")
-                # Fallback response based on detected language
-                language_agent = get_language_agent()
-                error_language = language_agent.detect_language_simple(message)
-                if error_language == 'sinhala':
-                    response = "මට ඔබේ ඉල්ලීම සම්පූර්ණ කිරීමට අපහසුයි. කරුණාකර සරල වචන වලින් නැවත උත්සාහ කරන්න."
-                elif error_language == 'singlish':
-                    response = "මට ඔබේ ඉල්ලීම සම්පූර්ණ කිරීමට අපහසුයි. කරුණාකර සරල වචන වලින් නැවත උත්සාහ කරන්න."
+                error_str = str(agent_error)
+                logger.error(f"[Agent] Execution error: {error_str}")
+                
+                # Handle specific validation errors
+                if "validation error for PlaceOrderInput" in error_str and "items" in error_str:
+                    logger.warning(f"[Agent] PlaceOrderInput validation error detected - items field missing")
+                    language_agent = get_language_agent()
+                    error_language = language_agent.detect_language_simple(message)
+                    if error_language == 'sinhala':
+                        response = "ඔබගේ ඇණවුම සදහා කරුණාකර නිශ්චිත නිෂ්පාදන සහ ප්‍රමාණ සඳහන් කරන්න. උදා: 'නිෂ්පාදන අංක 1, ප්‍රමාණ 2'."
+                    else:
+                        response = "To place your order, please specify the exact products and quantities you want. For example: 'Product ID 1, quantity 2'."
                 else:
-                    response = "I'm having trouble completing your request. Please try rephrasing it in simpler terms."
+                    # Fallback response based on detected language
+                    language_agent = get_language_agent()
+                    error_language = language_agent.detect_language_simple(message)
+                    if error_language == 'sinhala':
+                        response = "මට ඔබේ ඉල්ලීම සම්පූර්ණ කිරීමට අපහසුයි. කරුණාකර සරල වචන වලින් නැවත උත්සාහ කරන්න."
+                    elif error_language == 'singlish':
+                        response = "මට ඔබේ ඉල්ලීම සම්පූර්ණ කිරීමට අපහසුයි. කරුණාකර සරල වචන වලින් නැවත උත්සාහ කරන්න."
+                    else:
+                        response = "I'm having trouble completing your request. Please try rephrasing it in simpler terms."
             
             # Add assistant response
             self.chat_history.append({"role": "assistant", "content": response})
@@ -689,7 +963,15 @@ class OptimizedChatbot:
             total_time = time.time() - start_time
             logger.info(f"[Optimized] Total processing time: {total_time:.2f}s, Language: {detected_language}")
 
-            self.log_query(message, intent, response, self.extract_entities(), total_time*1000)
+            # Schedule background logging using threading to avoid blocking response
+            def background_log():
+                try:
+                    self.log_query(message, intent, response, self.extract_entities(), total_time*1000)
+                except Exception as log_error:
+                    logger.error(f"Background logging error: {str(log_error)}")
+            
+            # Submit to background thread (non-blocking)
+            threading.Thread(target=background_log, daemon=True).start()
 
             return response
             

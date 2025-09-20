@@ -20,6 +20,7 @@ class S3Service:
         self.bucket_name = os.getenv('AWS_BUCKET_NAME')
         
         if not all([self.aws_access_key_id, self.aws_secret_access_key, self.bucket_name]):
+            logger.error("Missing required AWS credentials or bucket name in environment variables")
             raise ValueError("Missing required AWS credentials or bucket name in environment variables")
         
         # Initialize S3 client
