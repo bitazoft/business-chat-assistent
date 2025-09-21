@@ -29,8 +29,8 @@ def get_product_info(product_name: str, seller_id: str) -> str:
         product = db.query(Product).filter(Product.name.ilike(f"%{product_name}%"), Product.seller_id == int(seller_id)).first()
         if product:
             imgs = get_product_images(product.id)
-            return f"Product ID: {product.id}, Product: {product.name}, Description: {product.description}, Price: ${product.price}, Stock: {product.stock}, Images: {', '.join(imgs)}"
-        return "Product not found"
+            return {"product_id": product.id, "product": product.name, "description": product.description, "price": product.price, "stock": product.stock, "images": imgs}
+        return {"error": "Product not found"}
     finally:
         db.close()
 
@@ -39,7 +39,7 @@ def get_all_products(seller_id: str) -> List[str]:
     try:
         products = db.query(Product).filter(Product.seller_id == int(seller_id)).all()
         if products:
-            return [f"Product: {p.name}, Price: ${p.price}, Stock: {p.stock}" for p in products]
+            return [{ "name": p.name, "price": p.price, "stock": p.stock } for p in products]
         return ["No products found for this seller"]
     finally:
         db.close()
@@ -88,7 +88,7 @@ def place_order(seller_id: str, user_id: str, items: List[dict]) -> str:
             product.stock -= item["quantity"]
         order.total_amount = total_amount
         db.commit()
-        return f"Order placed successfully. Order ID: {order.id}, Total Amount: ${total_amount:.2f}"
+        return f"Order placed successfully. Order ID: {order.id}, Total Amount: Rs.{total_amount:.2f}"
     except Exception as e:
         db.rollback()
         return f"Error placing order: {str(e)}"
@@ -189,6 +189,45 @@ def log_query(query: str, intent: str, entities: Union[str, Dict[str, Any], List
     finally:
         db.close()
 
+# Async version for background logging
+async def log_query_async(query: str, intent: str, entities: Union[str, Dict[str, Any], List], response: str, seller_id: str, user_id: str, response_time: int) -> None:
+    """Async version of log_query for background execution"""
+    def _log_sync():
+        db = SessionLocal()
+        try:
+            # Convert entities to proper JSON format
+            if isinstance(entities, str):
+                # Try to parse as JSON first
+                try:
+                    entities_json = json.loads(entities)
+                except json.JSONDecodeError:
+                    # If parsing fails, treat as plain text and wrap in object
+                    entities_json = {"raw": entities}
+            elif isinstance(entities, (dict, list)):
+                entities_json = entities
+            else:
+                entities_json = {"raw": str(entities)}
+                
+            chat_log = ChatLog(
+                user_query=query,
+                intent=intent,
+                entities=entities_json,
+                response=response,
+                seller_id=int(seller_id),
+                customer_id=user_id,
+                response_time_ms=response_time
+            )
+            db.add(chat_log)
+            db.commit()
+        except Exception as e:
+            print(f"Background logging error: {str(e)}")
+        finally:
+            db.close()
+    
+    # Run in thread pool to avoid blocking
+    loop = asyncio.get_event_loop()
+    await loop.run_in_executor(None, _log_sync)
+
 def query_context(query: str, seller_id: str) -> str:
     headers = {"Authorization": f"Bearer {DEEPSEEK_API_KEY}", "Content-Type": "application/json"}
     payload = {"input": query, "model": "deepseek-embedding"}  # Replace with DeepSeek's embedding model
@@ -252,7 +291,7 @@ def add_item_to_order(customer_id: str, order_id: str, product_identifier: str, 
             action = f"Added '{product.name}' (quantity: {quantity}) to order"
 
         db.commit()
-        return f"{action}. Order total: ${order.total_amount:.2f}"
+        return f"{action}. Order total: Rs.{order.total_amount:.2f}"
 
     except Exception as e:
         db.rollback()
@@ -297,7 +336,7 @@ def remove_item_from_order(customer_id: str, order_id: str, product_identifier: 
         db.delete(order_item)
         db.commit()
         
-        return f"Removed '{product.name}' from order. Order total: ${order.total_amount:.2f}"
+        return f"Removed '{product.name}' from order. Order total: Rs.{order.total_amount:.2f}"
 
     except Exception as e:
         db.rollback()
@@ -351,7 +390,7 @@ def update_item_quantity_in_order(customer_id: str, order_id: str, product_ident
         order.total_amount += product.price * quantity_diff
         
         db.commit()
-        return f"Updated '{product.name}' quantity from {old_quantity} to {new_quantity}. Order total: ${order.total_amount:.2f}"
+        return f"Updated '{product.name}' quantity from {old_quantity} to {new_quantity}. Order total: Rs.{order.total_amount:.2f}"
 
     except Exception as e:
         db.rollback()
@@ -412,7 +451,7 @@ def replace_order_items(customer_id: str, order_id: str, new_items: List[dict]) 
         order.total_amount = total_amount
         db.commit()
 
-        return f"Order {order.id} successfully updated with {len(new_items)} items. New total: ${total_amount:.2f}"
+        return f"Order {order.id} successfully updated with {len(new_items)} items. New total: Rs.{total_amount:.2f}"
 
     except Exception as e:
         db.rollback()
@@ -968,5 +1007,55 @@ def remove_order_payment_proof(order_id: int) -> str:
     except Exception as e:
         db.rollback()
         return f"Error removing payment proof: {str(e)}"
+    finally:
+        db.close()
+
+def cancel_order(customer_id: str, order_id: str, reason: str = "") -> str:
+    """
+    Cancel an order by updating its status to 'cancelled'.
+    Only pending orders can be cancelled.
+    Restores product stock when order is cancelled.
+    """
+    db = SessionLocal()
+    try:
+        # Find the order
+        order = db.query(Order).filter(
+            Order.id == order_id,
+            Order.customer_id == customer_id
+        ).first()
+        
+        if not order:
+            return f"Order {order_id} not found or doesn't belong to this customer."
+        
+        # Check if order can be cancelled
+        if order.status == "cancelled":
+            return f"Order {order_id} is already cancelled."
+        
+        if order.status not in ["pending"]:
+            return f"Cannot cancel order {order_id}. Current status: {order.status}. Only pending orders can be cancelled."
+        
+        # Get order items to restore stock
+        order_items = db.query(OrderItem).filter(OrderItem.order_id == order_id).all()
+        
+        # Restore stock for all items in the order
+        for item in order_items:
+            product = db.query(Product).filter(Product.id == item.product_id).first()
+            if product:
+                product.stock += item.quantity
+        
+        # Update order status to cancelled
+        order.status = "cancelled"
+        
+        # Add cancellation reason if provided
+        if reason:
+            pass
+        
+        db.commit()
+        
+        return f"Order {order_id} has been successfully cancelled. Stock has been restored for all items."
+        
+    except Exception as e:
+        db.rollback()
+        return f"Error cancelling order {order_id}: {str(e)}"
     finally:
         db.close()

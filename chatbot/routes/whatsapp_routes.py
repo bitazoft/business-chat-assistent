@@ -59,10 +59,10 @@ def process_whatsapp_message(phone_number: str, message_content: str, message_id
         response = chatbot.process_message(message_content)
         logger.info(response)
         # send images
-        img_urls = chatbot.get_img_urls()
-        if img_urls:
-            for url in img_urls:
-                whatsapp_service.send_image_message(phone_number, url, "", whatsapp_number_id)
+        # img_urls = chatbot.get_img_urls()
+        # if img_urls:
+        #     for url in img_urls:
+        #         whatsapp_service.send_image_message(phone_number, url, "", whatsapp_number_id)
         # # Remove URLs from response for text message
         # response = remove_urls_from_message(response)
 
@@ -71,8 +71,25 @@ def process_whatsapp_message(phone_number: str, message_content: str, message_id
         
         if result["success"]:
             logger.info(f"✅ Response sent to {phone_number}: {response[:50]}...")
-            # Mark original message as read
-            whatsapp_service.mark_message_as_read(message_id, whatsapp_number_id)
+            
+            # Perform background operations asynchronously (don't block response)
+            def background_whatsapp_operations():
+                try:
+                    # Send images in background
+                    img_urls = chatbot.get_img_urls()
+                    if img_urls:
+                        for url in img_urls:
+                            whatsapp_service.send_image_message(phone_number, url, "", whatsapp_number_id)
+                    
+                    # Mark original message as read in background
+                    whatsapp_service.mark_message_as_read(message_id, whatsapp_number_id)
+                    
+                except Exception as bg_error:
+                    logger.error(f"Background WhatsApp operations error: {str(bg_error)}")
+            
+            # Submit background operations to thread pool (non-blocking)
+            thread_pool.submit(background_whatsapp_operations)
+            
         else:
             logger.error(f"❌ Failed to send response to {phone_number}: {result.get('error')}")
             
