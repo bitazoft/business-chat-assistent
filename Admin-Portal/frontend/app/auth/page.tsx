@@ -4,7 +4,7 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 export default function AuthPage() {
   return (
-    <Suspense fallback={LoadingSpinner({size: "md"})}>
+    <Suspense fallback={<LoadingSpinner size="md" />}>
       <AuthPageClient />
     </Suspense>
   )
