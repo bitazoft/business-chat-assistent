@@ -115,7 +115,7 @@ export function SignupFields({ formData, onChange, passwordsMatch, showPasswordE
 
         <div className="space-y-1">
           <Label htmlFor="whatsapp_number_id" className="text-violet-400 font-medium text-sm">
-            Whatsapp Nnumber ID
+            Whatsapp Number ID
           </Label>
           <Input
             id="whatsapp_number_id"
