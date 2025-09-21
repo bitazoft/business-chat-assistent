@@ -54,7 +54,7 @@ export const fetchUsers = async (): Promise<User[]> => {
 
     return users
   } catch (error) {
-    handleApiError(error, "Failed to fetch orders")
+    handleApiError(error, "Failed to fetch users")
     throw error
   }
 };
