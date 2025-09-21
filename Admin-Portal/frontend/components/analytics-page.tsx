@@ -36,12 +36,10 @@ export function AnalyticsPage() {
   };
 
   const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
+    return `Rs. ${new Intl.NumberFormat('en-US', {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }).format(amount);
+    }).format(amount)}`;
   };
 
   const formatNumber = (num: number): string => {
@@ -51,7 +49,7 @@ export function AnalyticsPage() {
   const metrics = [
     {
       title: "Total Revenue",
-      value: overviewData ? formatCurrency(overviewData.totalProfit) : "$0",
+      value: overviewData ? formatCurrency(overviewData.totalProfit) : "Rs.0",
       change: overviewData ? calculatePercentageChange(overviewData.totalProfitThisMonth, overviewData.totalProfitLastMonth) : "0%",
       icon: TrendingUp,
       color: "text-violet-400",

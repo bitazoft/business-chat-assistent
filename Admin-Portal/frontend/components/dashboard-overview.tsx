@@ -73,7 +73,7 @@ export function DashboardOverview() {
     },
     {
       title: "Total Profit This Month",
-      value: `$${(overviewData.totalProfitThisMonth || 0).toLocaleString()}`,
+      value: `Rs.${(overviewData.totalProfitThisMonth || 0).toLocaleString()}`,
       change: calculateChange(overviewData.totalProfitThisMonth || 0, overviewData.totalProfitLastMonth || 0),
       icon: TrendingUp,
       color: "text-emerald-400",
@@ -88,7 +88,7 @@ export function DashboardOverview() {
     },
     {
       title: "Total Profit Today",
-      value: `$${(overviewData.totalProfitToday || 0).toLocaleString()}`,
+      value: `Rs.${(overviewData.totalProfitToday || 0).toLocaleString()}`,
       icon: TrendingUp,
       color: "text-green-400",
       bgColor: "bg-green-500/10",
@@ -177,7 +177,7 @@ export function DashboardOverview() {
                     <p className="text-gray-400 text-sm">#{order.orderId}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-violet-400 font-semibold">${(order.totalAmount || 0).toFixed(2)}</p>
+                    <p className="text-violet-400 font-semibold">Rs.{(order.totalAmount || 0).toFixed(2)}</p>
                     <span
                       className={`text-xs px-2 py-1 rounded-full ${
                         order.status === "Completed"
@@ -216,7 +216,7 @@ export function DashboardOverview() {
                     <p className="text-white font-medium">{product.productName}</p>
                     <p className="text-gray-400 text-sm">{product.totalSales} sales</p>
                   </div>
-                  <p className="text-emerald-400 font-semibold">${(product.totalQuantity || 0).toFixed(2)}</p>
+                  <p className="text-emerald-400 font-semibold">Rs.{(product.totalQuantity || 0).toFixed(2)}</p>
                 </div>
               )) : (
                 <div className="text-center text-gray-400 py-8">

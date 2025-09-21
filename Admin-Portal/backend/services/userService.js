@@ -23,7 +23,7 @@ async function createUser(data) {
         role,
         address,
   
-        ...(role === "seller" && {
+        ...(role === 'seller' && {
           seller_profiles: {
             create: {
               shop_name,
@@ -57,7 +57,22 @@ async function getUserByEmail(email) {
 
 async function getAllUsers() {
   try {
-    return await prisma.users.findMany();
+    return await prisma.users.findMany({
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        phone: true,
+        role: true,
+        address: true,
+        created_at: true,
+        seller_profiles: {
+          select: {
+            shop_name: true,
+          }
+        }
+      }
+    });    
   } catch (error) {
     throw new Error(`Error fetching all users: ${error.message}`);
   }
@@ -73,9 +88,43 @@ async function deleteUser(id) {
   }
 }
 
+async function usersWithStats(){
+  const users = await getAllUsers();
+
+  return Promise.all(
+    users.map(async (user)=>{
+      const ordersSummary = await prisma.orders.groupBy({
+        where: { seller_id: user.id },
+        by: ['seller_id'],
+        _count: {
+          id: true, 
+        },
+        _sum: {
+          total_amount: true,
+        },
+      });
+
+      const summary = ordersSummary.map(o => ({
+        totalOrders: o._count.id,
+        totalEarned: o._sum.total_amount
+      }));  
+
+      const { seller_profiles, ...rest } = user;
+
+      return {
+        ...rest,
+        name: seller_profiles?.shop_name || user.name,
+        totalOrders: summary[0]?.totalOrders || 0,
+        totalEarned: summary[0]?.totalEarned || 0,
+      };
+    })
+  )
+}
+
 export default {
   createUser,
   getUserByEmail,
   getAllUsers,
   deleteUser,
+  usersWithStats
 };

@@ -20,19 +20,6 @@ const register = async (req, res) => {
       whatsapp_number_id
     });
 
-    const token = jwt.sign(
-      { id: user.id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
-    );
-
-    res.cookie("access_token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", 
-      sameSite: "strict",
-      maxAge:  1 * 3600000, // 1 hour in milliseconds
-    });
-
     res.status(201).json({
       message: `User registered !! ${user.email}`,
       user: {
@@ -40,7 +27,7 @@ const register = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
-        sellerId: user.seller_profiles.id || null,
+        sellerId: user.seller_profiles?.id || null,
       },
     });
   } catch (error) {
@@ -78,7 +65,8 @@ const login = async (req, res) => {
       sameSite: "strict",
       maxAge:  1 * 3600000, // 24 hour in milliseconds
     });
-    console.log("User logged in:", user.email,user.seller_profiles.id);
+
+    console.log("User logged in:", user.email,user.seller_profiles?.id);
     res.status(200).json({
       message: "Login successful",
       user: {
@@ -86,7 +74,7 @@ const login = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
-        sellerId: user.seller_profiles.id || null,
+        sellerId: user.seller_profiles?.id || null,
       },
     });
   } catch (err) {
