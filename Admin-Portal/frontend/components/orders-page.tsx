@@ -583,7 +583,7 @@ export function OrdersPage() {
                 <div className="flex hover:bg-gray-800/30 p-2 rounded transition-colors duration-200">
                   <span className="text-gray-400 w-32 flex-shrink-0">Subtotal</span>
                   <span className="text-gray-300">:</span>
-                  <span className="text-white ml-4">${selectedOrder.netValue.toString()}</span>
+                  <span className="text-white ml-4">Rs.{selectedOrder.netValue.toString()}</span>
                 </div>
                 {/* <div className="flex hover:bg-gray-800/30 p-2 rounded transition-colors duration-200">
                   <span className="text-gray-400 w-32 flex-shrink-0">Tax (8%)</span>
@@ -595,7 +595,7 @@ export function OrdersPage() {
                 <div className="flex hover:bg-gray-800/30 p-2 rounded transition-colors duration-200">
                   <span className="text-gray-400 w-32 flex-shrink-0">Shipping</span>
                   <span className="text-gray-300">:</span>
-                  <span className="text-white ml-4">${calculateShipping()}</span>
+                  <span className="text-white ml-4">Rs.{calculateShipping()}</span>
                 </div>
                 <div className="flex border-t border-gray-700 pt-4 hover:bg-gray-800/30 p-2 rounded transition-colors duration-200">
                   <span className="text-gray-400 w-32 flex-shrink-0 font-semibold">Total Cost</span>
@@ -700,7 +700,7 @@ export function OrdersPage() {
                   <span className="text-gray-400 w-32 flex-shrink-0">Amount Paid</span>
                   <span className="text-gray-300">:</span>
                   <span className="text-emerald-400 ml-4 font-semibold">
-                    ${(parseFloat(selectedOrder.netValue.toString()) + parseFloat(calculateShipping().toString())).toFixed(2)}
+                  Rs.{(parseFloat(selectedOrder.netValue.toString()) + parseFloat(calculateShipping().toString())).toFixed(2)}
                   </span>
                 </div>
               </div>
@@ -846,8 +846,8 @@ export function OrdersPage() {
                         </div>
                       </td>
                       <td className="py-3 px-2 text-white">{item.quantity} pcs</td>
-                      <td className="py-3 px-2 text-white">${item.price}</td>
-                      <td className="py-3 px-2 text-violet-400 font-semibold">${item.price * item.quantity}</td>
+                      <td className="py-3 px-2 text-white">Rs.{item.price}</td>
+                      <td className="py-3 px-2 text-violet-400 font-semibold">Rs.{item.price * item.quantity}</td>
                       <td className="py-3 px-2">
                         <span className="px-2 py-1 rounded-full text-xs bg-emerald-500/20 text-emerald-400 animate-pulse">
                           Available
@@ -957,7 +957,7 @@ export function OrdersPage() {
                         <SelectItem key={product.id} value={product.id} className="text-white hover:bg-gray-700">
                           <div className="flex justify-between items-center w-full">
                             <span>{product.name}</span>
-                            <span className="text-emerald-400 ml-2">${product.price}</span>
+                            <span className="text-emerald-400 ml-2">Rs.{product.price}</span>
                           </div>
                         </SelectItem>
                       ))}
@@ -968,7 +968,7 @@ export function OrdersPage() {
                 {selectedProduct && (
                   <div className="bg-gray-800/50 p-4 rounded-lg space-y-3">
                     <h4 className="text-white font-semibold">{selectedProduct.name}</h4>
-                    <p className="text-gray-300">Price: <span className="text-emerald-400">${selectedProduct.price}</span></p>
+                    <p className="text-gray-300">Price: <span className="text-emerald-400">Rs.{selectedProduct.price}</span></p>
                     <p className="text-gray-300">Stock: <span className="text-blue-400">{selectedProduct.stock}</span></p>
                     {selectedProduct.description && (
                       <p className="text-gray-400 text-sm">{selectedProduct.description}</p>
@@ -1124,8 +1124,8 @@ export function OrdersPage() {
                       <td className="py-3 px-4 text-white font-medium hover:text-violet-400 transition-colors duration-200">
                         {order.customer}
                       </td>
-                      <td className="py-3 px-4 text-violet-400 font-semibold">${order.netValue}</td>
-                      <td className="py-3 px-4 text-emerald-400 font-semibold">${order.shippingCost}</td>
+                      <td className="py-3 px-4 text-violet-400 font-semibold">Rs.{order.netValue}</td>
+                      <td className="py-3 px-4 text-emerald-400 font-semibold">Rs.{order.shippingCost}</td>
                       <td className="py-3 px-4">
                         <span
                           className={`px-2 py-1 rounded-full text-xs ${getPaymentStatusColor(order.paymentStatus || 'Pending')} transition-all duration-200 hover:scale-110`}
@@ -1318,7 +1318,7 @@ export function OrdersPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="shippingCost" className="text-violet-400 font-medium">
-                      Shipping Cost ($)
+                      Shipping Cost (Rs.)
                     </Label>
                     <Input
                       id="shippingCost"
@@ -1402,7 +1402,7 @@ export function OrdersPage() {
                               />
                             </td>
                             <td className="py-2 px-2">
-                              <span className="text-violet-400 font-semibold">${item.total.toFixed(2)}</span>
+                              <span className="text-violet-400 font-semibold">Rs.{item.total.toFixed(2)}</span>
                             </td>
                             <td className="py-2 px-2">
                               <Button
@@ -1443,7 +1443,7 @@ export function OrdersPage() {
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <span className="text-gray-400">Subtotal:</span>
-                      <span className="text-white">${calculateSubtotal(editingOrder.orderItems)}</span>
+                      <span className="text-white">Rs.{calculateSubtotal(editingOrder.orderItems)}</span>
                     </div>
                     {/* <div className="flex justify-between">
                       <span className="text-gray-400">Tax (8%):</span>
@@ -1453,12 +1453,12 @@ export function OrdersPage() {
                     </div> */}
                     <div className="flex justify-between">
                       <span className="text-gray-400">Shipping:</span>
-                      <span className="text-white">${calculateShipping()}</span>
+                      <span className="text-white">Rs.{calculateShipping()}</span>
                     </div>
                     <div className="flex justify-between border-t border-gray-700 pt-2">
                       <span className="text-white font-semibold">Total:</span>
                       <span className="text-violet-400 font-bold text-lg">
-                        $
+                        Rs.
                         {Math.round(
                           calculateSubtotal(editingOrder.orderItems) + calculateShipping(),
                         )}
