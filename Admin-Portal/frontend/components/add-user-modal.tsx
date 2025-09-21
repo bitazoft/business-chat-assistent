@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { SignupFields } from "@/components/signup-fields"
-import { useToast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 
 interface AddUserModalProps {
   isOpen: boolean
@@ -53,8 +53,6 @@ export function AddUserModal({ isOpen, onClose, onAddUser }: AddUserModalProps) 
   })
   const [passwordsMatch, setPasswordsMatch] = useState(true)
   const [showPasswordError, setShowPasswordError] = useState(false)
-
-  const { toast } = useToast()
 
   useEffect(() => {
     setMounted(true)
@@ -147,10 +145,8 @@ export function AddUserModal({ isOpen, onClose, onAddUser }: AddUserModalProps) 
     e.preventDefault()
 
     if (!validateForm()) {
-      toast({
-        title: "Validation Error",
+      toast.error( "Validation Error",{
         description: "Please fix the errors in the form before submitting",
-        variant: "destructive",
       })
       return
     }
@@ -168,11 +164,11 @@ export function AddUserModal({ isOpen, onClose, onAddUser }: AddUserModalProps) 
         whatsapp_number_id: formData.whatsapp_number_id,
         role: formData.role,
       })
+
+      toast.success("User added successfully")
     } catch (error) {
-      toast({
-        title: "Error",
+      toast.error("Error",{
         description: "Failed to add user. Please try again.",
-        variant: "destructive",
       })
     } finally {
       setIsSubmitting(false)

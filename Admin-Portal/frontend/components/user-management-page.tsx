@@ -27,87 +27,6 @@ export interface User {
   totalEarned: string
 }
 
-// const initialUsers: User[] = [
-//   {
-//     id: "usr_001",
-//     businessName: "Tech Solutions Inc",
-//     email: "admin@techsolutions.com",
-//     whatsappNumber: "+1 (555) 123-4567",
-//     address: "123 Tech Street, Silicon Valley, CA",
-//     role: "admin",
-//     status: "active",
-//     createdAt: "2024-01-15",
-//     lastLogin: "2024-01-20",
-//     totalOrders: 0,
-//     totalEarned: "$0.00",
-//   },
-//   {
-//     id: "usr_002",
-//     businessName: "Fashion Boutique",
-//     email: "owner@fashionboutique.com",
-//     whatsappNumber: "+1 (555) 234-5678",
-//     address: "456 Fashion Ave, New York, NY",
-//     role: "user",
-//     status: "active",
-//     createdAt: "2024-01-10",
-//     lastLogin: "2024-01-19",
-//     totalOrders: 45,
-//     totalEarned: "$12,450.00",
-//   },
-//   {
-//     id: "usr_003",
-//     businessName: "Food Delivery Co",
-//     email: "manager@fooddelivery.com",
-//     whatsappNumber: "+1 (555) 345-6789",
-//     address: "789 Food Court, Chicago, IL",
-//     role: "user",
-//     status: "active",
-//     createdAt: "2024-01-08",
-//     lastLogin: "2024-01-18",
-//     totalOrders: 128,
-//     totalEarned: "$8,920.00",
-//   },
-//   {
-//     id: "usr_004",
-//     businessName: "Electronics Store",
-//     email: "info@electronicsstore.com",
-//     whatsappNumber: "+1 (555) 456-7890",
-//     address: "321 Electronics Blvd, Austin, TX",
-//     role: "user",
-//     status: "suspended",
-//     createdAt: "2024-01-05",
-//     lastLogin: "2024-01-15",
-//     totalOrders: 23,
-//     totalEarned: "$5,670.00",
-//   },
-//   {
-//     id: "usr_005",
-//     businessName: "Home Decor Studio",
-//     email: "contact@homedecor.com",
-//     whatsappNumber: "+1 (555) 567-8901",
-//     address: "654 Design Lane, Los Angeles, CA",
-//     role: "user",
-//     status: "inactive",
-//     createdAt: "2024-01-03",
-//     lastLogin: "2024-01-10",
-//     totalOrders: 12,
-//     totalEarned: "$2,340.00",
-//   },
-//   {
-//     id: "usr_006",
-//     businessName: "Sports Equipment",
-//     email: "sales@sportsequip.com",
-//     whatsappNumber: "+1 (555) 678-9012",
-//     address: "987 Sports Way, Denver, CO",
-//     role: "user",
-//     status: "active",
-//     createdAt: "2024-01-01",
-//     lastLogin: "2024-01-20",
-//     totalOrders: 67,
-//     totalEarned: "$15,890.00",
-//   },
-// ]
-
 export function UserManagementPage() {
   const [users, setUsers] = useState<User[]>([])
   const [searchTerm, setSearchTerm] = useState("")
@@ -247,26 +166,11 @@ export function UserManagementPage() {
 
       const data = await response.json()
 
-      if (!response.ok || !data?.success) {
+      if (response.status != 201) {
         throw new Error(data?.message || "Registration failed")
       }
+      fetchUsers()
 
-      const created = data.user
-      const newUser: User = {
-        id: `usr_${Date.now()}`,
-        businessName: created?.shop_name || userData.shop_name,
-        email: created?.email || userData.email,
-        whatsappNumber: created?.phone || userData.phone,
-        address: created?.address || userData.address,
-        role: (created?.role === "admin" ? "admin" : "user") as "admin" | "user",
-        status: "active",
-        createdAt: new Date().toISOString().split("T")[0],
-        totalOrders: 0,
-        totalEarned: "$0.00",
-      }
-
-      setUsers([...users, newUser])
-      
       toast.success("Account created successfully! Redirecting to dashboard...", {
         style: {
           background: "#0f0f23",
