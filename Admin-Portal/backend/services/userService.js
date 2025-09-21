@@ -23,7 +23,7 @@ async function createUser(data) {
         role,
         address,
   
-        ...(role === seller && {
+        ...(role === 'seller' && {
           seller_profiles: {
             create: {
               shop_name,
