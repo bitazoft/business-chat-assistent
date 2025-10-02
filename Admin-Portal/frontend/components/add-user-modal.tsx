@@ -26,6 +26,7 @@ interface AddUserModalProps {
   }) => Promise<void>
 }
 
+// add user modal
 export function AddUserModal({ isOpen, onClose, onAddUser }: AddUserModalProps) {
   const [mounted, setMounted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
