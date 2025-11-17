@@ -214,4 +214,9 @@ You can containerize each service separately; no root-level compose is provided 
 
 ## License
 
-MIT Licence 
+All Rights Reserved - Viewing Only
+
+This project is proprietary software. You may view the source code for informational 
+purposes only. Copying, using, modifying, or distributing this software is prohibited.
+
+See [LICENSE](LICENSE) file for details. 
