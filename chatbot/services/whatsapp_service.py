@@ -5,16 +5,28 @@ WhatsApp Cloud API Service
 Handles sending and receiving messages through WhatsApp Business Cloud API for multiple accounts
 """
 
+import hashlib
+import hmac
 import os
-import json
-import requests
 import re
-from typing import Dict, Any, Optional, List
+
+import requests
+from typing import Dict, Any, Optional
+from config.settings import settings
+from utils.http import get_session
 from utils.logger import get_logger
+from utils.metrics import metrics
+from utils.text import split_message
 from dataclasses import dataclass
 from enum import Enum
 
 logger = get_logger(__name__)
+
+# One pooled, retrying session for all Graph API traffic. Every call used to open
+# a new connection, so each message paid for a fresh TLS handshake to
+# graph.facebook.com - typically 100-300ms of pure overhead, several times per
+# conversation turn.
+_http = get_session("whatsapp", total_retries=settings.whatsapp_send_retries, backoff_factor=0.5)
 
 class MessageType(Enum):
     TEXT = "text"
@@ -151,16 +163,64 @@ class WhatsAppService:
     
     def send_text_message(self, to_number: str, message: str, phone_number_id: str) -> Dict[str, Any]:
         """
-        Send a text message via WhatsApp using a specific account
-        
+        Send a text message via WhatsApp using a specific account.
+
+        A message over WhatsApp's 4096-character body limit is split and sent as
+        several messages. Previously the API rejected the whole thing, so a long
+        product list simply never reached the customer.
+
         Args:
             to_number: Recipient phone number (with country code, without +)
             message: Text message to send
             phone_number_id: Phone number ID of the sending account
-            
+
         Returns:
-            API response dictionary
+            API response dictionary. For a split message this reports the first
+            chunk's id and how many parts were sent.
         """
+        chunks = split_message(message or "", settings.whatsapp_max_message_chars)
+
+        if not chunks:
+            logger.warning("Refusing to send an empty WhatsApp message to %s", to_number)
+            return {"success": False, "error": "Message is empty", "response": None}
+
+        if len(chunks) == 1:
+            return self._send_text_chunk(to_number, chunks[0], phone_number_id)
+
+        logger.info(
+            "Message to %s is %d chars - splitting into %d parts",
+            to_number,
+            len(message),
+            len(chunks),
+        )
+        metrics.incr("whatsapp.message_split")
+
+        first_result = None
+        for index, chunk in enumerate(chunks, 1):
+            result = self._send_text_chunk(to_number, chunk, phone_number_id)
+            if first_result is None:
+                first_result = result
+            if not result.get("success"):
+                # Stop on the first failure - continuing would deliver the tail
+                # of a message whose beginning never arrived.
+                logger.error(
+                    "Part %d/%d failed for %s; not sending the rest",
+                    index,
+                    len(chunks),
+                    to_number,
+                )
+                return {
+                    "success": False,
+                    "error": result.get("error"),
+                    "parts_sent": index - 1,
+                    "parts_total": len(chunks),
+                    "response": result.get("response"),
+                }
+
+        return dict(first_result, parts_sent=len(chunks), parts_total=len(chunks))
+
+    def _send_text_chunk(self, to_number: str, message: str, phone_number_id: str) -> Dict[str, Any]:
+        """Send exactly one text message, no splitting."""
         config = self.get_config(phone_number_id)
         if not config or not self.is_configured(phone_number_id):
             error_msg = f"WhatsApp service is not properly configured for account {phone_number_id}"
@@ -190,7 +250,7 @@ class WhatsAppService:
             
             logger.info(f"Sending WhatsApp message to {to_number} from account {phone_number_id}: {message[:50]}...")
             
-            response = requests.post(url, headers=headers, json=payload, timeout=30)
+            response = _http.post(url, headers=headers, json=payload, timeout=30)
             response.raise_for_status()
             
             result = response.json()
@@ -260,7 +320,7 @@ class WhatsAppService:
             
             logger.info(f"Sending WhatsApp image to {to_number} from account {phone_number_id}")
             
-            response = requests.post(url, headers=headers, json=payload, timeout=30)
+            response = _http.post(url, headers=headers, json=payload, timeout=30)
             response.raise_for_status()
             
             result = response.json()
@@ -412,7 +472,7 @@ class WhatsAppService:
                 "message_id": message_id
             }
             
-            response = requests.post(url, headers=headers, json=payload, timeout=10)
+            response = _http.post(url, headers=headers, json=payload, timeout=10)
             response.raise_for_status()
             
             logger.info(f"✅ Message {message_id} marked as read for account {phone_number_id}")
@@ -422,6 +482,85 @@ class WhatsAppService:
             logger.error(f"❌ Failed to mark message as read for account {phone_number_id}: {str(e)}")
             return False
     
+    def verify_signature(self, raw_body: bytes, signature_header: Optional[str]) -> bool:
+        """Check the X-Hub-Signature-256 header against WHATSAPP_APP_SECRET.
+
+        The webhook is a public URL that creates orders and reads customer data.
+        Without this check, anyone who finds it can impersonate WhatsApp and drive
+        the bot as any phone number. Enable with VERIFY_WEBHOOK_SIGNATURE=true.
+
+        Returns True when signing is not configured, so turning it on is an
+        explicit choice rather than something that silently breaks the webhook.
+        """
+        if not settings.verify_webhook_signature:
+            return True
+
+        secret = settings.whatsapp_app_secret
+        if not secret:
+            logger.error(
+                "VERIFY_WEBHOOK_SIGNATURE is on but WHATSAPP_APP_SECRET is not set - "
+                "rejecting the request rather than accepting it unverified"
+            )
+            return False
+
+        if not signature_header:
+            logger.warning("Webhook request has no X-Hub-Signature-256 header")
+            return False
+
+        # Header format is "sha256=<hex digest>"
+        prefix, _, received = signature_header.partition("=")
+        if prefix != "sha256" or not received:
+            logger.warning("Unexpected signature header format: %r", signature_header[:32])
+            return False
+
+        expected = hmac.new(secret.encode("utf-8"), raw_body, hashlib.sha256).hexdigest()
+
+        # compare_digest, not ==, so a wrong signature can't be recovered by
+        # timing how long the comparison took.
+        if not hmac.compare_digest(expected, received):
+            logger.warning("Webhook signature mismatch - rejecting request")
+            metrics.incr("whatsapp.signature_invalid")
+            return False
+
+        return True
+
+    def mark_read_and_typing(self, message_id: str, phone_number_id: str) -> bool:
+        """Show the blue ticks and a typing indicator while we think.
+
+        A turn can take a few seconds; without this the customer sees nothing at
+        all and often sends the message again. Sent as one call because the Cloud
+        API accepts the read receipt and the typing indicator together.
+        """
+        config = self.get_config(phone_number_id)
+        if not config or not self.is_configured(phone_number_id):
+            logger.error(f"WhatsApp service is not properly configured for account {phone_number_id}")
+            return False
+
+        payload = {
+            "messaging_product": "whatsapp",
+            "status": "read",
+            "message_id": message_id,
+        }
+        if settings.typing_indicator:
+            payload["typing_indicator"] = {"type": "text"}
+
+        try:
+            response = _http.post(
+                f"{config.base_url}/messages",
+                headers={
+                    "Authorization": f"Bearer {config.access_token}",
+                    "Content-Type": "application/json",
+                },
+                json=payload,
+                timeout=10,
+            )
+            response.raise_for_status()
+            return True
+        except Exception as e:
+            # A missing typing indicator is cosmetic - never fail the turn for it.
+            logger.warning("Could not mark %s as read/typing: %s", message_id, e)
+            return False
+
     def download_image(self, whatsapp_message: WhatsAppMessage, save_directory: str = "./downloads") -> Dict[str, Any]:
         """
         Convenience method to download an image from a WhatsApp message
@@ -501,7 +640,7 @@ class WhatsAppService:
             
             logger.info(f"Getting media URL for {media_id} from account {phone_number_id}")
             
-            response = requests.get(media_url, headers=headers, timeout=30)
+            response = _http.get(media_url, headers=headers, timeout=30)
             response.raise_for_status()
             
             media_info = response.json()
@@ -522,7 +661,7 @@ class WhatsAppService:
             # Step 2: Download the actual file
             logger.info(f"Downloading media from {download_url}")
             
-            download_response = requests.get(download_url, headers=headers, timeout=60)
+            download_response = _http.get(download_url, headers=headers, timeout=60)
             download_response.raise_for_status()
             
             content = download_response.content
@@ -590,7 +729,7 @@ class WhatsAppService:
                 "fields": "profile_name"
             }
             
-            response = requests.get(url, headers=headers, params=params, timeout=10)
+            response = _http.get(url, headers=headers, params=params, timeout=10)
             response.raise_for_status()
             
             result = response.json()

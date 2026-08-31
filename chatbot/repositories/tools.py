@@ -1,58 +1,156 @@
-from db.database import SessionLocal
+from db.database import SessionLocal, read_session
 from models.schemas import Product, Order, ChatLog, OrderItem, Customers, SellerProfile, ProductImage
-from vector_store.vector_store import vector_store
 import os
-import numpy as np
-import requests
+import re
+import random
 import json
 from datetime import datetime
-from typing import List, Union, Dict, Any
+from typing import List, Union, Dict, Any, Optional
 from sqlalchemy import text
 from collections import defaultdict
-import asyncio
+from utils.async_bridge import run_sync
+from utils.cache import get_cache
+from utils.logger import get_logger
 
-# Import S3 service for payment proof handling
+logger = get_logger(__name__)
+
+# The WhatsApp number -> seller mapping is read on EVERY inbound message but
+# changes about never, so it is cached. Product listings get a short TTL: stale
+# stock in a listing is harmless because place_order re-checks stock inside the
+# order transaction, and it is invalidated whenever we change stock ourselves.
+_seller_cache = get_cache("seller_by_whatsapp", maxsize=256, ttl=300)
+_product_cache = get_cache("product_lookups", maxsize=512, ttl=30)
+
+
+DEFAULT_PRODUCT_IMAGE = (
+    "https://www.shutterstock.com/image-photo/"
+    "person-using-smartphone-interact-friendly-600nw-2482428287.jpg"
+)
+
+
+def invalidate_product_cache(seller_id: Optional[str] = None) -> None:
+    """Drop cached product data after anything that changes stock or price."""
+    if seller_id is None:
+        _product_cache.clear()
+    else:
+        _product_cache.delete(f"all:{seller_id}")
+
+# Import storage service (S3 or local filesystem, picked via STORAGE_BACKEND) for payment proof handling
 try:
-    from services.s3_service import upload_payment_proof, generate_presigned_url
+    from services.storage_service import upload_payment_proof, generate_presigned_url
 except ImportError:
-    # Fallback if boto3 is not installed
+    # Fallback if boto3 is not installed and STORAGE_BACKEND=s3
     async def upload_payment_proof(*args, **kwargs):
-        return {"error": "S3 service not available - boto3 not installed"}
-    
+        return {"error": "Storage service not available - boto3 not installed"}
+
     async def generate_presigned_url(*args, **kwargs):
-        return {"error": "S3 service not available - boto3 not installed"}
+        return {"error": "Storage service not available - boto3 not installed"}
 
 # LangChain Tools
-def get_product_info(product_name: str, seller_id: str) -> str:
-    db = SessionLocal()
-    try:
-        product = db.query(Product).filter(Product.name.ilike(f"%{product_name}%"), Product.seller_id == int(seller_id)).first()
-        if product:
-            imgs = get_product_images(product.id)
-            return {"product_id": product.id, "product": product.name, "description": product.description, "price": product.price, "stock": product.stock, "images": imgs}
-        return {"error": "Product not found"}
-    finally:
-        db.close()
+def get_product_info(product_name: str, seller_id: str) -> Dict[str, Any]:
+    """Look up one product by name (or numeric id) for a seller.
 
-def get_all_products(seller_id: str) -> List[str]:
-    db = SessionLocal()
-    try:
-        products = db.query(Product).filter(Product.seller_id == int(seller_id)).all()
-        if products:
-            return [{ "name": p.name, "price": p.price, "stock": p.stock } for p in products]
+    Images are fetched in the same session as the product. This used to call
+    get_product_images(), which opened a second connection while the first was
+    still checked out - two pool slots per lookup, and a deadlock risk once the
+    pool was saturated.
+    """
+    identifier = str(product_name).strip()
+    with read_session() as db:
+        query = db.query(Product).filter(Product.seller_id == int(seller_id))
+        if identifier.isdigit():
+            product = query.filter(Product.id == int(identifier)).first()
+        else:
+            product = query.filter(Product.name.ilike(f"%{identifier}%")).first()
+
+        if not product:
+            return {"error": "Product not found"}
+
+        image_rows = (
+            db.query(ProductImage.image_url)
+            .filter(ProductImage.product_id == product.id)
+            .all()
+        )
+        images = [url for (url,) in image_rows if url] or [DEFAULT_PRODUCT_IMAGE]
+
+        return {
+            "product_id": product.id,
+            "product": product.name,
+            "description": product.description,
+            "price": product.price,
+            "stock": product.stock,
+            "images": images,
+        }
+
+def get_all_products(seller_id: str) -> List[Any]:
+    """The seller's catalogue. Cached briefly - it is requested constantly."""
+
+    def _load():
+        with read_session() as db:
+            rows = (
+                db.query(Product.name, Product.price, Product.stock)
+                .filter(Product.seller_id == int(seller_id))
+                .order_by(Product.name)
+                .all()
+            )
+        if rows:
+            return [{"name": n, "price": p, "stock": s} for n, p, s in rows]
         return ["No products found for this seller"]
-    finally:
-        db.close()
+
+    return _product_cache.get_or_set(f"all:{seller_id}", _load)
+
+def track_order_detailed(order_id: str) -> Dict[str, Any]:
+    """Order status as structured data, so message templates can render it.
+
+    The string-returning track_order() below is what the LLM tool calls; this is
+    what the outbound formatter reads.
+    """
+    try:
+        numeric_id = int(str(order_id).strip())
+    except (TypeError, ValueError):
+        return {"found": False, "error": f"'{order_id}' is not a valid order number"}
+
+    with read_session() as db:
+        row = (
+            db.query(Order.id, Order.status, Order.created_at, Order.total_amount)
+            .filter(Order.id == numeric_id)
+            .first()
+        )
+    if not row:
+        return {"found": False, "error": "Order not found"}
+    return {
+        "found": True,
+        "order_id": row.id,
+        "status": row.status,
+        "created_at": str(row.created_at),
+        "total_amount": row.total_amount,
+    }
 
 def track_order(order_id: str) -> str:
-    db = SessionLocal()
-    try:
-        order = db.query(Order).filter(Order.id == int(order_id)).first()
-        if order:
-            return f"Order ID: {order.id}, Status: {order.status}, Created: {order.created_at}"
-        return "Order not found"
-    finally:
-        db.close()
+    result = track_order_detailed(order_id)
+    if not result["found"]:
+        return result["error"]
+    return (
+        f"Order ID: {result['order_id']}, Status: {result['status']}, "
+        f"Created: {result['created_at']}"
+    )
+
+def place_order_detailed(seller_id: str, user_id: str, items: List[dict]) -> Dict[str, Any]:
+    """Place an order and return structured details for the templates."""
+    message = place_order(seller_id, user_id, items)
+
+    # place_order returns prose; pull the ids back out rather than duplicating
+    # the whole transaction here.
+    match = re.search(r"Order ID:\s*(\d+).*?Rs\.([\d.]+)", message)
+    if match:
+        return {
+            "success": True,
+            "order_id": int(match.group(1)),
+            "total_amount": float(match.group(2)),
+            "message": message,
+            "items": items,
+        }
+    return {"success": False, "message": message, "error": message, "items": items}
 
 def place_order(seller_id: str, user_id: str, items: List[dict]) -> str:
     db = SessionLocal()
@@ -88,6 +186,7 @@ def place_order(seller_id: str, user_id: str, items: List[dict]) -> str:
             product.stock -= item["quantity"]
         order.total_amount = total_amount
         db.commit()
+        invalidate_product_cache(seller_id)
         return f"Order placed successfully. Order ID: {order.id}, Total Amount: Rs.{total_amount:.2f}"
     except Exception as e:
         db.rollback()
@@ -143,7 +242,7 @@ def update_user_info(user_id: str, name: str = None, email: str = None, address:
 def create_tmp_user_id() -> str:
     """Create a temporary user ID based on current timestamp and random number"""
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-    random_number = np.random.randint(1000, 9999)
+    random_number = random.randint(1000, 9999)
     return f"user_{timestamp}_{random_number}"         
 
 def save_user(user_id: str, name: str, email: str, address: str, number: str) -> str:
@@ -188,54 +287,6 @@ def log_query(query: str, intent: str, entities: Union[str, Dict[str, Any], List
         db.commit()
     finally:
         db.close()
-
-# Async version for background logging
-async def log_query_async(query: str, intent: str, entities: Union[str, Dict[str, Any], List], response: str, seller_id: str, user_id: str, response_time: int) -> None:
-    """Async version of log_query for background execution"""
-    def _log_sync():
-        db = SessionLocal()
-        try:
-            # Convert entities to proper JSON format
-            if isinstance(entities, str):
-                # Try to parse as JSON first
-                try:
-                    entities_json = json.loads(entities)
-                except json.JSONDecodeError:
-                    # If parsing fails, treat as plain text and wrap in object
-                    entities_json = {"raw": entities}
-            elif isinstance(entities, (dict, list)):
-                entities_json = entities
-            else:
-                entities_json = {"raw": str(entities)}
-                
-            chat_log = ChatLog(
-                user_query=query,
-                intent=intent,
-                entities=entities_json,
-                response=response,
-                seller_id=int(seller_id),
-                customer_id=user_id,
-                response_time_ms=response_time
-            )
-            db.add(chat_log)
-            db.commit()
-        except Exception as e:
-            print(f"Background logging error: {str(e)}")
-        finally:
-            db.close()
-    
-    # Run in thread pool to avoid blocking
-    loop = asyncio.get_event_loop()
-    await loop.run_in_executor(None, _log_sync)
-
-def query_context(query: str, seller_id: str) -> str:
-    headers = {"Authorization": f"Bearer {DEEPSEEK_API_KEY}", "Content-Type": "application/json"}
-    payload = {"input": query, "model": "deepseek-embedding"}  # Replace with DeepSeek's embedding model
-    response = requests.post(f"{DEEPSEEK_API_BASE}/embeddings", json=payload, headers=headers)
-    response.raise_for_status()
-    query_embedding = np.array(response.json()["data"][0]["embedding"], dtype=np.float32).reshape(1, -1)
-    results = vector_store.search(query_embedding, seller_id)
-    return "\n".join(results)
 
 def add_item_to_order(customer_id: str, order_id: str, product_identifier: str, quantity: int) -> str:
     """
@@ -291,6 +342,7 @@ def add_item_to_order(customer_id: str, order_id: str, product_identifier: str, 
             action = f"Added '{product.name}' (quantity: {quantity}) to order"
 
         db.commit()
+        invalidate_product_cache(str(order.seller_id))
         return f"{action}. Order total: Rs.{order.total_amount:.2f}"
 
     except Exception as e:
@@ -335,7 +387,8 @@ def remove_item_from_order(customer_id: str, order_id: str, product_identifier: 
         
         db.delete(order_item)
         db.commit()
-        
+        invalidate_product_cache(str(order.seller_id))
+
         return f"Removed '{product.name}' from order. Order total: Rs.{order.total_amount:.2f}"
 
     except Exception as e:
@@ -390,6 +443,7 @@ def update_item_quantity_in_order(customer_id: str, order_id: str, product_ident
         order.total_amount += product.price * quantity_diff
         
         db.commit()
+        invalidate_product_cache(str(order.seller_id))
         return f"Updated '{product.name}' quantity from {old_quantity} to {new_quantity}. Order total: Rs.{order.total_amount:.2f}"
 
     except Exception as e:
@@ -450,6 +504,7 @@ def replace_order_items(customer_id: str, order_id: str, new_items: List[dict]) 
         # Update the total and commit
         order.total_amount = total_amount
         db.commit()
+        invalidate_product_cache(str(order.seller_id))
 
         return f"Order {order.id} successfully updated with {len(new_items)} items. New total: Rs.{total_amount:.2f}"
 
@@ -696,29 +751,67 @@ def edit_order_with_stock_update(order_id: int, customer_id: str, new_items: lis
         db.close()
 
 def get_seller_id_by_whatsapp_number_id(whatsapp_number_id: str) -> str:
-    """Get seller ID based on WhatsApp number"""
-    db = SessionLocal()
-    try:
-        # Assuming you have a mapping of WhatsApp numbers to seller IDs
-        # This is a placeholder logic, replace with actual implementation
-        seller = db.query(SellerProfile).filter(SellerProfile.whatsapp_number_id == whatsapp_number_id).first()
-        if seller:
-            return str(seller.id)
-        return "default_seller"  # Fallback if no specific seller found
-    finally:
-        db.close()
+    """Map an inbound WhatsApp number id to a seller id.
+
+    Runs on every single inbound message, so the result is cached for 5 minutes.
+    """
+
+    def _load() -> str:
+        with read_session() as db:
+            row = (
+                db.query(SellerProfile.id)
+                .filter(SellerProfile.whatsapp_number_id == whatsapp_number_id)
+                .first()
+            )
+        if row:
+            return str(row.id)
+        logger.warning(
+            "No seller profile mapped to WhatsApp number id %s - falling back to "
+            "'default_seller', which will not match any products",
+            whatsapp_number_id,
+        )
+        return "default_seller"
+
+    return _seller_cache.get_or_set(str(whatsapp_number_id), _load)
 
 
 
-def get_product_images(product_id: int) -> str:
-    """Get image URL for a product by its ID"""
-    db = SessionLocal()
-    try:
-        images = db.query(ProductImage).filter(ProductImage.product_id == product_id).all()
-        urls = [img.image_url for img in images if img.image_url]
-        return urls if urls else ["https://www.shutterstock.com/image-photo/person-using-smartphone-interact-friendly-600nw-2482428287.jpg"]
-    finally:
-        db.close()
+def get_shop_name(seller_id: str) -> str:
+    """The seller's shop name, for use in message templates.
+
+    Cached with the seller lookup TTL - it is read on every outbound message and
+    changes about never.
+    """
+
+    def _load() -> str:
+        try:
+            with read_session() as db:
+                row = (
+                    db.query(SellerProfile.shop_name)
+                    .filter(SellerProfile.id == int(seller_id))
+                    .first()
+                )
+            if row and row[0]:
+                return str(row[0])
+        except (TypeError, ValueError):
+            pass  # seller_id isn't numeric (e.g. "default_seller")
+        except Exception as e:
+            logger.debug("Could not read shop name for seller %s: %s", seller_id, e)
+        return "our shop"
+
+    return _seller_cache.get_or_set(f"shop_name:{seller_id}", _load)
+
+
+def get_product_images(product_id: int) -> List[str]:
+    """Image URLs for a product, or a single placeholder if it has none."""
+    with read_session() as db:
+        rows = (
+            db.query(ProductImage.image_url)
+            .filter(ProductImage.product_id == product_id)
+            .all()
+        )
+    urls = [url for (url,) in rows if url]
+    return urls or [DEFAULT_PRODUCT_IMAGE]
 
 
 # Payment Proof Functions
@@ -737,7 +830,7 @@ def upload_payment_proof_for_order(order_id: int, file_name: str, file_type: str
     """
     try:
         # Run the async function
-        result = asyncio.run(upload_payment_proof(
+        result = run_sync(upload_payment_proof(
             order_id=order_id,
             file_name=file_name,
             file_type=file_type,
@@ -768,7 +861,7 @@ def get_presigned_upload_url(file_name: str, file_type: str, file_size: int, fol
     """
     try:
         # Run the async function
-        result = asyncio.run(generate_presigned_url(
+        result = run_sync(generate_presigned_url(
             file_name=file_name,
             file_type=file_type,
             file_size=file_size,
@@ -853,7 +946,6 @@ def upload_payment_proof_and_update_order(order_id: int, file_path: str) -> str:
         
         # Get file information
         file_name = os.path.basename(file_path)
-        file_size = os.path.getsize(file_path)
         
         # Determine file type based on extension
         file_extension = os.path.splitext(file_name)[1].lower()
@@ -886,13 +978,13 @@ def upload_payment_proof_and_update_order(order_id: int, file_path: str) -> str:
         finally:
             db.close()
         
-        # Upload to S3 and update order
+        # Upload via configured storage backend (S3 or local) and update order
         try:
-            # Import S3 service locally to avoid import errors if boto3 not installed
-            from services.s3_service import s3_service
-            
-            # Upload file directly to S3
-            result = asyncio.run(s3_service.upload_file_direct(
+            # Import locally to avoid import errors if boto3 not installed (S3 backend only)
+            from services.storage_service import storage_service as s3_service
+
+            # Upload file via storage backend
+            result = run_sync(s3_service.upload_file_direct(
                 file_name=file_name,
                 file_type=file_type,
                 file_content=file_content,
@@ -919,19 +1011,19 @@ def upload_payment_proof_and_update_order(order_id: int, file_path: str) -> str:
                 
             except Exception as e:
                 db.rollback()
-                # If DB update fails, try to delete the S3 file to avoid orphaned files
+                # If DB update fails, try to delete the uploaded file to avoid orphaned files
                 try:
-                    asyncio.run(s3_service.delete_file(result['key']))
+                    run_sync(s3_service.delete_file(result['key']))
                 except:
-                    pass  # Ignore S3 cleanup errors
+                    pass  # Ignore cleanup errors
                 return f"Error updating order in database: {str(e)}"
             finally:
                 db.close()
-                
+
         except ImportError:
             return "Error: S3 service not available - boto3 not installed. Please install boto3: pip install boto3"
         except Exception as e:
-            return f"Error uploading to S3: {str(e)}"
+            return f"Error uploading payment proof: {str(e)}"
             
     except Exception as e:
         return f"Error processing payment proof upload: {str(e)}"
@@ -985,18 +1077,23 @@ def remove_order_payment_proof(order_id: int) -> str:
         
         old_url = order.payment_proof
         
-        # Try to delete from S3 if possible
+        # Try to delete the stored file if possible (S3 or local, depending on STORAGE_BACKEND)
         try:
-            from services.s3_service import s3_service
-            # Extract S3 key from URL
-            if 's3.amazonaws.com/' in old_url:
-                s3_key = old_url.split('s3.amazonaws.com/')[-1]
-                asyncio.run(s3_service.delete_file(s3_key))
-                s3_delete_msg = " S3 file has been deleted."
+            from services.storage_service import storage_service
+            from config.storage import S3_ENABLED, LOCAL_STORAGE_BASE_URL
+
+            if S3_ENABLED and 's3.amazonaws.com/' in old_url:
+                file_key = old_url.split('s3.amazonaws.com/')[-1]
+                run_sync(storage_service.delete_file(file_key))
+                s3_delete_msg = " Stored file has been deleted."
+            elif not S3_ENABLED and old_url.startswith(LOCAL_STORAGE_BASE_URL + "/"):
+                file_key = old_url[len(LOCAL_STORAGE_BASE_URL) + 1:]
+                run_sync(storage_service.delete_file(file_key))
+                s3_delete_msg = " Stored file has been deleted."
             else:
-                s3_delete_msg = " Could not delete S3 file (invalid URL format)."
+                s3_delete_msg = " Could not delete stored file (invalid URL format)."
         except:
-            s3_delete_msg = " Could not delete S3 file."
+            s3_delete_msg = " Could not delete stored file."
         
         # Remove URL from database
         order.payment_proof = None
@@ -1051,11 +1148,351 @@ def cancel_order(customer_id: str, order_id: str, reason: str = "") -> str:
             pass
         
         db.commit()
-        
+        invalidate_product_cache(str(order.seller_id))
+
         return f"Order {order_id} has been successfully cancelled. Stock has been restored for all items."
         
     except Exception as e:
         db.rollback()
         return f"Error cancelling order {order_id}: {str(e)}"
+    finally:
+        db.close()
+
+
+# =====================================================================
+# Image-aware tools: receipt verification and visual product search
+# =====================================================================
+
+# How far the receipt amount may differ from the order total before we flag it.
+PAYMENT_TOLERANCE = float(os.getenv("PAYMENT_AMOUNT_TOLERANCE", "1.0"))
+
+
+def _read_image_file(file_path: str) -> Dict[str, Any]:
+    """Shared checks for an image path handed to us by the agent."""
+    if not file_path or not os.path.exists(file_path):
+        return {"ok": False, "error": f"File not found at path '{file_path}'"}
+
+    file_name = os.path.basename(file_path)
+    ext = os.path.splitext(file_name)[1].lower()
+    type_map = {'.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png',
+                '.gif': 'image/gif', '.webp': 'image/webp'}
+    file_type = type_map.get(ext)
+    if not file_type:
+        return {"ok": False, "error": f"Unsupported file type '{ext}'. Use JPG, PNG, GIF or WEBP."}
+
+    with open(file_path, 'rb') as f:
+        content = f.read()
+
+    return {"ok": True, "file_name": file_name, "file_type": file_type, "content": content}
+
+
+def verify_and_save_payment_proof(order_id: int, file_path: str, customer_id: str = None) -> str:
+    """
+    Look at a payment receipt image, check it against the order, then store it.
+
+    Reads the amount/reference/bank off the receipt with the vision model and
+    compares the amount to the order total. The proof is always saved (so nothing
+    the customer sent is lost), but the order is flagged for human review when the
+    image isn't a receipt, can't be read, or the amount doesn't match.
+
+    Returns a human-readable message for the customer.
+    """
+    db = SessionLocal()
+    try:
+        try:
+            order_id = int(order_id)
+        except (TypeError, ValueError):
+            return f"Error: '{order_id}' is not a valid order ID."
+
+        order = db.query(Order).filter(Order.id == order_id).first()
+        if not order:
+            return f"Order with ID {order_id} not found."
+
+        # Make sure this order actually belongs to the person in the chat.
+        if customer_id and str(order.customer_id) != str(customer_id):
+            logger.warning(
+                f"Customer {customer_id} tried to attach payment proof to order {order_id} "
+                f"which belongs to {order.customer_id}"
+            )
+            return f"Order {order_id} does not belong to you. Please check the order number."
+
+        file_info = _read_image_file(file_path)
+        if not file_info["ok"]:
+            return f"Error: {file_info['error']}"
+
+        # ---- Step 1: read the receipt -------------------------------------
+        try:
+            from services.image_analysis_service import vision_service
+            extraction = vision_service.extract_receipt_details(file_path)
+        except Exception as e:
+            logger.error(f"Vision check failed for order {order_id}: {str(e)}")
+            extraction = {"success": False, "error": str(e)}
+
+        verification = "unreadable"
+        flagged = True
+        flag_reason = "Could not read the receipt"
+        customer_msg = None
+
+        if not extraction.get("success"):
+            flag_reason = f"Vision check failed: {extraction.get('error', 'unknown error')}"
+            customer_msg = (
+                "I've saved your payment slip, but I couldn't read it automatically. "
+                "Our team will check it manually and confirm shortly."
+            )
+
+        elif not extraction.get("is_receipt"):
+            verification = "not_a_receipt"
+            flag_reason = "Image does not appear to be a payment receipt"
+            customer_msg = (
+                "That image doesn't look like a payment receipt. "
+                "Please send a clear photo or screenshot of your bank transfer slip."
+            )
+
+        else:
+            amount = extraction.get("amount")
+            issues = extraction.get("issues") or []
+
+            if amount is None:
+                verification = "unreadable"
+                flag_reason = "Amount could not be read from the receipt"
+                if issues:
+                    flag_reason += f" ({'; '.join(str(i) for i in issues)})"
+                customer_msg = (
+                    "I've saved your receipt, but I couldn't clearly read the amount. "
+                    "Our team will verify it manually and confirm shortly."
+                )
+
+            elif abs(float(amount) - float(order.total_amount)) <= PAYMENT_TOLERANCE:
+                verification = "verified"
+                flagged = False
+                flag_reason = None
+                customer_msg = (
+                    f"Payment verified. We received your payment of {amount:.2f} "
+                    f"for order {order_id}. Thank you!"
+                )
+
+            else:
+                verification = "amount_mismatch"
+                flag_reason = (
+                    f"Receipt shows {amount:.2f} but order total is {float(order.total_amount):.2f}"
+                )
+                customer_msg = (
+                    f"I've saved your receipt, but the amount on it ({amount:.2f}) doesn't match "
+                    f"the order total ({float(order.total_amount):.2f}). "
+                    "Our team will review this and get back to you."
+                )
+
+        # ---- Step 2: store the file ---------------------------------------
+        try:
+            from services.storage_service import storage_service
+            upload = run_sync(storage_service.upload_file_direct(
+                file_name=file_info["file_name"],
+                file_type=file_info["file_type"],
+                file_content=file_info["content"],
+                folder="payment-proofs",
+            ))
+            file_url = upload["file_url"]
+        except Exception as e:
+            logger.error(f"Failed to store payment proof for order {order_id}: {str(e)}")
+            return f"Error saving payment proof: {str(e)}"
+
+        # ---- Step 3: write it all to the order -----------------------------
+        try:
+            order.payment_proof = file_url
+            order.payment_verification = verification
+            order.payment_flagged = flagged
+            order.payment_flag_reason = flag_reason
+            order.payment_verified_at = datetime.utcnow()
+
+            if extraction.get("success"):
+                order.payment_amount = extraction.get("amount")
+                order.payment_currency = extraction.get("currency")
+                order.payment_reference = extraction.get("reference")
+                order.payment_bank = extraction.get("bank")
+                order.payment_date = extraction.get("date")
+                order.payment_raw_extraction = {
+                    k: v for k, v in extraction.items() if k != "success"
+                }
+
+            # Keep the Admin Portal's own field in its expected vocabulary.
+            order.payment_status = "Paid" if verification == "verified" else "Pending"
+
+            db.commit()
+        except Exception as e:
+            db.rollback()
+            logger.error(f"DB update failed for order {order_id}: {str(e)}")
+            # Don't leave an orphaned file behind
+            try:
+                run_sync(storage_service.delete_file(upload["key"]))
+            except Exception:
+                pass
+            return f"Error updating order {order_id}: {str(e)}"
+
+        # Local download is no longer needed
+        try:
+            os.remove(file_path)
+        except OSError:
+            pass
+
+        logger.info(
+            f"Payment proof for order {order_id}: {verification} "
+            f"(flagged={flagged}, reason={flag_reason})"
+        )
+        return customer_msg
+
+    except Exception as e:
+        db.rollback()
+        logger.error(f"verify_and_save_payment_proof failed: {str(e)}")
+        return f"Error processing payment proof: {str(e)}"
+    finally:
+        db.close()
+
+
+def verify_and_save_payment_proof_detailed(
+    order_id: int, file_path: str, customer_id: str = None
+) -> Dict[str, Any]:
+    """verify_and_save_payment_proof plus the verification fields it wrote.
+
+    The outbound templates need to know whether the receipt matched, and by how
+    much. Rather than thread a second return value through that whole function,
+    this reads the columns it just committed - one indexed lookup, and only on a
+    receipt image, which is rare.
+    """
+    message = verify_and_save_payment_proof(order_id, file_path, customer_id)
+    details: Dict[str, Any] = {"message": message, "order_id": order_id}
+
+    try:
+        with read_session() as db:
+            row = (
+                db.query(
+                    Order.payment_verification,
+                    Order.payment_amount,
+                    Order.payment_currency,
+                    Order.payment_reference,
+                    Order.payment_flagged,
+                    Order.payment_flag_reason,
+                    Order.total_amount,
+                )
+                .filter(Order.id == int(order_id))
+                .first()
+            )
+        if row:
+            details.update(
+                {
+                    "verification": row.payment_verification,
+                    "amount": row.payment_amount,
+                    "currency": row.payment_currency,
+                    "reference": row.payment_reference,
+                    "flagged": row.payment_flagged,
+                    "flag_reason": row.payment_flag_reason,
+                    "total_amount": row.total_amount,
+                }
+            )
+    except Exception as e:
+        # The proof is already saved; failing to read it back is cosmetic.
+        logger.debug("Could not read back payment verification for %s: %s", order_id, e)
+
+    return details
+
+
+def find_similar_products_by_image(file_path: str, seller_id: str) -> str:
+    """
+    Customer sent a photo of something - find what we sell that matches.
+
+    The vision model describes the item, then we match that description against
+    the seller's catalogue by name and description keywords.
+    """
+    file_info = _read_image_file(file_path)
+    if not file_info["ok"]:
+        return f"Error: {file_info['error']}"
+
+    # ---- Step 1: describe what's in the photo -----------------------------
+    try:
+        from services.image_analysis_service import vision_service
+        described = vision_service.describe_product_image(file_path)
+    except Exception as e:
+        logger.error(f"Vision description failed: {str(e)}")
+        return "I couldn't analyse that image. Could you tell me what you're looking for?"
+
+    if not described.get("success"):
+        return (
+            "I couldn't make out what's in that image. "
+            "Could you describe what you're looking for?"
+        )
+
+    item_type = described.get("item_type") or ""
+    keywords = [str(k) for k in (described.get("keywords") or [])]
+    colors = [str(c) for c in (described.get("colors") or [])]
+    description = described.get("description", "")
+
+    # ---- Step 2: match against the catalogue ------------------------------
+    db = SessionLocal()
+    try:
+        products = db.query(Product).filter(Product.seller_id == int(seller_id)).all()
+        if not products:
+            return "We don't have any products listed yet."
+
+        # Score each product by how many of the vision terms appear in its
+        # name or description. Item type counts double - it's the strongest signal.
+        terms = [t.lower() for t in ([item_type] + keywords + colors) if t]
+        scored = []
+
+        for p in products:
+            haystack = f"{p.name or ''} {p.description or ''}".lower()
+            score = 0
+            for term in terms:
+                # Word-boundary match so "tea" doesn't match "steam"
+                if re.search(r'\b' + re.escape(term) + r'\b', haystack):
+                    score += 2 if term == item_type.lower() else 1
+            if score > 0:
+                scored.append((score, p))
+
+        scored.sort(key=lambda x: (-x[0], x[1].name or ""))
+        matches = [p for _, p in scored[:5]]
+
+        if not matches:
+            return (
+                f"I can see this is {description or 'an item'}, but I couldn't find "
+                f"anything matching it in our catalogue. "
+                "Would you like to see what we do have?"
+            )
+
+        lines = [f"I can see this is {description}", "", "Here's what we have that's similar:"]
+        for p in matches:
+            stock_note = f"{p.stock} in stock" if p.stock and p.stock > 0 else "out of stock"
+            lines.append(f"- {p.name} - {p.price:.2f} ({stock_note})")
+
+        return "\n".join(lines)
+
+    except Exception as e:
+        logger.error(f"Product image search failed: {str(e)}")
+        return f"Error searching for similar products: {str(e)}"
+    finally:
+        db.close()
+
+
+def get_flagged_payment_orders(seller_id: str) -> str:
+    """List orders whose payment proof needs a human to look at it."""
+    db = SessionLocal()
+    try:
+        orders = (
+            db.query(Order)
+            .filter(Order.seller_id == int(seller_id), Order.payment_flagged == True)  # noqa: E712
+            .order_by(Order.created_at.desc())
+            .all()
+        )
+        if not orders:
+            return "No payment proofs are waiting for review."
+
+        lines = [f"{len(orders)} payment proof(s) need review:"]
+        for o in orders:
+            lines.append(
+                f"- Order {o.id}: {o.payment_verification or 'unknown'} - "
+                f"{o.payment_flag_reason or 'no reason recorded'} "
+                f"(order total {float(o.total_amount):.2f})"
+            )
+        return "\n".join(lines)
+    except Exception as e:
+        return f"Error fetching flagged orders: {str(e)}"
     finally:
         db.close()

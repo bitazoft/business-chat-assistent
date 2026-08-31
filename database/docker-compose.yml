@@ -1,4 +1,16 @@
-version: '3.8'
+# Local PostgreSQL for the chatbot and Admin Portal.
+#
+# Published on host port 6432, not 5432. A native PostgreSQL install on this
+# machine already holds 5432 and wins the bind - so the mapping looked fine in
+# `docker ps` while every client silently reached that other server instead,
+# which has no `assistant` database. Use 6432 in DATABASE_URL.
+#
+#   docker compose up -d          # start (keeps existing data)
+#   docker compose down           # stop, data kept in the pgdata volume
+#   docker compose down -v        # DESTROYS all data - only when you mean it
+#
+# `version:` is intentionally absent: it is obsolete in current Compose and only
+# produces a warning.
 
 services:
   db:
@@ -10,10 +22,37 @@ services:
       POSTGRES_PASSWORD: 12345678
       POSTGRES_DB: assistant
     ports:
-      - "5432:5432"
+      # host:container - the container still listens on 5432 internally
+      - "6432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      # Everything below runs ONCE, and only when pgdata is empty (a first-time
+      # setup). Postgres runs the files in this directory in filename order, so
+      # they are numbered: base schema first, then each migration.
+      # An existing database is left alone - apply migrations there with
+      #   cd chatbot && python scripts/apply_migrations.py
+      #
+      # init.docker.sql, not init.sql: init.sql is a full `pg_dumpall` cluster
+      # dump that starts with CREATE ROLE postgres and CREATE DATABASE assistant.
+      # The entrypoint has already created both from POSTGRES_USER/POSTGRES_DB,
+      # so it fails on "role postgres already exists" and, because the entrypoint
+      # runs psql with ON_ERROR_STOP=1, the whole container exits. init.docker.sql
+      # is the same dump with the cluster-level statements removed.
+      - ./init.docker.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./migrations/001_payment_verification.sql:/docker-entrypoint-initdb.d/02-payment-verification.sql:ro
+      - ./migrations/002_performance_indexes.sql:/docker-entrypoint-initdb.d/03-performance-indexes.sql:ro
+      - ./migrations/003_conversation_messages.sql:/docker-entrypoint-initdb.d/04-conversation-messages.sql:ro
+      - ./migrations/004_token_usage_and_templates.sql:/docker-entrypoint-initdb.d/05-token-usage-and-templates.sql:ro
+      # 005 is deliberately not mounted: it relaxes a foreign key, so it stays
+      # opt-in. See the comments at the top of that file.
+    healthcheck:
+      # So `docker compose up -d --wait` reports ready only when the database is
+      # actually accepting queries, not merely when the container has started.
+      test: ["CMD-SHELL", "pg_isready -U postgres -d assistant"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
 
 volumes:
   pgdata:

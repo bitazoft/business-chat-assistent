@@ -1,234 +1,284 @@
-# Performance Optimization Guide - Reducing 3s Response Delay
+# What changed, and why
 
-## 🎯 Priority 1: Make Database Logging Asynchronous
+This replaces the earlier planning document. That file proposed changes; this one
+records what was actually done.
 
-### Current Issue:
-The `log_query()` function runs synchronously after each response, causing blocking delays.
+Everything here is in place. Nothing needs a new service — no Redis, no queue.
+Two database migrations are required (see **Before you deploy** at the bottom).
 
-### Solution 1: Background Task Logging
-```python
-# In agent.py - Replace synchronous logging
-import asyncio
-from concurrent.futures import ThreadPoolExecutor
+---
 
-# Create thread pool for background tasks
-background_executor = ThreadPoolExecutor(max_workers=2)
+## Bugs fixed
 
-def log_query_async(self, query: str, intent: str, response: str, entities: Dict, response_time: int):
-    """Log query asynchronously to avoid blocking"""
-    def _log_in_background():
-        try:
-            log_query(
-                query=query,
-                intent=intent,
-                entities=entities,
-                response=response,
-                seller_id=self.seller_id,
-                user_id=self.user_id,
-                response_time=response_time
-            )
-        except Exception as e:
-            logger.error(f"Background logging error: {str(e)}")
-    
-    # Submit to background executor
-    background_executor.submit(_log_in_background)
+These were real defects, not slowness.
 
-# Replace the synchronous call in process_message():
-# OLD: self.log_query(message, intent, response, self.extract_entities(), total_time*1000)
-# NEW: self.log_query_async(message, intent, response, self.extract_entities(), total_time*1000)
-```
+**`/chat` crashed on payment receipts.** The endpoint was `async def` but called
+the agent directly. Inside, `verify_and_save_payment_proof` called
+`asyncio.run()`, which raises `RuntimeError: asyncio.run() cannot be called from
+a running event loop` when a loop is already running. The WhatsApp path happened
+to work because it ran in a worker thread, so the bug only appeared on one route.
+Coroutines now go through `utils/async_bridge.py`, which runs them on a dedicated
+loop and works from any thread.
 
-### Solution 2: Use FastAPI Background Tasks
-```python
-# In routes/whatsapp_routes.py
-from fastapi import BackgroundTasks
+**Duplicate orders.** WhatsApp redelivers a webhook it thinks failed. Nothing
+checked whether a message had already been handled, so a redelivery re-ran the
+customer's message — and could place a second order. Message ids are now
+remembered for 15 minutes and repeats are dropped before any work happens.
 
-def log_conversation_background(message: str, response: str, user_id: str, seller_id: str):
-    """Background task for logging"""
-    # Move logging here
-    pass
+**Long replies were never delivered.** WhatsApp rejects a text body over 4096
+characters outright. A long product list or order history simply failed to send,
+with no fallback. Replies are now split on paragraph, line, or sentence
+boundaries and sent as several messages.
 
-# In process_whatsapp_message, add background_tasks parameter and use it
-```
+**The event loop was blocked on every request.** `/chat` called the blocking
+agent inline, and the WhatsApp webhook downloaded the image and ran a vision
+model call — several seconds — before returning 200. During that time no other
+request in the process could be served, and the webhook risked WhatsApp's
+timeout, which triggers the redelivery described above. All blocking work now
+runs on worker threads.
 
-## 🎯 Priority 2: Optimize WhatsApp API Calls
+**Sessions leaked.** Sessions lived in a module-level dict that only ever grew.
+It recorded `last_activity` but nothing read it, so every phone number that ever
+messaged kept a full agent object alive for the life of the process. Sessions now
+have a sliding one-hour lease, a count cap, and a background sweeper.
 
-### Current Issues:
-- `mark_message_as_read()` runs synchronously after response
-- Image sending happens sequentially
+**`/whatsapp/send-message` and `/whatsapp/profile/{n}` always failed.** Both
+called service methods without the required `phone_number_id`, raising
+`TypeError` on every call. They now accept it, defaulting to the single
+configured account when there is only one.
 
-### Solution: Async WhatsApp Operations
-```python
-# In routes/whatsapp_routes.py - Modify process_whatsapp_message
-async def process_whatsapp_message_async(phone_number: str, message_content: str, message_id: str, whatsapp_number_id: str):
-    """Async version with optimized API calls"""
-    try:
-        # Process message first
-        chatbot = get_or_create_chatbot(phone_number, seller_id)
-        response = chatbot.process_message(message_content)
-        
-        # Send text response immediately (don't wait)
-        text_result = whatsapp_service.send_text_message(phone_number, response, whatsapp_number_id)
-        
-        # Handle images and read receipts in background
-        if text_result["success"]:
-            # Background tasks (non-blocking)
-            asyncio.create_task(send_images_async(chatbot, phone_number, whatsapp_number_id))
-            asyncio.create_task(mark_read_async(message_id, whatsapp_number_id))
-            
-    except Exception as e:
-        logger.error(f"Error: {str(e)}")
+**Unknown `AI_PROVIDER` failed at the worst moment.** If `AI_PROVIDER` was
+neither `GPT` nor `DEEPSEEK`, the module-level `llm` name was never assigned. The
+app imported cleanly and then died with `NameError` on the first customer
+message. It now fails at startup with a message saying what to set.
 
-async def send_images_async(chatbot, phone_number: str, whatsapp_number_id: str):
-    """Send images asynchronously"""
-    img_urls = chatbot.get_img_urls()
-    if img_urls:
-        # Send images concurrently, not sequentially
-        tasks = [
-            asyncio.create_task(whatsapp_service.send_image_message(phone_number, url, "", whatsapp_number_id))
-            for url in img_urls
-        ]
-        await asyncio.gather(*tasks, return_exceptions=True)
+**A database blip meant total silence.** The seller lookup raised, and the error
+handler called that same lookup again — so the customer got no reply at all. The
+error path no longer touches anything that can fail.
 
-async def mark_read_async(message_id: str, whatsapp_number_id: str):
-    """Mark message as read asynchronously"""
-    whatsapp_service.mark_message_as_read(message_id, whatsapp_number_id)
-```
+**Intent detection misread every order.** `'order'` appeared in three different
+keyword lists and `order_tracking` was checked first, so "I want to order a
+laptop" was classified as order tracking. Patterns are now ordered
+most-specific-first and use word boundaries.
 
-## 🎯 Priority 3: Reduce Template Processing Overhead
+**RAG distances were meaningless.** Queries were encoded with
+`normalize_embeddings=True` while the FAISS index held raw vectors, so the
+distances compared against the threshold were between vectors of different
+magnitudes. Stored vectors are now normalised to match.
 
-### Solution: Pre-compile Template Checks
-```python
-# In agent.py - Optimize template detection
-import re
+**`@lru_cache` on a method leaked.** `FastVectorStore.similarity_search` was
+decorated with `lru_cache`, which caches on `self` and therefore pinned the
+instance and its embedding arrays forever — sitting on top of a second
+hand-rolled dict cache doing the same job with different keys.
 
-# Pre-compile regex patterns (do this once at module level)
-TEMPLATE_PATTERNS = [
-    re.compile(r'^🛍️'),
-    re.compile(r'^🚚'),
-    re.compile(r'^📋'),
-    # ... other template patterns
-]
+**Retrying a WhatsApp send could double-send.** Fixed as part of adding retries:
+read timeouts are not retried (the message may already have been delivered), only
+connect failures and statuses that mean "not processed" — 429, 502, 503, 504.
 
-def is_template_response(text: str) -> bool:
-    """Fast template detection using pre-compiled patterns"""
-    return any(pattern.match(text) for pattern in TEMPLATE_PATTERNS)
+**Products were shown to customers as "Unknown Product".** The product template
+read `name` and `id`, while `get_product_info` returns `product` and
+`product_id`. Every product detail message said "Product ID: N/A / Name: Unknown
+Product" with the right price and stock underneath it. Both spellings are
+accepted now, and the new template layer renders from the structured data
+directly.
 
-# Replace the template checking loop with:
-if tool_results and any(is_template_response(str(result.get("result", ""))) for result in tool_results):
-    # Use template response
-    pass
-```
+**Entity extraction always came back empty for products.** The tool wrapper
+stored the *image URL list* where the product id was expected, so
+`chat_logs.entities` never recorded a product. Now `{"product_id": "3"}`.
 
-## 🎯 Priority 4: Optimize Database Operations
+**Model names were recorded doubled.** `langchain-openai` pointed at OpenRouter
+reports `response_metadata["model_name"]` as the name twice over
+(`openai/gpt-4o-miniopenai/gpt-4o-mini`), which would have become its own row in
+every per-model cost report. Found while verifying against the live API;
+normalised now. Costs were unaffected.
 
-### Solution: Connection Pooling & Batch Operations
-```python
-# In repositories/tools.py - Optimize log_query
-def log_query_optimized(query: str, intent: str, entities: Union[str, Dict[str, Any], List], response: str, seller_id: str, user_id: str, response_time: int) -> None:
-    """Optimized logging with minimal processing"""
-    db = SessionLocal()
-    try:
-        # Simplified entity processing
-        if isinstance(entities, dict):
-            entities_json = entities
-        else:
-            entities_json = {"data": str(entities)}  # Simplified conversion
-            
-        chat_log = ChatLog(
-            user_query=query[:500],  # Truncate long queries
-            intent=intent,
-            entities=entities_json,
-            response=response[:1000],  # Truncate long responses  
-            seller_id=int(seller_id),
-            customer_id=user_id,
-            response_time_ms=response_time
-        )
-        db.add(chat_log)
-        db.commit()
-    except Exception as e:
-        logger.error(f"Quick log error: {e}")
-    finally:
-        db.close()
-```
+---
 
-## 🎯 Priority 5: Configuration Optimizations
+## Performance
 
-### Immediate Configuration Changes:
-```python
-# In agent.py - Update LLM config for speed
-llm = ChatDeepSeek(
-    model=os.getenv("CHAT_MODEL","deepseek-chat"),
-    api_key=API_KEY,
-    base_url=API_BASE,
-    temperature=0.0,      # Changed from 0.1 to 0.0 for fastest responses
-    max_tokens=256,       # Reduced from 512 to 256
-    timeout=15,           # Reduced from 300 to 15 seconds  
-    max_retries=1         # Reduced from 3 to 1
-)
+**The agent was rebuilt for every message.** Each `/chat` request constructed
+about twenty Pydantic model classes, twenty tools, a bound LLM and an executor,
+then threw it all away. Building a Pydantic model class compiles a validator — it
+is one of the more expensive things you can do per request, and the result was
+identical every time.
 
-# Reduce agent iterations
-agent = AgentExecutor(
-    agent=agent, 
-    tools=self.tools, 
-    verbose=False,
-    max_iterations=2,     # Reduced from 10 to 2
-    early_stopping_method="generate",
-    handle_parsing_errors=True,
-    return_intermediate_steps=False
-)
-```
+- Argument schemas moved to `agent/schemas.py`, built once at import.
+- The system prompt moved to `agent/prompts.py` and is cached per seller.
+- Sessions are reused, so an agent is built once per conversation.
 
-### Environment Variables to Set:
+**The database had no connection pooling configured.** `create_engine` took no
+pool arguments, so it ran on defaults: 5 connections, 10 overflow, and no
+liveness check. `config/performance.py` defined a `DB_CONFIG` with sensible
+values that nothing ever read. Now configured, with `pool_pre_ping` so a
+connection dropped by Postgres or a NAT timeout reconnects instead of failing a
+customer's message, and a connect timeout so an unreachable database fails fast
+instead of pinning a worker thread for the OS TCP timeout.
+
+**No indexes on anything the bot queries.** "This customer's pending orders" and
+"this seller's products" were sequential scans. Product lookup uses
+`name ILIKE '%term%'`, which cannot use a btree index at all — a trigram index
+now covers it. See `database/migrations/002_performance_indexes.sql`.
+
+**Every outbound call opened a new connection.** Each WhatsApp message paid for a
+full TLS handshake to graph.facebook.com — roughly 100–300ms of pure overhead,
+several times per conversation turn. Now a pooled, keep-alive session.
+
+**Two connections per product lookup.** `get_product_info` called
+`get_product_images`, which opened a second session while the first was still
+checked out — two pool slots per lookup, and a deadlock risk once the pool
+saturated. One session now.
+
+**A thread per message.** Each finished turn did
+`threading.Thread(target=...).start()` to write its log row: an OS thread created
+and destroyed per message, unbounded under load, and killed mid-write at
+shutdown. One shared bounded pool now, drained on shutdown.
+
+**The whole webhook payload was logged at INFO with `indent=2`.** Megabytes of
+logs and real CPU spent formatting JSON nobody read. Now at DEBUG and truncated.
+The log file also had no rotation, so it grew without limit.
+
+**Other:** gzip on responses (product lists compress well), a short cache on the
+seller-by-WhatsApp-number lookup that ran on every message, a 30-second cache on
+product listings invalidated whenever stock changes, and the embedding model is
+no longer loaded at all when `RAG_ENABLED=false`.
+
+---
+
+## Security
+
+- **Webhook signature verification** (`X-Hub-Signature-256`). The webhook is a
+  public URL that creates orders and reads customer data; without this, anyone
+  who finds it can drive the bot as any phone number. Off by default so it does
+  not silently break an existing deployment — set `VERIFY_WEBHOOK_SIGNATURE=true`
+  and `WHATSAPP_APP_SECRET`. Compared with `hmac.compare_digest`.
+- **Rate limiting per customer.** Every message costs an LLM call, so a script
+  hammering the webhook is a bill, not just load.
+- **CORS.** `allow_origins=["*"]` with `allow_credentials=True` is refused by
+  browsers anyway. Credentials are now only enabled when real origins are
+  configured, and production warns if it is left open.
+- **Template rendering is restricted.** Templates are edited by shop staff, and
+  `{message.__class__.__mro__}` is valid `str.format` syntax that would leak
+  internals. Only bare `{placeholder}` names are substituted — no attribute
+  access, no indexing, no format specs.
+
+---
+
+## New features
+
+- **Customisable message templates** — edit what the bot says without a deploy.
+  See [docs/MESSAGE_TEMPLATES.md](docs/MESSAGE_TEMPLATES.md).
+- **Token and cost tracking per session and seller**, plus model routing and a
+  daily budget cap. See [docs/COST_AND_USAGE.md](docs/COST_AND_USAGE.md).
+- **Human handover.** The agent can call `escalate_to_human` for refunds,
+  complaints, or anything its tools cannot do. The bot then stops auto-replying
+  to that customer so staff can take over the thread. `GET /whatsapp/handoffs`
+  lists open ones; `DELETE /whatsapp/handoffs/{phone}` closes one.
+- **Conversation history survives restarts.** History lived only in memory, so a
+  deploy mid-order lost everything the customer had said and the bot started
+  asking for their details again. Now persisted and reloaded per session.
+- **Read receipts and a typing indicator**, sent before the turn starts rather
+  than after the reply. A silent chat makes customers resend.
+- **Real health and metrics.** `/health` returned `healthy` unconditionally — it
+  stayed green with the database unreachable, so a load balancer kept sending
+  traffic to an instance that could not answer. `/health?deep=true` now checks
+  the database, and `/metrics` exposes latency percentiles, cache hit rates and
+  pool occupancy.
+- **Graceful shutdown.** Queued log and usage writes finish instead of being
+  killed mid-write.
+
+---
+
+## Removed
+
+Dead code that misled:
+
+- `config/performance.py` — nothing read it. Its values now live in
+  `config/settings.py`, which is actually used.
+- `services/chat.py` — 94 lines, entirely commented out, a stale copy of
+  `routes/chat.py`.
+- `agent/multi_agent.py` — superseded; nothing imported it.
+- `requirements_optimized.txt` — pinned LangChain 0.1.0 against an installed
+  1.3.18. Installing it would have broken the app.
+- `log_query_async` in `repositories/tools.py` — unused, and referenced
+  `asyncio` after that import was removed, so calling it would have raised
+  `NameError`.
+
+---
+
+## Before you deploy
+
+**1. Apply the migrations.** All are safe to re-run.
+
 ```bash
-# Add to your .env file
-RAG_ENABLED=false                    # Disable RAG for faster responses
-LANGUAGE_DETECTION_ENABLED=false    # Disable language detection
-ENABLE_DEBUG_LOGGING=false          # Disable verbose logging
-MAX_CHAT_HISTORY=5                  # Reduce chat history
+cd chatbot
+python scripts/apply_migrations.py            # uses DATABASE_URL from .env
+python scripts/apply_migrations.py --dry-run  # see what it would do first
 ```
 
-## 🎯 Priority 6: Quick Wins
+The runner exists because `psql` is usually not on PATH on a Windows dev machine,
+and because `002` uses `CREATE INDEX CONCURRENTLY`, which Postgres refuses inside
+a transaction block — sending a whole file through a driver as one string counts
+as one. The runner splits each file into statements (handling dollar-quoted
+`DO $$ ... $$` blocks) and runs them in autocommit, which is what `psql -f` does.
 
-### 1. Remove Unnecessary Operations:
-```python
-# In process_whatsapp_message - Comment out or remove:
-# whatsapp_service.mark_message_as_read(message_id, whatsapp_number_id)  # Do this in background
+With `psql` available, this works too — but not with `-1` / `--single-transaction`:
 
-# Simplify image URL extraction:
-def get_img_urls_fast(self) -> List[str]:
-    """Faster image URL extraction"""
-    urls = []
-    for result in self.last_tool_results:
-        if result.get("tool_name") == "get_product_info":
-            urls.extend(re.findall(r'https?://\S+', str(result['result'])))
-    return urls[:3]  # Limit to 3 images max
+```bash
+psql "$DATABASE_URL" -f database/migrations/002_performance_indexes.sql
+psql "$DATABASE_URL" -f database/migrations/003_conversation_messages.sql
+psql "$DATABASE_URL" -f database/migrations/004_token_usage_and_templates.sql
 ```
 
-### 2. Disable Non-Essential Features:
-```python
-# In agent.py process_message method:
-# Comment out or disable:
-# detected_language = detect_language(message)  # Skip language detection
-# examples = get_cached_rag_examples(...)       # Skip RAG examples
+Without `003`, history will not persist (set `PERSIST_CONVERSATIONS=false` to
+silence the warnings). Without `004`, `/usage/history` returns 503 and templates
+fall back to the built-in defaults — the bot still works.
+
+**`005` is optional but worth reading.** `chat_logs.customer_id` has a foreign
+key to `customers.id`, and a customer only gets a `customers` row once they hand
+over their details at their first order. So every turn before that point fails
+its analytics INSERT with a foreign-key violation — the bot replies normally
+(the write is on a background thread) but the row is lost. That is most of the
+funnel: every browse, every price question, every abandoned conversation. `005`
+drops that one constraint. It is optional because Prisma may re-add the FK on the
+Admin Portal's next `migrate`, so mirror it in `prisma/schema.prisma` if you
+apply it.
+
+**2. The database now lives on port 6432.** `database/docker-compose.yml`
+publishes 6432 instead of 5432, and `DATABASE_URL` was updated to match. A native
+PostgreSQL install on this machine already holds 5432 and wins the bind, so the
+container's mapping looked correct in `docker ps` while every client silently
+reached that other server - which has no `assistant` database. The container
+still listens on 5432 internally; only the host port changed.
+
+The same compose file now also applies migrations 001-004 automatically on a
+first-time start, and mounts `init.docker.sql` rather than `init.sql`. `init.sql`
+is a full `pg_dumpall` cluster dump beginning with `CREATE ROLE postgres` and
+`CREATE DATABASE assistant`; both already exist by the time it runs, and because
+the entrypoint uses `ON_ERROR_STOP=1` the container exits during init. That path
+had never worked - verified by starting a throwaway container on an empty volume,
+which failed on `role "postgres" already exists` before the fix and came up with
+the full schema, 23 indexes and all migrations after it.
+
+If anything else points at the old port - the Admin Portal backend's
+`DATABASE_URL`, a saved connection in a database GUI - update it to 6432 too.
+
+**3. Review the new settings.** `.env.example` documents all of them. Defaults
+preserve existing behaviour: `COST_STRATEGY=fixed` uses `CHAT_MODEL` exactly as
+before, and `VERIFY_WEBHOOK_SIGNATURE=false` keeps the webhook working until you
+set the app secret.
+
+**4. Keep one worker.** Sessions, caches, rate limits and webhook deduplication
+are per-process. With more than one uvicorn worker, a customer's session and
+their duplicate message can land on different processes, which would reinstate
+the duplicate-order bug. The app is already concurrent within a process via its
+worker threads. Moving that state to Redis is the change that would make
+multi-worker safe — the cache layer in `utils/cache.py` is deliberately shaped
+like the subset of operations Redis offers, so a backend can be dropped in
+without touching call sites.
+
+**5. Run the tests.**
+
+```bash
+pip install -r requirements-dev.txt
+pytest
 ```
-
-## 📊 Expected Performance Improvements:
-
-| Optimization | Time Saved | Difficulty |
-|-------------|------------|------------|
-| Async Database Logging | 1-2 seconds | Easy |
-| Background WhatsApp API calls | 0.5-1 second | Medium |
-| Disable RAG/Language Detection | 0.3-0.5 seconds | Easy |
-| Reduce LLM tokens/timeout | 0.2-0.5 seconds | Easy |
-| **Total Expected Reduction** | **2-4 seconds** | **Mixed** |
-
-## 🚀 Implementation Priority:
-
-1. **Start with async database logging** (biggest impact)
-2. **Disable RAG and language detection** (quick wins)
-3. **Reduce LLM parameters** (immediate)
-4. **Optimize WhatsApp API calls** (medium effort)
-5. **Template processing optimization** (polish)
-
-These optimizations should reduce your 3-second delay to under 1 second in most cases.

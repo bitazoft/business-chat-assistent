@@ -1,0 +1,10 @@
+# Optional: vector search / RAG.
+#
+#     pip install -r requirements-ml.txt
+#
+# Only needed when RAG_ENABLED=true. These pull in torch (~2.5GB), which is why
+# they are split out of requirements.txt - vector_store.py imports them lazily,
+# so the app starts and serves normally without them.
+
+sentence-transformers~=6.0.1
+faiss-cpu~=1.15.0

@@ -1,53 +1,43 @@
-# To Install run pip install -r requirements.txt
+# To install:  pip install -r requirements.txt
+#
+# Versions are pinned with ~= (compatible release) so a patch fix is picked up
+# but a breaking major/minor is not. Previously nothing was pinned at all, so
+# two installs a week apart could get different major versions of LangChain -
+# which is exactly the kind of thing that turns into a mystery outage.
+#
+# Vector search (sentence-transformers, faiss-cpu) is optional: it pulls in
+# torch, ~2.5GB. The app runs without it as long as RAG_ENABLED=false.
+# See requirements-ml.txt.
 
+# ---- Web framework ----
+fastapi~=0.141.1
+uvicorn[standard]~=0.52.4
+pydantic~=2.13.5
+typing_extensions~=4.16.0
 
-# FastAPI for building APIs
-fastapi
+# ---- LLM ----
+langchain~=1.3.18
+langchain-core~=1.6.1
+langchain-classic~=1.0.8
+langchain-openai~=1.6.0
+langchain-community~=0.4.2
+tiktoken~=0.14.0
 
-# ASGI server for FastAPI
-uvicorn[standard]
+# Only needed when AI_PROVIDER=DEEPSEEK; agent.py imports it lazily.
+# langchain-deepseek~=1.0.0
 
-# Pydantic for data validation
-pydantic
+# ---- Database ----
+sqlalchemy~=2.0.52
+psycopg2-binary~=2.9.12
 
-# Typing support (included in Python 3.8+, typing_extensions for backward compatibility)
-typing_extensions
+# ---- HTTP / utilities ----
+requests~=2.34.2
+python-dotenv~=1.2.3
+numpy~=2.5.2
 
-# LangChain and OpenAI / DeepSeek integrations
-langchain
-langchain-openai
-langchain-deepseek
-langchain-community
+# ---- AWS S3 (only used when STORAGE_BACKEND=s3) ----
+boto3~=1.43.83
+botocore~=1.43.83
 
-# Token encoding (used in LangChain/OpenAI)
-tiktoken
-
-# PostgreSQL support
-psycopg2-binary
-
-# SQLAlchemy ORM
-sqlalchemy
-
-# NumPy for embedding/vector ops
-numpy
-
-# HTTP requests
-requests
-
-# .env management
-python-dotenv
-
-# Optional: FAISS or Chroma for vector database (only if used)
-faiss-cpu
-# chromadb
-
-pandas
-
-# Sentence Transformers for embeddings
-sentence-transformers
-
-langchain-community
-
-# AWS S3 support
-boto3
-botocore
+# ---- Data tooling (used by data/process_bitext_dataset.py) ----
+pandas~=3.0.5

@@ -4,7 +4,7 @@ A specialized agent for identifying Sinhala, Singlish, and English languages
 """
 
 from langchain_deepseek.chat_models import ChatDeepSeek
-from langchain.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from pydantic import BaseModel, Field
 from typing import Dict, List, Optional, Tuple
@@ -12,7 +12,7 @@ import re
 import os
 from functools import lru_cache
 from utils.logger import get_logger
-from langchain.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 
 # Get logger for this module
 logger = get_logger(__name__)
@@ -37,6 +37,7 @@ if os.getenv("AI_PROVIDER") == "GPT":
     language_detection_llm = ChatOpenAI(
         model_name=os.getenv("CHAT_MODEL", "gpt-3.5-turbo"),
         openai_api_key=API_KEY,
+        openai_api_base=API_BASE,
         temperature=0.0,
         max_tokens=50,
         timeout=60,

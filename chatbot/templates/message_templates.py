@@ -20,15 +20,17 @@ class MessageTemplates:
                 description = parts.get('description', 'No description available')
                 price = parts.get('price', 'N/A')
                 stock = parts.get('stock', 'N/A')
-                images = parts.get('images', 'No images available')
             else:
-                # Handle dictionary format
-                product_id = product_data.get('id', 'N/A')
-                name = product_data.get('name', 'Unknown Product')
+                # Handle dictionary format.
+                # get_product_info returns 'product_id' and 'product'; this only
+                # looked for 'id' and 'name', so every product was shown to the
+                # customer as "Product ID: N/A / Name: Unknown Product". Both
+                # spellings are accepted now.
+                product_id = product_data.get('product_id', product_data.get('id', 'N/A'))
+                name = product_data.get('product') or product_data.get('name') or 'Unknown Product'
                 description = product_data.get('description', 'No description available')
                 price = f"Rs.{product_data.get('price', 0)}"
                 stock = product_data.get('stock', 'N/A')
-                images = product_data.get('images', 'No images available')
             
             template = f"""
 🛍️ *PRODUCT DETAILS*

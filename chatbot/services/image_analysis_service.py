@@ -1,270 +1,306 @@
-# """
-# DeepSeek Vision Image Analysis Service
-# Handles image analysis using DeepSeek's vision model
-# """
+"""
+Vision service - lets the assistant actually SEE customer images.
 
-# import os
-# import base64
-# import requests
-# from typing import Dict, Any, Optional, List
-# from utils.logger import get_logger
-# import json
-# import torch
-# from transformers import AutoModelForCausalLM
+Uses the same OpenAI-compatible endpoint as the chat LLM (OpenRouter by default),
+so no extra provider or API key is needed. The model is set by VISION_MODEL and
+must be vision-capable (e.g. openai/gpt-4o-mini).
 
-# from deepseek_vl.models import VLChatProcessor, MultiModalityCausalLM
-# from deepseek_vl.utils.io import load_pil_images
+Three jobs:
+  1. classify_image()          - what kind of image is this? (receipt / product / other)
+  2. extract_receipt_details() - read amount, reference, bank, date off a payment receipt
+  3. describe_product_image()  - turn a product photo into search text
+"""
+import base64
+import json
+import os
+import mimetypes
+from typing import Dict, Any, Optional
 
-# logger = get_logger(__name__)
+import requests
+from dotenv import load_dotenv
 
-# class DeepSeekVisionService:
-#     # """Service for analyzing images using DeepSeek Vision model"""
-    
-#     # def __init__(self):
-#     #     self.api_key = os.getenv("DEEPSEEK_API_KEY")
-#     #     self.base_url = "https://api.deepseek.com/v1/chat/completions"
-#     #     self.model = "deepseek-vl"
-        
-#     #     if not self.api_key:
-#     #         logger.warning("⚠️ DEEPSEEK_API_KEY not found in environment variables")
-    
-#     # def encode_image_to_base64(self, image_path: str) -> str:
-#     #     """
-#     #     Encode image file to base64 string
-        
-#     #     Args:
-#     #         image_path: Path to the image file
-            
-#     #     Returns:
-#     #         Base64 encoded image string
-#     #     """
-#     #     try:
-#     #         with open(image_path, "rb") as image_file:
-#     #             return base64.b64encode(image_file.read()).decode('utf-8')
-#     #     except Exception as e:
-#     #         logger.error(f"❌ Error encoding image to base64: {str(e)}")
-#     #         raise
-    
-#     # def analyze_image(self, image_path: str, prompt: str = None, language: str = "en") -> Dict[str, Any]:
-#     #     """
-#     #     Analyze an image using DeepSeek Vision
-        
-#     #     Args:
-#     #         image_path: Path to the image file
-#     #         prompt: Custom prompt for image analysis (optional)
-#     #         language: Language for the response (en, ar, etc.)
-            
-#     #     Returns:
-#     #         Dictionary containing analysis results
-#     #     """
-#     #     if not self.api_key:
-#     #         return {
-#     #             "success": False,
-#     #             "error": "DeepSeek API key not configured",
-#     #             "analysis": None
-#     #         }
-        
-#     #     if not os.path.exists(image_path):
-#     #         return {
-#     #             "success": False,
-#     #             "error": f"Image file not found: {image_path}",
-#     #             "analysis": None
-#     #         }
-        
-#     #     try:
-#     #         # Encode image to base64
-#     #         base64_image = self.encode_image_to_base64(image_path)
-            
-#     #         # Default prompt based on language
-#     #         if not prompt:
-#     #                 prompt = """Analyze this image carefully. Please describe:
-#     #                 1. What you see in the image
-#     #                 2. Main objects and important details
-#     #                 3. Colors and composition
-#     #                 4. Any text present in the image
-#     #                 5. The context or likely purpose of the image
+from utils.logger import get_logger
 
-#     #                 Be descriptive and detailed in your response."""
-            
-#     #         # Prepare the request payload
-#     #         payload = {
-#     #             "model": self.model,
-#     #             "messages": [
-#     #                 {
-#     #                     "role": "user",
-#     #                     "content": [
-#     #                         {
-#     #                             "type": "text",
-#     #                             "text": prompt
-#     #                         },
-#     #                         {
-#     #                             "type": "image_url",
-#     #                             "image_url": {
-#     #                                 "url": f"data:image/jpeg;base64,{base64_image}"
-#     #                             }
-#     #                         }
-#     #                     ]
-#     #                 }
-#     #             ],
-#     #             "max_tokens": 1000,
-#     #             "temperature": 0.7
-#     #         }
-            
-#     #         headers = {
-#     #             "Authorization": f"Bearer {self.api_key}",
-#     #             "Content-Type": "application/json"
-#     #         }
-            
-#     #         logger.info(f"🔍 Analyzing image with DeepSeek Vision: {image_path}")
-            
-#     #         # Make the API request
-#     #         response = requests.post(
-#     #             self.base_url,
-#     #             headers=headers,
-#     #             json=payload,
-#     #             timeout=60
-#     #         )
-            
-#     #         response.raise_for_status()
-#     #         result = response.json()
-            
-#     #         # Extract the analysis from the response
-#     #         if "choices" in result and len(result["choices"]) > 0:
-#     #             analysis = result["choices"][0]["message"]["content"]
-                
-#     #             logger.info(f"✅ Successfully analyzed image: {image_path}")
-                
-#     #             return {
-#     #                 "success": True,
-#     #                 "analysis": analysis,
-#     #                 "model": self.model,
-#     #                 "image_path": image_path,
-#     #                 "prompt_used": prompt,
-#     #                 "usage": result.get("usage", {})
-#     #             }
-#     #         else:
-#     #             logger.error("❌ No analysis returned from DeepSeek Vision")
-#     #             return {
-#     #                 "success": False,
-#     #                 "error": "No analysis returned from API",
-#     #                 "analysis": None
-#     #             }
-                
-#     #     except requests.exceptions.RequestException as e:
-#     #         logger.error(f"❌ Request error in DeepSeek Vision API: {str(e)}")
-#     #         return {
-#     #             "success": False,
-#     #             "error": f"API request failed: {str(e)}",
-#     #             "analysis": None
-#     #         }
-#     #     except Exception as e:
-#     #         logger.error(f"❌ Error analyzing image with DeepSeek Vision: {str(e)}")
-#     #         return {
-#     #             "success": False,
-#     #             "error": str(e),
-#     #             "analysis": None
-#     #         }
+load_dotenv()
+logger = get_logger(__name__)
 
-#     def __init__(self):
-#         model_path = "deepseek-ai/deepseek-vl-7b-base"
-#         vl_chat_processor: VLChatProcessor = VLChatProcessor.from_pretrained(model_path)
-#         tokenizer = vl_chat_processor.tokenizer
+SUPPORTED_FORMATS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
+MAX_IMAGE_BYTES = 8 * 1024 * 1024  # 8MB - keeps request payloads sane
 
-#         vl_gpt: MultiModalityCausalLM = AutoModelForCausalLM.from_pretrained(model_path, trust_remote_code=True)
-#         vl_gpt = vl_gpt.to(torch.bfloat16).cuda().eval()
 
-#         conversation = [
-#             {
-#                 "role": "User",
-#                 "content": "<image_placeholder>Describe each stage of this image.",
-#                 "images": ["./downloads/whatsapp_image_94713966820_20250901_230730_17511838.jpg"]
-#             },
-#             {
-#                 "role": "Assistant",
-#                 "content": ""
-#             }
-#         ]
+class VisionService:
+    def __init__(self):
+        self.api_key = os.getenv("API_KEY")
+        self.api_base = os.getenv("API_BASE", "https://openrouter.ai/api/v1").rstrip("/")
+        # Falls back to the chat model, which is vision-capable on the default setup.
+        self.model = os.getenv("VISION_MODEL") or os.getenv("CHAT_MODEL", "openai/gpt-4o-mini")
+        self.timeout = int(os.getenv("VISION_TIMEOUT", "60"))
 
-#         # load images and prepare for inputs
-#         pil_images = load_pil_images(conversation)
-#         prepare_inputs = vl_chat_processor(
-#             conversations=conversation,
-#             images=pil_images,
-#             force_batchify=True
-#         ).to(vl_gpt.device)
+    def is_configured(self) -> bool:
+        return bool(self.api_key)
 
-#         # run image encoder to get the image embeddings
-#         inputs_embeds = vl_gpt.prepare_inputs_embeds(**prepare_inputs)
+    def get_supported_formats(self) -> list:
+        return sorted(SUPPORTED_FORMATS)
 
-#         # run the model to get the response
-#         outputs = vl_gpt.language_model.generate(
-#             inputs_embeds=inputs_embeds,
-#             attention_mask=prepare_inputs.attention_mask,
-#             pad_token_id=tokenizer.eos_token_id,
-#             bos_token_id=tokenizer.bos_token_id,
-#             eos_token_id=tokenizer.eos_token_id,
-#             max_new_tokens=512,
-#             do_sample=False,
-#             use_cache=True
-#         )
+    # ------------------------------------------------------------------ helpers
 
-#         answer = tokenizer.decode(outputs[0].cpu().tolist(), skip_special_tokens=True)
-#         logger.info(f"✅ Successfully analyzed image with DeepSeek Vision: {answer}")
-#         print(f"{prepare_inputs['sft_format'][0]}", answer)
-    
-#     def analyze_image_for_business(self, image_path: str, business_context: str = "", language: str = "en") -> Dict[str, Any]:
-#         """
-#         Analyze an image with business context (e.g., product inquiry, complaint, etc.)
-        
-#         Args:
-#             image_path: Path to the image file
-#             business_context: Context about the business/product
-#             language: Language for the response
-            
-#         Returns:
-#             Dictionary containing business-focused analysis
-#         """
-#         if language == "ar":
-#             business_prompt = f"""Analyze this image from a business perspective. {business_context}
+    def _encode_image(self, image_path: str) -> Dict[str, Any]:
+        """Read an image off disk and return a base64 data URI."""
+        if not os.path.exists(image_path):
+            return {"success": False, "error": f"File not found: {image_path}"}
 
-#             Please identify:
-#             1. Type of product or service shown
-#             2. Condition of the product (new, used, damaged, etc.)
-#             3. Any visible problems or defects
-#             4. Image quality and clarity
-#             5. Important recommendations or observations
-#             6. Any important text or numbers in the image
-#             7. Is this a payment confirmation?
+        ext = os.path.splitext(image_path)[1].lower()
+        if ext not in SUPPORTED_FORMATS:
+            return {"success": False, "error": f"Unsupported image format '{ext}'"}
 
-#             Be precise and helpful in your analysis."""
-        
-#         return self.analyze_image(image_path, business_prompt, language)
-    
-#     def extract_text_from_image(self, image_path: str, language: str = "en") -> Dict[str, Any]:
-#         """
-#         Extract text content from an image using DeepSeek Vision
-        
-#         Args:
-#             image_path: Path to the image file
-#             language: Language for instructions
-            
-#         Returns:
-#             Dictionary containing extracted text
-#         """
-#         if language == "ar":
-#             text_prompt = """Extract all text content from this image.
-# Write the text exactly as it appears, maintaining formatting and order.
-# If text is in multiple languages, write each text in its original language."""
-        
-#         return self.analyze_image(image_path, text_prompt, language)
-    
-#     def is_configured(self) -> bool:
-#         """Check if the service is properly configured"""
-#         return bool(self.api_key)
-    
-#     def get_supported_formats(self) -> List[str]:
-#         """Get list of supported image formats"""
-#         return [".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp"]
+        size = os.path.getsize(image_path)
+        if size > MAX_IMAGE_BYTES:
+            return {"success": False, "error": f"Image too large ({size} bytes, max {MAX_IMAGE_BYTES})"}
 
-# # Global instance
-# deepseek_vision_service = DeepSeekVisionService()
+        mime_type = mimetypes.guess_type(image_path)[0] or "image/jpeg"
+        with open(image_path, "rb") as f:
+            encoded = base64.b64encode(f.read()).decode("utf-8")
+
+        return {"success": True, "data_uri": f"data:{mime_type};base64,{encoded}"}
+
+    def _ask_vision(self, image_path: str, prompt: str, max_tokens: int = 700) -> Dict[str, Any]:
+        """Send one image + prompt to the vision model, return raw text."""
+        if not self.is_configured():
+            return {"success": False, "error": "Vision service not configured - API_KEY is missing"}
+
+        encoded = self._encode_image(image_path)
+        if not encoded["success"]:
+            return encoded
+
+        payload = {
+            "model": self.model,
+            "max_tokens": max_tokens,
+            "temperature": 0.0,  # deterministic - we want facts off the image, not creativity
+            "messages": [{
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": prompt},
+                    {"type": "image_url", "image_url": {"url": encoded["data_uri"]}},
+                ],
+            }],
+        }
+
+        try:
+            response = requests.post(
+                f"{self.api_base}/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {self.api_key}",
+                    "Content-Type": "application/json",
+                },
+                json=payload,
+                timeout=self.timeout,
+            )
+            if response.status_code != 200:
+                logger.error(f"Vision API error {response.status_code}: {response.text[:300]}")
+                return {"success": False, "error": f"Vision API returned {response.status_code}"}
+
+            content = response.json()["choices"][0]["message"]["content"]
+            return {"success": True, "analysis": content}
+
+        except requests.Timeout:
+            return {"success": False, "error": f"Vision request timed out after {self.timeout}s"}
+        except Exception as e:
+            logger.error(f"Vision request failed: {str(e)}")
+            return {"success": False, "error": str(e)}
+
+    @staticmethod
+    def _parse_json(text: str) -> Optional[dict]:
+        """Vision models often wrap JSON in prose or ``` fences - dig it out."""
+        if not text:
+            return None
+        cleaned = text.strip()
+        if "```" in cleaned:
+            # take the content of the first fenced block
+            parts = cleaned.split("```")
+            if len(parts) >= 2:
+                cleaned = parts[1]
+                if cleaned.lstrip().lower().startswith("json"):
+                    cleaned = cleaned.lstrip()[4:]
+        start, end = cleaned.find("{"), cleaned.rfind("}")
+        if start == -1 or end == -1 or end < start:
+            return None
+        try:
+            return json.loads(cleaned[start:end + 1])
+        except json.JSONDecodeError:
+            logger.warning(f"Could not parse vision JSON: {cleaned[:200]}")
+            return None
+
+    # ------------------------------------------------------------------- public
+
+    def classify_image(self, image_path: str) -> Dict[str, Any]:
+        """
+        Work out what the customer sent us.
+
+        Returns image_type: 'payment_receipt' | 'product_photo' | 'other'
+        """
+        prompt = (
+            "Look at this image sent by a customer to an online shop and classify it.\n"
+            "Reply with ONLY a JSON object, no other text:\n"
+            "{\n"
+            '  "image_type": "payment_receipt" | "product_photo" | "other",\n'
+            '  "confidence": 0.0-1.0,\n'
+            '  "summary": "one short sentence describing what is in the image"\n'
+            "}\n\n"
+            "Guidance:\n"
+            "- 'payment_receipt': a bank transfer slip, ATM/deposit slip, online banking confirmation, "
+            "mobile wallet transfer screenshot, or any proof of payment.\n"
+            "- 'product_photo': a photo or screenshot of a physical item the customer might want to buy "
+            "or ask about.\n"
+            "- 'other': anything else (selfies, memes, documents, screenshots of chats, blank images)."
+        )
+
+        result = self._ask_vision(image_path, prompt, max_tokens=200)
+        if not result["success"]:
+            return {"success": False, "error": result["error"], "image_type": "unknown"}
+
+        parsed = self._parse_json(result["analysis"])
+        if not parsed:
+            return {
+                "success": False,
+                "error": "Could not understand the vision model response",
+                "image_type": "unknown",
+                "raw": result["analysis"],
+            }
+
+        return {
+            "success": True,
+            "image_type": parsed.get("image_type", "other"),
+            "confidence": parsed.get("confidence", 0.0),
+            "summary": parsed.get("summary", ""),
+        }
+
+    def extract_receipt_details(self, image_path: str) -> Dict[str, Any]:
+        """
+        Read a payment receipt. Returns whether it really is a receipt plus the
+        details needed to check it against an order.
+        """
+        prompt = (
+            "This image should be a proof of payment (bank transfer slip, deposit slip, "
+            "online banking confirmation, or mobile wallet transfer).\n"
+            "Read it carefully and reply with ONLY a JSON object, no other text:\n"
+            "{\n"
+            '  "is_receipt": true | false,\n'
+            '  "amount": number or null,\n'
+            '  "currency": "LKR" | "USD" | other code | null,\n'
+            '  "reference": "transaction/reference number" or null,\n'
+            '  "bank": "bank or service name" or null,\n'
+            '  "date": "YYYY-MM-DD" or null,\n'
+            '  "beneficiary": "who received the money" or null,\n'
+            '  "confidence": 0.0-1.0,\n'
+            '  "issues": ["anything that looks wrong, unreadable, edited, or suspicious"]\n'
+            "}\n\n"
+            "Rules:\n"
+            "- Set is_receipt to false if this is not a proof of payment at all.\n"
+            "- Use null for any field you genuinely cannot read. Never guess a number.\n"
+            "- 'amount' must be the amount transferred, as a plain number without commas or currency symbols.\n"
+            "- Note in 'issues' if the image is blurry, cropped, obviously edited, or the amount is unclear."
+        )
+
+        result = self._ask_vision(image_path, prompt, max_tokens=500)
+        if not result["success"]:
+            return {"success": False, "error": result["error"]}
+
+        parsed = self._parse_json(result["analysis"])
+        if not parsed:
+            return {
+                "success": False,
+                "error": "Could not understand the vision model response",
+                "raw": result["analysis"],
+            }
+
+        # Normalise amount - models sometimes return "1,500.00" despite instructions
+        amount = parsed.get("amount")
+        if isinstance(amount, str):
+            try:
+                amount = float(amount.replace(",", "").strip())
+            except ValueError:
+                amount = None
+
+        return {
+            "success": True,
+            "is_receipt": bool(parsed.get("is_receipt", False)),
+            "amount": amount,
+            "currency": parsed.get("currency"),
+            "reference": parsed.get("reference"),
+            "bank": parsed.get("bank"),
+            "date": parsed.get("date"),
+            "beneficiary": parsed.get("beneficiary"),
+            "confidence": parsed.get("confidence", 0.0),
+            "issues": parsed.get("issues") or [],
+        }
+
+    def describe_product_image(self, image_path: str) -> Dict[str, Any]:
+        """
+        Turn a product photo into search text we can match against the catalogue.
+        """
+        prompt = (
+            "A customer sent this photo asking about a product.\n"
+            "Describe the item so it can be matched against a shop's product catalogue.\n"
+            "Reply with ONLY a JSON object, no other text:\n"
+            "{\n"
+            '  "item_type": "what the item is, e.g. t-shirt, running shoe, ceramic mug",\n'
+            '  "colors": ["main colours"],\n'
+            '  "material": "material if visible" or null,\n'
+            '  "brand": "brand if clearly visible" or null,\n'
+            '  "keywords": ["5-10 words a shop might use to name or describe this item"],\n'
+            '  "description": "one natural sentence describing the item"\n'
+            "}\n\n"
+            "Describe only what you can actually see. Use null or empty lists when unsure."
+        )
+
+        result = self._ask_vision(image_path, prompt, max_tokens=400)
+        if not result["success"]:
+            return {"success": False, "error": result["error"]}
+
+        parsed = self._parse_json(result["analysis"])
+        if not parsed:
+            return {
+                "success": False,
+                "error": "Could not understand the vision model response",
+                "raw": result["analysis"],
+            }
+
+        keywords = parsed.get("keywords") or []
+        colors = parsed.get("colors") or []
+
+        # One flat string for keyword matching against product name/description
+        search_terms = " ".join(
+            str(t) for t in ([parsed.get("item_type")] + colors + keywords + [parsed.get("brand")]) if t
+        )
+
+        return {
+            "success": True,
+            "item_type": parsed.get("item_type"),
+            "colors": colors,
+            "material": parsed.get("material"),
+            "brand": parsed.get("brand"),
+            "keywords": keywords,
+            "description": parsed.get("description", ""),
+            "search_terms": search_terms,
+        }
+
+    def analyze_image(self, image_path: str, prompt: str, language: str = "en") -> Dict[str, Any]:
+        """Free-form image question - used by the manual /analyze-image endpoint."""
+        if language and language != "en":
+            prompt = f"{prompt}\n\nRespond in language code: {language}."
+        return self._ask_vision(image_path, prompt)
+
+    def extract_text_from_image(self, image_path: str, language: str = "en") -> Dict[str, Any]:
+        """Plain OCR - used by the manual /extract-text endpoint."""
+        return self._ask_vision(
+            image_path,
+            "Extract all readable text from this image exactly as it appears. "
+            "Return only the text, no commentary. If there is no text, return an empty response.",
+        )
+
+
+# Singleton used across the app
+vision_service = VisionService()
+
+# Backwards-compatible alias - whatsapp_routes.py referred to this name
+deepseek_vision_service = vision_service

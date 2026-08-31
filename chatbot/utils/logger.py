@@ -1,7 +1,13 @@
 import logging
+import logging.handlers
 import os
 from datetime import datetime
-from typing import Optional
+
+# Cap the log file so a busy day cannot fill the disk. The previous handler was a
+# plain FileHandler with no rotation, and the webhook logged its entire JSON
+# payload at INFO on every message.
+MAX_LOG_BYTES = 50 * 1024 * 1024  # 50 MB per file
+LOG_BACKUP_COUNT = 5
 
 class GlobalLogger:
     """Global logger configuration for the entire application"""
@@ -43,9 +49,11 @@ class GlobalLogger:
             handlers=[
                 # Console handler
                 logging.StreamHandler(),
-                # File handler
-                logging.FileHandler(
+                # Rotating file handler, so the log cannot grow without limit
+                logging.handlers.RotatingFileHandler(
                     os.path.join(log_dir, f"chatbot_{datetime.now().strftime('%Y%m%d')}.log"),
+                    maxBytes=MAX_LOG_BYTES,
+                    backupCount=LOG_BACKUP_COUNT,
                     encoding='utf-8'
                 )
             ]
@@ -70,6 +78,13 @@ class GlobalLogger:
         logging.getLogger("langchain_core").setLevel(logging.WARNING)
         logging.getLogger("langchain_openai").setLevel(logging.WARNING)
         logging.getLogger("langchain_deepseek").setLevel(logging.WARNING)
+        logging.getLogger("langchain_classic").setLevel(logging.WARNING)
+        logging.getLogger("httpcore").setLevel(logging.WARNING)
+        logging.getLogger("botocore").setLevel(logging.WARNING)
+        logging.getLogger("boto3").setLevel(logging.WARNING)
+        logging.getLogger("s3transfer").setLevel(logging.WARNING)
+        # Chatty at INFO on every embedding call
+        logging.getLogger("sentence_transformers").setLevel(logging.WARNING)
         
         # Suppress uvicorn/fastapi file watching debug messages
         logging.getLogger("watchfiles").setLevel(logging.WARNING)
@@ -81,7 +96,9 @@ class GlobalLogger:
         # Set application loggers to appropriate levels
         app_modules = [
             "agent.agent",
-            "services.chat", 
+            "services.session_store",
+            "services.usage_tracker",
+            "services.cost_optimizer",
             "repositories.tools",
             "db.database",
             "vector_store.vector_store"

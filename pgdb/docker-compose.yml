@@ -1,4 +1,12 @@
-version: '3.8'
+# DUPLICATE - prefer database/docker-compose.yml, which is the one kept current
+# (it also mounts the migrations on a first-time setup).
+#
+# This file uses the same container_name (my_postgres) but a separate volume, so
+# the two cannot run at the same time and do not share data. It is kept only so
+# an existing pgdb_pgdata volume stays reachable.
+#
+# Port matches database/: 6432 on the host, because a native PostgreSQL install
+# on this machine already holds 5432 and wins the bind.
 
 services:
   db:
@@ -10,10 +18,16 @@ services:
       POSTGRES_PASSWORD: 12345678
       POSTGRES_DB: assistant
     ports:
-      - "5432:5432"
+      - "6432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d assistant"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
 
 volumes:
   pgdata:

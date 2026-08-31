@@ -8,9 +8,12 @@ from utils.file_validator import validate_file, validate_file_extension
 from db.database import SessionLocal
 from models.schemas import Order
 from sqlalchemy.exc import SQLAlchemyError
+from utils.logger import get_logger
 
 # Load environment variables
 load_dotenv()
+
+logger = get_logger(__name__)
 
 class S3Service:
     def __init__(self):
